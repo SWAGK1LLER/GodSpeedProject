@@ -9,17 +9,16 @@
 #include "EOSGameInstance.generated.h"
 
 
-
-
-USTRUCT(BlueprintType)
-struct FSessionResult
-{
-	GENERATED_USTRUCT_BODY()
-public:
-	FOnlineSessionSearchResult OnlineResult;
-
-	FSessionResult() {}
-};
+//USTRUCT(BlueprintType)
+//struct FSessionResult
+//{
+//	GENERATED_USTRUCT_BODY()
+//public:
+//	FOnlineSessionSearchResult OnlineResult;
+//	FString sessionID;
+//
+//	FSessionResult() {}
+//};
 
 namespace EOnJoinSessionCompleteResult { enum Type; }
 
@@ -89,12 +88,6 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void updateGameSettings(int teamA, int teamB);
 	//----------
-	//Join Game
-	UFUNCTION(BlueprintImplementableEvent)
-	void BringLobbyToGame(FSessionResult Game);
-	UFUNCTION(BlueprintCallable)
-	void JoinFromLobbyGame(FSessionResult Game);
-	void OnJoinFromLobyGameComplete(FName SessionName, EOnJoinSessionCompleteResult::Type Result);
 
 
 

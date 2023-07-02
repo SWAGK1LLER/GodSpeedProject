@@ -265,7 +265,7 @@ void UEOSGameInstance::CreateGame()
 	SessionSettings.bUsesPresence = false;
 	SessionSettings.bUseLobbiesIfAvailable = true;
 	SessionSettings.bUseLobbiesVoiceChatIfAvailable = true;
-	SessionSettings.bAllowInvites = false;
+	SessionSettings.bAllowInvites = true;
 	createCustomSettings(SessionSettings);
 
 	SessionSettings.Set(SEARCH_KEYWORDS, FSearchGameSessionName, EOnlineDataAdvertisementType::ViaOnlineService);
@@ -279,15 +279,88 @@ void UEOSGameInstance::OnCreateGameComplete(FName SessionName, bool bWasSuccess)
 	IOnlineSessionPtr SessionPtr = OnlineSubsystem->GetSessionInterface();
 	if (!SessionPtr)
 		return;
-	
-	FSessionResult forLobby;
-	forLobby.OnlineResult.Session = *SessionPtr->GetNamedSession(FGameSessionName);
-	BringLobbyToGame(forLobby);
-	
-	UE_LOG(LogTemp, Error, TEXT("event bring from game"));
 
+	TArray<FUniqueNetIdRef> Players;
+	for (FConstPlayerControllerIterator Iterator = GetWorld()->GetPlayerControllerIterator(); Iterator; ++Iterator)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("loop"));
+
+		APlayerController* PlayerActor = Iterator->Get();
+		if (PlayerActor == nullptr)
+			continue;
+
+		if (PlayerActor->NetConnection == nullptr)
+			continue;
+
+		IOnlineIdentityPtr Identety = OnlineSubsystem->GetIdentityInterface();
+		if (Identety == nullptr)
+			continue;
+
+
+		FString Left, Right;
+
+		FString str = PlayerActor->NetConnection->PlayerId.GetUniqueNetId().Get()->ToString();
+		str.Split(TEXT("|"), &Left, &Right);
+
+		TSharedPtr<const FUniqueNetId>PlayerId2 = Identety->CreateUniquePlayerId(Right);
+		if (!PlayerId2.IsValid())
+		{
+			UE_LOG(LogTemp, Error, TEXT("invalid id"));
+			continue;
+		}
+
+		Players.Add(PlayerId2->AsShared());
+	}
+
+	SessionPtr->RegisterPlayers(FGameSessionName, Players, true);
+
+	//for (auto It = this->GetWorld()->GetPlayerControllerIterator(); It; ++It)
+	//{
+	//	APlayerController* PlayerController = It->Get();
+
+	//	FUniqueNetIdRepl UniqueNetIdRepl;
+	//	if (PlayerController->IsLocalPlayerController())
+	//	{
+	//		ULocalPlayer* LocalPlayer = PlayerController->GetLocalPlayer();
+	//		if (IsValid(LocalPlayer))
+	//		{
+	//			UniqueNetIdRepl = LocalPlayer->GetPreferredUniqueNetId();
+	//		}
+	//		else
+	//		{
+	//			UNetConnection* RemoteNetConnection = Cast<UNetConnection>(PlayerController->Player);
+	//			check(IsValid(RemoteNetConnection));
+	//			UniqueNetIdRepl = RemoteNetConnection->PlayerId;
+	//		}
+	//	}
+	//	else
+	//	{
+	//		UNetConnection* RemoteNetConnection = Cast<UNetConnection>(PlayerController->Player);
+	//		check(IsValid(RemoteNetConnection));
+	//		UniqueNetIdRepl = RemoteNetConnection->PlayerId;
+	//	}
+
+	//	// Get the unique player ID.
+	//	FUniqueNetId player = FUniqueNetIdString::Create();
+
+	//	TSharedPtr<const FUniqueNetId> UniqueNetId = UniqueNetIdRepl.GetUniqueNetId();
+	//	check(UniqueNetId != nullptr);
+
+	//	UE_LOG(LogTemp, Error, TEXT("id %s"), *(UniqueNetId.Get()->ToString()));
+
+	//	// Register the player with the "MyLocalSessionName" session; this name should match the name you provided in CreateSession.
+	//	if (!SessionPtr->RegisterPlayer(FGameSessionName, *UniqueNetId, false))
+	//	{
+	//		// The player could not be registered; typically you will want to kick the player from the server in this situation.
+	//		UE_LOG(LogTemp, Error, TEXT("cant register player"));
+	//	}
+	//}
+	
+	
+
+	UE_LOG(LogTemp, Error, TEXT("register from game"));
 	SessionPtr->ClearOnCreateSessionCompleteDelegates(this);
-	GetWorld()->ServerTravel(FString("/Game/Maps/GameLobby?listen"), false);
+	//GetWorld()->ServerTravel(FString("/Game/Maps/GameLobby?listen"), false);
 }
 
 void UEOSGameInstance::createCustomSettings(FOnlineSessionSettings& settings)
@@ -442,28 +515,31 @@ void UEOSGameInstance::CancelFindGame()
 
 	SessionPtr->CancelFindSessions();
 }
-//Join session from lobby
-//--------
-void UEOSGameInstance::JoinFromLobbyGame(FSessionResult Game)
-{
-	UE_LOG(LogTemp, Error, TEXT("join from game"));
-
-	IOnlineSessionPtr SessionPtr = OnlineSubsystem->GetSessionInterface();
-	if (!SessionPtr)
-		return;
-
-	SessionPtr->OnJoinSessionCompleteDelegates.AddUObject(this, &UEOSGameInstance::OnJoinFromLobyGameComplete);
-	SessionPtr->JoinSession(0, FGameSessionName, Game.OnlineResult);
-}
-
-void UEOSGameInstance::OnJoinFromLobyGameComplete(FName SessionName, EOnJoinSessionCompleteResult::Type Result)
-{
-	IOnlineSessionPtr SessionPtr = OnlineSubsystem->GetSessionInterface();
-	if (!SessionPtr)
-		return;
-
-	SessionPtr->ClearOnJoinSessionCompleteDelegates(this);
-}
+////Join session from lobby
+////--------
+//void UEOSGameInstance::JoinFromLobbyGame(FSessionResult Game)
+//{
+//	UE_LOG(LogTemp, Error, TEXT("join from game"));
+//	//UE_LOG(LogTemp, Error, TEXT("%s"), *Game.OnlineResult.GetSessionIdStr());
+//	UE_LOG(LogTemp, Error, TEXT("%s"), *Game.sessionID);
+//
+//	IOnlineSessionPtr SessionPtr = OnlineSubsystem->GetSessionInterface();
+//	if (!SessionPtr)
+//		return;
+//
+//	SessionPtr->OnJoinSessionCompleteDelegates.AddUObject(this, &UEOSGameInstance::OnJoinFromLobyGameComplete);
+//	SessionPtr->JoinSession(0, FGameSessionName, Game.OnlineResult);
+//	//SessionPtr->RegisterPlayers
+//}
+//
+//void UEOSGameInstance::OnJoinFromLobyGameComplete(FName SessionName, EOnJoinSessionCompleteResult::Type Result)
+//{
+//	IOnlineSessionPtr SessionPtr = OnlineSubsystem->GetSessionInterface();
+//	if (!SessionPtr)
+//		return;
+//
+//	SessionPtr->ClearOnJoinSessionCompleteDelegates(this);
+//}
 
 
 
