@@ -29,6 +29,14 @@ enum EOutcomePins
 	Success
 };
 
+UENUM(BlueprintType)
+enum class ETeam : uint8
+{
+	A,
+	B,
+	NONE
+};
+
 UCLASS()
 class PROJECTRANSACK_API UEOSGameInstance : public UGameInstance
 {
@@ -83,13 +91,15 @@ public:
 	//Create game
 	void CreateGame();
 	void OnCreateGameComplete(FName SessionName, bool bWasSuccess);
+	void OnRegisterPlayersCompleteDelegates(FName SessionName, const TArray<TSharedRef<const FUniqueNetId>>& Players, bool bWasSuccessful);
 	void createCustomSettings(FOnlineSessionSettings& settings);
 	void createSearchCustomSettings();
 	UFUNCTION(BlueprintCallable)
 	void updateGameSettings(int teamA, int teamB);
 	//----------
-
-
+	UFUNCTION(BlueprintImplementableEvent)
+	void setPlayerTeam(ETeam aTeam);
+	void setTeam(FOnlineSessionSearchResult search);
 
 
 
@@ -118,4 +128,7 @@ public:
 	FOnlineSessionSearchResult PartyToJoin;
 	bool bHasSession = false;
 	int numberSlotneeded = 1;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	ETeam team = ETeam::NONE;
 };

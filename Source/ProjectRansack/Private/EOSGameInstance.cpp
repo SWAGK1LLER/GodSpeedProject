@@ -145,7 +145,7 @@ void UEOSGameInstance::CreateParty(bool pTravel)
 	SessionSettings.bUseLobbiesIfAvailable = true;
 	SessionSettings.bUseLobbiesVoiceChatIfAvailable = true;
 	SessionSettings.bAllowInvites = true;
-
+	
 	SessionSettings.Set(SEARCH_KEYWORDS, FSearchName, EOnlineDataAdvertisementType::ViaOnlineService);
 
 	if (pTravel)
@@ -263,15 +263,19 @@ void UEOSGameInstance::CreateGame()
 	SessionSettings.bAllowJoinInProgress = false;
 	SessionSettings.bAllowJoinViaPresence = false;
 	SessionSettings.bUsesPresence = false;
-	SessionSettings.bUseLobbiesIfAvailable = true;
-	SessionSettings.bUseLobbiesVoiceChatIfAvailable = true;
-	SessionSettings.bAllowInvites = true;
+	SessionSettings.bUseLobbiesIfAvailable = false;
+	SessionSettings.bUseLobbiesVoiceChatIfAvailable = false;
+	SessionSettings.bAllowInvites = false;
+
 	createCustomSettings(SessionSettings);
 
 	SessionSettings.Set(SEARCH_KEYWORDS, FSearchGameSessionName, EOnlineDataAdvertisementType::ViaOnlineService);
 	
 	SessionPtr->OnCreateSessionCompleteDelegates.AddUObject(this, &UEOSGameInstance::OnCreateGameComplete);
 	SessionPtr->CreateSession(0, FGameSessionName, SessionSettings);
+
+	team = ETeam::A;
+	setPlayerTeam(team);
 }
 
 void UEOSGameInstance::OnCreateGameComplete(FName SessionName, bool bWasSuccess)
@@ -281,111 +285,63 @@ void UEOSGameInstance::OnCreateGameComplete(FName SessionName, bool bWasSuccess)
 		return;
 
 	TArray<FUniqueNetIdRef> Players;
-	for (FConstPlayerControllerIterator Iterator = GetWorld()->GetPlayerControllerIterator(); Iterator; ++Iterator)
-	{
-		UE_LOG(LogTemp, Warning, TEXT("loop"));
 
-		APlayerController* PlayerActor = Iterator->Get();
-		if (PlayerActor == nullptr)
-			continue;
+	FOnlineSessionSettings* settings = SessionPtr->GetSessionSettings(FSessionName);
+	TUniqueNetIdMap<FSessionSettings> memberSettings = settings->MemberSettings;
+	for (auto it = memberSettings.begin(); it != memberSettings.end(); ++it)
+		Players.Add(it.Key().Get().AsShared());
 
-		if (PlayerActor->NetConnection == nullptr)
-			continue;
+	SessionPtr->OnRegisterPlayersCompleteDelegates.AddUObject(this, &UEOSGameInstance::OnRegisterPlayersCompleteDelegates);
+	SessionPtr->RegisterPlayers(FGameSessionName, Players, false);
 
-		IOnlineIdentityPtr Identety = OnlineSubsystem->GetIdentityInterface();
-		if (Identety == nullptr)
-			continue;
-
-
-		FString Left, Right;
-
-		FString str = PlayerActor->NetConnection->PlayerId.GetUniqueNetId().Get()->ToString();
-		str.Split(TEXT("|"), &Left, &Right);
-
-		TSharedPtr<const FUniqueNetId>PlayerId2 = Identety->CreateUniquePlayerId(Right);
-		if (!PlayerId2.IsValid())
-		{
-			UE_LOG(LogTemp, Error, TEXT("invalid id"));
-			continue;
-		}
-
-		Players.Add(PlayerId2->AsShared());
-	}
-
-	SessionPtr->RegisterPlayers(FGameSessionName, Players, true);
-
-	//for (auto It = this->GetWorld()->GetPlayerControllerIterator(); It; ++It)
-	//{
-	//	APlayerController* PlayerController = It->Get();
-
-	//	FUniqueNetIdRepl UniqueNetIdRepl;
-	//	if (PlayerController->IsLocalPlayerController())
-	//	{
-	//		ULocalPlayer* LocalPlayer = PlayerController->GetLocalPlayer();
-	//		if (IsValid(LocalPlayer))
-	//		{
-	//			UniqueNetIdRepl = LocalPlayer->GetPreferredUniqueNetId();
-	//		}
-	//		else
-	//		{
-	//			UNetConnection* RemoteNetConnection = Cast<UNetConnection>(PlayerController->Player);
-	//			check(IsValid(RemoteNetConnection));
-	//			UniqueNetIdRepl = RemoteNetConnection->PlayerId;
-	//		}
-	//	}
-	//	else
-	//	{
-	//		UNetConnection* RemoteNetConnection = Cast<UNetConnection>(PlayerController->Player);
-	//		check(IsValid(RemoteNetConnection));
-	//		UniqueNetIdRepl = RemoteNetConnection->PlayerId;
-	//	}
-
-	//	// Get the unique player ID.
-	//	FUniqueNetId player = FUniqueNetIdString::Create();
-
-	//	TSharedPtr<const FUniqueNetId> UniqueNetId = UniqueNetIdRepl.GetUniqueNetId();
-	//	check(UniqueNetId != nullptr);
-
-	//	UE_LOG(LogTemp, Error, TEXT("id %s"), *(UniqueNetId.Get()->ToString()));
-
-	//	// Register the player with the "MyLocalSessionName" session; this name should match the name you provided in CreateSession.
-	//	if (!SessionPtr->RegisterPlayer(FGameSessionName, *UniqueNetId, false))
-	//	{
-	//		// The player could not be registered; typically you will want to kick the player from the server in this situation.
-	//		UE_LOG(LogTemp, Error, TEXT("cant register player"));
-	//	}
-	//}
-	
-	
-
-	UE_LOG(LogTemp, Error, TEXT("register from game"));
 	SessionPtr->ClearOnCreateSessionCompleteDelegates(this);
-	//GetWorld()->ServerTravel(FString("/Game/Maps/GameLobby?listen"), false);
+	GetWorld()->ServerTravel(FString("/Game/Maps/GameLobby?listen"), false);
+}
+
+void UEOSGameInstance::OnRegisterPlayersCompleteDelegates(FName SessionName, const TArray<TSharedRef<const FUniqueNetId>>& Players, bool bWasSuccessful)
+{
+	IOnlineSessionPtr SessionPtr = OnlineSubsystem->GetSessionInterface();
+	if (!SessionPtr)
+		return;
+
+	SessionPtr->ClearOnRegisterPlayersCompleteDelegates(this);
 }
 
 void UEOSGameInstance::createCustomSettings(FOnlineSessionSettings& settings)
 {
-	settings.Set(FName("TeamOf3"), true, EOnlineDataAdvertisementType::ViaOnlineService);
-	settings.Set(FName("TeamOf2"), true, EOnlineDataAdvertisementType::ViaOnlineService);
-	settings.Set(FName("NoTeam"), true, EOnlineDataAdvertisementType::ViaOnlineService);
+	settings.Set(FName("TeamOf3A"), true, EOnlineDataAdvertisementType::ViaOnlineService);
+	settings.Set(FName("TeamOf2A"), true, EOnlineDataAdvertisementType::ViaOnlineService);
+	settings.Set(FName("NoTeamA"), true, EOnlineDataAdvertisementType::ViaOnlineService);
+
+	settings.Set(FName("TeamOf3B"), true, EOnlineDataAdvertisementType::ViaOnlineService);
+	settings.Set(FName("TeamOf2B"), true, EOnlineDataAdvertisementType::ViaOnlineService);
+	settings.Set(FName("NoTeamB"), true, EOnlineDataAdvertisementType::ViaOnlineService);
 }
 
 void UEOSGameInstance::createSearchCustomSettings()
 {
 	if (numberSlotneeded == 1)
 	{
-		SearchSettings->QuerySettings.Set(FName("TeamOf3"), true, EOnlineComparisonOp::Equals);
-		SearchSettings->QuerySettings.Set(FName("TeamOf2"), true, EOnlineComparisonOp::Equals);
-		SearchSettings->QuerySettings.Set(FName("NoTeam"), true, EOnlineComparisonOp::Equals);
+		SearchSettings->QuerySettings.Set(FName("TeamOf3A"), true, EOnlineComparisonOp::Equals);
+		SearchSettings->QuerySettings.Set(FName("TeamOf2A"), true, EOnlineComparisonOp::Equals);
+		SearchSettings->QuerySettings.Set(FName("NoTeamA"), true, EOnlineComparisonOp::Equals);
+
+		SearchSettings->QuerySettings.Set(FName("TeamOf3B"), true, EOnlineComparisonOp::Equals);
+		SearchSettings->QuerySettings.Set(FName("TeamOf2B"), true, EOnlineComparisonOp::Equals);
+		SearchSettings->QuerySettings.Set(FName("NoTeamB"), true, EOnlineComparisonOp::Equals);
 	}
 	else if (numberSlotneeded == 2)
 	{
-		SearchSettings->QuerySettings.Set(FName("TeamOf3"), true, EOnlineComparisonOp::Equals);
-		SearchSettings->QuerySettings.Set(FName("TeamOf2"), true, EOnlineComparisonOp::Equals);
+		SearchSettings->QuerySettings.Set(FName("TeamOf3A"), true, EOnlineComparisonOp::Equals);
+		SearchSettings->QuerySettings.Set(FName("TeamOf2A"), true, EOnlineComparisonOp::Equals);
+
+		SearchSettings->QuerySettings.Set(FName("TeamOf3B"), true, EOnlineComparisonOp::Equals);
+		SearchSettings->QuerySettings.Set(FName("TeamOf2B"), true, EOnlineComparisonOp::Equals);
 	}
 	else if (numberSlotneeded == 3)
 	{
-		SearchSettings->QuerySettings.Set(FName("TeamOf3"), true, EOnlineComparisonOp::Equals);
+		SearchSettings->QuerySettings.Set(FName("TeamOf3A"), true, EOnlineComparisonOp::Equals);
+		SearchSettings->QuerySettings.Set(FName("TeamOf3B"), true, EOnlineComparisonOp::Equals);
 	}
 }
 
@@ -399,41 +355,55 @@ void UEOSGameInstance::updateGameSettings(int teamA, int teamB)
 	SessionSettings.bAllowJoinInProgress = false;
 	SessionSettings.bAllowJoinViaPresence = false;
 	SessionSettings.bUsesPresence = false;
-	SessionSettings.bUseLobbiesIfAvailable = true;
-	SessionSettings.bUseLobbiesVoiceChatIfAvailable = true;
+	SessionSettings.bUseLobbiesIfAvailable = false;
+	SessionSettings.bUseLobbiesVoiceChatIfAvailable = false;
 	SessionSettings.bAllowInvites = false;
+
+	SessionSettings.Set(FName("TeamOf3A"), false, EOnlineDataAdvertisementType::ViaOnlineService);
+	SessionSettings.Set(FName("TeamOf2A"), false, EOnlineDataAdvertisementType::ViaOnlineService);
+	SessionSettings.Set(FName("NoTeamA"), false, EOnlineDataAdvertisementType::ViaOnlineService);
+
+	SessionSettings.Set(FName("TeamOf3B"), false, EOnlineDataAdvertisementType::ViaOnlineService);
+	SessionSettings.Set(FName("TeamOf2B"), false, EOnlineDataAdvertisementType::ViaOnlineService);
+	SessionSettings.Set(FName("NoTeamB"), false, EOnlineDataAdvertisementType::ViaOnlineService);
 
 	if (teamA == 0)
 	{
-		SessionSettings.Set(FName("TeamOf3"), true, EOnlineDataAdvertisementType::ViaOnlineService);
-		SessionSettings.Set(FName("TeamOf2"), true, EOnlineDataAdvertisementType::ViaOnlineService);
-		SessionSettings.Set(FName("NoTeam"), true, EOnlineDataAdvertisementType::ViaOnlineService);
+		SessionSettings.Set(FName("TeamOf3A"), true, EOnlineDataAdvertisementType::ViaOnlineService);
+		SessionSettings.Set(FName("TeamOf2A"), true, EOnlineDataAdvertisementType::ViaOnlineService);
+		SessionSettings.Set(FName("NoTeamA"), true, EOnlineDataAdvertisementType::ViaOnlineService);
 	}
 	else if (teamA == 1)
 	{
-		SessionSettings.Set(FName("TeamOf2"), true, EOnlineDataAdvertisementType::ViaOnlineService);
-		SessionSettings.Set(FName("NoTeam"), true, EOnlineDataAdvertisementType::ViaOnlineService);
+		SessionSettings.Set(FName("TeamOf2A"), true, EOnlineDataAdvertisementType::ViaOnlineService);
+		SessionSettings.Set(FName("NoTeamA"), true, EOnlineDataAdvertisementType::ViaOnlineService);
 	}
 	else if (teamA == 2)
 	{
-		SessionSettings.Set(FName("NoTeam"), true, EOnlineDataAdvertisementType::ViaOnlineService);
+		SessionSettings.Set(FName("NoTeamA"), true, EOnlineDataAdvertisementType::ViaOnlineService);
 	}
 	//---------------
 	if (teamB == 0)
 	{
-		SessionSettings.Set(FName("TeamOf3"), true, EOnlineDataAdvertisementType::ViaOnlineService);
-		SessionSettings.Set(FName("TeamOf2"), true, EOnlineDataAdvertisementType::ViaOnlineService);
-		SessionSettings.Set(FName("NoTeam"), true, EOnlineDataAdvertisementType::ViaOnlineService);
+		SessionSettings.Set(FName("TeamOf3B"), true, EOnlineDataAdvertisementType::ViaOnlineService);
+		SessionSettings.Set(FName("TeamOf2B"), true, EOnlineDataAdvertisementType::ViaOnlineService);
+		SessionSettings.Set(FName("NoTeamB"), true, EOnlineDataAdvertisementType::ViaOnlineService);
 	}
 	else if (teamB == 1)
 	{
-		SessionSettings.Set(FName("TeamOf2"), true, EOnlineDataAdvertisementType::ViaOnlineService);
-		SessionSettings.Set(FName("NoTeam"), true, EOnlineDataAdvertisementType::ViaOnlineService);
+		SessionSettings.Set(FName("TeamOf2B"), true, EOnlineDataAdvertisementType::ViaOnlineService);
+		SessionSettings.Set(FName("NoTeamB"), true, EOnlineDataAdvertisementType::ViaOnlineService);
 	}
 	else if (teamB == 2)
 	{
-		SessionSettings.Set(FName("NoTeam"), true, EOnlineDataAdvertisementType::ViaOnlineService);
+		SessionSettings.Set(FName("NoTeamB"), true, EOnlineDataAdvertisementType::ViaOnlineService);
 	}
+
+	IOnlineSessionPtr SessionPtr = OnlineSubsystem->GetSessionInterface();
+	if (!SessionPtr)
+		return;
+
+	SessionPtr->UpdateSession(FGameSessionName, SessionSettings);
 }
 
 void UEOSGameInstance::FindGameSession(int pNumberOfSlotneeded)
@@ -473,14 +443,9 @@ void UEOSGameInstance::OnFindGameSessionComplete(bool bWasSucess)
 		return;
 	}
 
-	/*for (int i = 0; i < SearchSettings->SearchResults.Num(); i++)
-	{
-		FOnlineSessionSearchResult& session = SearchSettings->SearchResults[i];
-		if (session.Session.NumOpenPublicConnections >= numberSlotneeded)
-		{
-
-		}
-	}*/
+	//Get team
+	setTeam(SearchSettings->SearchResults[0]);
+	setPlayerTeam(team);
 
 	SessionPtr->OnJoinSessionCompleteDelegates.AddUObject(this, &UEOSGameInstance::OnJoinGameComplete);
 	SessionPtr->JoinSession(0, FGameSessionName, SearchSettings->SearchResults[0]);
@@ -494,17 +459,31 @@ void UEOSGameInstance::OnJoinGameComplete(FName SessionName, EOnJoinSessionCompl
 
 	SessionPtr->ClearOnJoinSessionCompleteDelegates(this);
 
+	//Connect sub player
+	TArray<FUniqueNetIdRef> Players;
+
+	FOnlineSessionSettings* settings = SessionPtr->GetSessionSettings(FSessionName);
+	TUniqueNetIdMap<FSessionSettings> memberSettings = settings->MemberSettings;
+	for (auto it = memberSettings.begin(); it != memberSettings.end(); ++it)
+		Players.Add(it.Key().Get().AsShared());
+
+	SessionPtr->OnRegisterPlayersCompleteDelegates.AddUObject(this, &UEOSGameInstance::OnRegisterPlayersCompleteDelegates);
+	SessionPtr->RegisterPlayers(FGameSessionName, Players, false);
+	//
+
 	FString ConnectionInfo = FString();
 	SessionPtr->GetResolvedConnectString(SessionName, ConnectionInfo);
-
 	if (ConnectionInfo.IsEmpty())
 		return;
 
-	APlayerController* pc = UGameplayStatics::GetPlayerController(GetWorld(), 0);
-	if (!pc)
-		return;
+	for (FConstPlayerControllerIterator Iterator = GetWorld()->GetPlayerControllerIterator(); Iterator; ++Iterator)
+	{
+		APlayerController* Controller = Cast<APlayerController>(Iterator->Get());
+		if (Controller == nullptr)
+			continue;
 
-	//pc->ClientTravel(ConnectionInfo, ETravelType::TRAVEL_Absolute);
+		Controller->ClientTravel(ConnectionInfo, ETravelType::TRAVEL_Absolute);
+	}
 }
 
 void UEOSGameInstance::CancelFindGame()
@@ -515,31 +494,33 @@ void UEOSGameInstance::CancelFindGame()
 
 	SessionPtr->CancelFindSessions();
 }
-////Join session from lobby
-////--------
-//void UEOSGameInstance::JoinFromLobbyGame(FSessionResult Game)
-//{
-//	UE_LOG(LogTemp, Error, TEXT("join from game"));
-//	//UE_LOG(LogTemp, Error, TEXT("%s"), *Game.OnlineResult.GetSessionIdStr());
-//	UE_LOG(LogTemp, Error, TEXT("%s"), *Game.sessionID);
-//
-//	IOnlineSessionPtr SessionPtr = OnlineSubsystem->GetSessionInterface();
-//	if (!SessionPtr)
-//		return;
-//
-//	SessionPtr->OnJoinSessionCompleteDelegates.AddUObject(this, &UEOSGameInstance::OnJoinFromLobyGameComplete);
-//	SessionPtr->JoinSession(0, FGameSessionName, Game.OnlineResult);
-//	//SessionPtr->RegisterPlayers
-//}
-//
-//void UEOSGameInstance::OnJoinFromLobyGameComplete(FName SessionName, EOnJoinSessionCompleteResult::Type Result)
-//{
-//	IOnlineSessionPtr SessionPtr = OnlineSubsystem->GetSessionInterface();
-//	if (!SessionPtr)
-//		return;
-//
-//	SessionPtr->ClearOnJoinSessionCompleteDelegates(this);
-//}
+
+void UEOSGameInstance::setTeam(FOnlineSessionSearchResult search)
+{
+	FOnlineSessionSettings SessionSettings = search.Session.SessionSettings;
+
+	bool value;
+	if (numberSlotneeded == 1)
+	{
+		SessionSettings.Get("NoTeamA", value);
+		team = value? ETeam::A : ETeam::B;
+	}
+	else if (numberSlotneeded == 2)
+	{
+		SessionSettings.Get("TeamOf2A", value);
+		team = value ? ETeam::A : ETeam::B;
+	}
+	else if (numberSlotneeded == 3)
+	{
+		SessionSettings.Get("TeamOf3A", value);
+		team = value ? ETeam::A : ETeam::B;
+	}
+}
+
+
+
+
+
 
 
 
