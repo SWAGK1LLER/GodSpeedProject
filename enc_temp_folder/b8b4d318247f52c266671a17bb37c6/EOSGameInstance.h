@@ -121,5 +121,5 @@ public:
 	int numberSlotneeded = 1;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	ETeam team = ETeam::A;
+	ETeam team = ETeam::NONE;
 };
