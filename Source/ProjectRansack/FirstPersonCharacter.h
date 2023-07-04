@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
+#include "Player.h"
 #include "InputActionValue.h"
 #include "FirstPersonCharacter.generated.h"
 
@@ -15,7 +16,7 @@ class UAnimMontage;
 class USoundBase;
 
 UCLASS(config=Game)
-class AFirstPersonCharacter : public ACharacter
+class AFirstPersonCharacter : public APlayer
 {
 	GENERATED_BODY()
 

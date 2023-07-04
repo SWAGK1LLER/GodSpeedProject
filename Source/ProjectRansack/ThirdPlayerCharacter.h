@@ -4,12 +4,13 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
+#include "Player.h"
 #include "InputActionValue.h"
 #include "ThirdPlayerCharacter.generated.h"
 
 
 UCLASS(config=Game)
-class AThirdPlayerCharacter : public ACharacter
+class AThirdPlayerCharacter : public APlayer
 {
 	GENERATED_BODY()
 
