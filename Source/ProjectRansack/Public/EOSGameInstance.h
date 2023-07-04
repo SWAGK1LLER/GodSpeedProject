@@ -79,7 +79,9 @@ public:
 	//Find game
 	UFUNCTION(BlueprintCallable)
 	void FindGameSession(int pNumberOfSlotneeded);
-	void OnFindGameSessionComplete(bool bWasSucess);
+	void FindGameSessionB(int pNumberOfSlotneeded);
+	void OnFindGameSessionCompleteA(bool bWasSucess);
+	void OnFindGameSessionCompleteB(bool bWasSucess);
 	UFUNCTION(BlueprintCallable)
 	void CancelFindGame();
 	UFUNCTION(BlueprintImplementableEvent)
@@ -93,31 +95,20 @@ public:
 	void OnCreateGameComplete(FName SessionName, bool bWasSuccess);
 	void OnRegisterPlayersCompleteDelegates(FName SessionName, const TArray<TSharedRef<const FUniqueNetId>>& Players, bool bWasSuccessful);
 	void createCustomSettings(FOnlineSessionSettings& settings);
-	void createSearchCustomSettings();
+	void createSearchCustomSettingsA();
+	void createSearchCustomSettingsB();
 	UFUNCTION(BlueprintCallable)
 	void updateGameSettings(int teamA, int teamB);
-	//----------
 	UFUNCTION(BlueprintImplementableEvent)
 	void setPlayerTeam(ETeam aTeam);
 	void setTeam(FOnlineSessionSearchResult search);
-
-
-
-
-
-
-
-
-
-
 	UFUNCTION(BlueprintCallable)
-	void DeleteSession();
-	void OnDeleteSessionComplete(FName SessionName, bool bWasSuccess);
+	void registerPlayerToGameSession(class APlayerController* InPlayerController);
+	//------------
+	//start Game
 	UFUNCTION(BlueprintCallable)
-	void FindSession();
-	
-	void OnFindSessionComplete(bool bWasSucess);
-	void OnJoinSessionComplete(FName SessionName, EOnJoinSessionCompleteResult::Type Result);
+	void StartGame();
+
 
 
 public:
