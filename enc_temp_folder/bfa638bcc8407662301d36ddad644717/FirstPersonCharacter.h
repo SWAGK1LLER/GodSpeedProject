@@ -5,7 +5,6 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
 #include "InputActionValue.h"
-#include "PlayerCharacter.h"
 #include "FirstPersonCharacter.generated.h"
 
 class UInputComponent;
@@ -15,8 +14,8 @@ class UCameraComponent;
 class UAnimMontage;
 class USoundBase;
 
-UCLASS()
-class PROJECTRANSACK_API AFirstPersonCharacter : public APlayerCharacter
+UCLASS(config=Game)
+class AFirstPersonCharacter : public ACharacter
 {
 	GENERATED_BODY()
 
