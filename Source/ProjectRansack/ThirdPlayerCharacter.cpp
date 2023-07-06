@@ -9,6 +9,7 @@
 #include "GameFramework/SpringArmComponent.h"
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
+#include "Item.h"
 
 
 //////////////////////////////////////////////////////////////////////////
@@ -124,6 +125,12 @@ void AThirdPlayerCharacter::Look(const FInputActionValue& Value)
 	}
 }
 
+bool AThirdPlayerCharacter::ValidateSpaceItem(AItem& pItem)
+{
+	return inventory.ValidateSpace(pItem);
+}
 
-
-
+void AThirdPlayerCharacter::AddItem(AItem& pItem)
+{
+	inventory.AddItem(pItem);
+}

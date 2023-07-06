@@ -6,6 +6,7 @@
 #include "GameFramework/Character.h"
 #include "PlayerCharacter.h"
 #include "InputActionValue.h"
+#include "Inventory.h"
 #include "ThirdPlayerCharacter.generated.h"
 
 
@@ -14,6 +15,7 @@ class PROJECTRANSACK_API AThirdPlayerCharacter : public APlayerCharacter
 {
 	GENERATED_BODY()
 
+public:
 	/** Camera boom positioning the camera behind the character */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
 	class USpringArmComponent* CameraBoom;
@@ -38,11 +40,10 @@ class PROJECTRANSACK_API AThirdPlayerCharacter : public APlayerCharacter
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
 	class UInputAction* LookAction;
 
-public:
+	Inventory inventory;
+
 	AThirdPlayerCharacter();
 	
-
-protected:
 
 	/** Called for movement input */
 	void Move(const FInputActionValue& Value);
@@ -51,14 +52,16 @@ protected:
 	void Look(const FInputActionValue& Value);
 			
 
-protected:
 	// APawn interface
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 	
 	// To add mapping context
 	virtual void BeginPlay();
 
-public:
+	void AddItem(class AItem& pItem);
+
+	bool ValidateSpaceItem(class AItem& pItem);
+
 	/** Returns CameraBoom subobject **/
 	FORCEINLINE class USpringArmComponent* GetCameraBoom() const { return CameraBoom; }
 	/** Returns FollowCamera subobject **/
