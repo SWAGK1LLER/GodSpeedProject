@@ -2,6 +2,24 @@
 #include "Item.h"
 
 
+FItemLooted::FItemLooted(AItem& pItem, FPosition pPos) : item(&pItem), position(pPos)
+{
+}
+
+FItemLooted::FItemLooted(AItem& pItem) : item(&pItem)
+{
+}
+
+bool FItemLooted::operator==(const FItemLooted& pOther)
+{
+	return item == pOther.item;
+}
+
+AItem& FItemLooted::GetItem()
+{
+	return *item;
+}
+
 Inventory::Inventory()
 {
 }
@@ -19,8 +37,8 @@ bool Inventory::ValidateSpace(AItem& pItem)
 		for (int j = 0; j < 4; j++)
 		{
 			bool haveSpaceY = true;
-			for (int y = i; y < size.SizeY && y < 2; y++)
-				if (space[y][j] != nullptr)
+			for (int y = i; y < i + size.SizeX; y++)
+				if (space[y][j] != nullptr || y == 2)
 				{
 					haveSpaceY = false;
 					break;
@@ -31,8 +49,8 @@ bool Inventory::ValidateSpace(AItem& pItem)
 
 
 			bool haveSpaceX = true;
-			for (int x = j; x < size.SizeX && x < 4; x++)
-				if (space[i][x] != nullptr)
+			for (int x = j; x < j + size.SizeY; x++)
+				if (space[i][x] != nullptr || x == 4)
 				{
 					haveSpaceX = false;
 					break;
@@ -48,7 +66,7 @@ bool Inventory::ValidateSpace(AItem& pItem)
 	return false;
 }
 
-bool Inventory::ValidateSpace(AItem& pItem, Position& pOut)
+bool Inventory::ValidateSpace(AItem& pItem, FPosition& pOut)
 {
 	FSize size = pItem.SizeNeeded;
 
@@ -57,8 +75,8 @@ bool Inventory::ValidateSpace(AItem& pItem, Position& pOut)
 		for ( int j = 0; j < 4; j++)
 		{
 			bool haveSpaceY = true;
-			for ( int y = i; y < size.SizeY && y < 2; y++)
-				if (space[y][j] != nullptr)
+			for ( int y = i; y < i + size.SizeX; y++)
+				if (space[y][j] != nullptr || y == 2)
 				{
 					haveSpaceY = false;
 					break;
@@ -69,8 +87,8 @@ bool Inventory::ValidateSpace(AItem& pItem, Position& pOut)
 
 
 			bool haveSpaceX = true;
-			for ( int x = j; x < size.SizeX && x < 4; x++)
-				if (space[i][x] != nullptr)
+			for ( int x = j; x < j + size.SizeY; x++)
+				if (space[i][x] != nullptr || x == 4)
 				{
 					haveSpaceX = false;
 					break;
@@ -88,12 +106,12 @@ bool Inventory::ValidateSpace(AItem& pItem, Position& pOut)
 	return false;
 }
 
-void Inventory::AddItem(AItem& pItem, Position& pPos)
+void Inventory::AddItem(AItem& pItem, FPosition& pPos)
 {
 	if (pPos.X == -1 || pPos.Y == -1)
 		return;
 
-	items.Add(&pItem);
+	items.Add(FItemLooted(pItem, pPos));
 
 	for ( int i = pPos.X; i < pPos.X + pItem.SizeNeeded.SizeX; i++)
 		for ( int j = pPos.Y; j < pPos.Y + pItem.SizeNeeded.SizeY; j++)
@@ -102,7 +120,7 @@ void Inventory::AddItem(AItem& pItem, Position& pPos)
 
 void Inventory::AddItem(AItem& pItem)
 {
-	Position pos;
+	FPosition pos;
 	if (!ValidateSpace(pItem, pos))
 		return;
 
@@ -111,7 +129,7 @@ void Inventory::AddItem(AItem& pItem)
 
 void Inventory::RemoveItem(AItem& pItem)
 {
-	if (items.Remove(&pItem) == 0)
+	if (items.Remove(FItemLooted(pItem)) == 0)
 		return;
 
 	for ( int i = 0; i < 2; i++)

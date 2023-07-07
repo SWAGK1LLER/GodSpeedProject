@@ -10,6 +10,8 @@
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
 #include "Item.h"
+#include <GamePlayerController.h>
+#include <Kismet/GameplayStatics.h>
 
 
 //////////////////////////////////////////////////////////////////////////
@@ -133,4 +135,10 @@ bool AThirdPlayerCharacter::ValidateSpaceItem(AItem& pItem)
 void AThirdPlayerCharacter::AddItem(AItem& pItem)
 {
 	inventory.AddItem(pItem);
+
+	AGamePlayerController* PC = Cast<AGamePlayerController>(UGameplayStatics::GetPlayerController(GetWorld(), 0));
+	if (PC == nullptr)
+		return;
+
+	PC->UpdateInventoryUI(inventory.items);
 }
