@@ -1,6 +1,6 @@
 #include "Item.h"
 #include "Components/BoxComponent.h"
-#include "../ThirdPlayerCharacter.h"
+#include "Thief.h"
 
 AItem::AItem()
 {
@@ -26,7 +26,7 @@ void AItem::Tick(float DeltaTime)
 
 void AItem::OnTriggerOverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
-    AThirdPlayerCharacter* player = Cast<AThirdPlayerCharacter>(OtherActor);
+    AThief* player = Cast<AThief>(OtherActor);
     if (player == nullptr)
         return;
 
