@@ -6,6 +6,8 @@
 #include "GameFramework/SpringArmComponent.h"
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
+#include "HealthComponent.h"
+#include <Kismet/GameplayStatics.h>
 
 // Sets default values
 ABase3C::ABase3C()
@@ -24,6 +26,8 @@ ABase3C::ABase3C()
 	camera = CreateDefaultSubobject<UCameraComponent>(TEXT("Camera"));
 	camera->SetupAttachment(cameraBoom, USpringArmComponent::SocketName); // Attach the camera to the end of the boom and let the boom adjust to match the controller orientation
 	camera->bUsePawnControlRotation = false; // Camera does not rotate relative to arm
+	//Health Comp
+	healthComp = CreateDefaultSubobject<UHealthComponent>(TEXT("HealthComponent"));
 }
 
 // Called when the game starts or when spawned
@@ -78,7 +82,13 @@ void ABase3C::Move(const FInputActionValue& Value)
 
 void ABase3C::Interact()
 {
-	//GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("Some debug message!"));
+	TestDamage(this);
+}
+
+void ABase3C::TestDamage_Implementation(AActor* DamageActor)
+{
+	GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("Working!"));
+	UGameplayStatics::ApplyDamage(DamageActor, 1, this->GetInstigatorController(), this, UDamageType::StaticClass());
 }
 
 void ABase3C::BindInputHandler()
