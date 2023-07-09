@@ -2,6 +2,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
+#include "Blueprint/UserWidget.h"
 #include "Item.generated.h"
 
 USTRUCT(BlueprintType)
@@ -28,7 +29,11 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	float TimeToPickUp = 0;
 
-	UPROPERTY(VisibleAnywhere)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	TSubclassOf<UUserWidget> WidgetClass;
+	UUserWidget* Widget = nullptr;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	class UShapeComponent* Trigger = nullptr;
 
 	AItem();

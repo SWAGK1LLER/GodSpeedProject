@@ -20,15 +20,7 @@ AItem& FItemLooted::GetItem()
 	return *item;
 }
 
-Inventory::Inventory()
-{
-}
-
-Inventory::~Inventory()
-{
-}
-
-bool Inventory::ValidateSpace(AItem& pItem)
+bool UInventory::ValidateSpace(AItem& pItem)
 {
 	FSize size = pItem.SizeNeeded;
 
@@ -66,7 +58,7 @@ bool Inventory::ValidateSpace(AItem& pItem)
 	return false;
 }
 
-bool Inventory::ValidateSpace(AItem& pItem, FPosition& pOut)
+bool UInventory::ValidateSpace(AItem& pItem, FPosition& pOut)
 {
 	FSize size = pItem.SizeNeeded;
 
@@ -106,7 +98,7 @@ bool Inventory::ValidateSpace(AItem& pItem, FPosition& pOut)
 	return false;
 }
 
-void Inventory::AddItem(AItem& pItem, FPosition& pPos)
+void UInventory::AddItem(AItem& pItem, FPosition& pPos)
 {
 	if (pPos.X == -1 || pPos.Y == -1)
 		return;
@@ -118,7 +110,7 @@ void Inventory::AddItem(AItem& pItem, FPosition& pPos)
 			space[i][j] = &pItem;
 }
 
-void Inventory::AddItem(AItem& pItem)
+void UInventory::AddItem(AItem& pItem)
 {
 	FPosition pos;
 	if (!ValidateSpace(pItem, pos))
@@ -127,7 +119,7 @@ void Inventory::AddItem(AItem& pItem)
 	AddItem(pItem, pos);
 }
 
-void Inventory::RemoveItem(AItem& pItem)
+void UInventory::RemoveItem(AItem& pItem)
 {
 	if (items.Remove(FItemLooted(pItem)) == 0)
 		return;
@@ -138,7 +130,7 @@ void Inventory::RemoveItem(AItem& pItem)
 				space[i][j] = nullptr;
 }
 
-void Inventory::ClearInventory()
+void UInventory::ClearInventory()
 {
 	items.Empty();
 

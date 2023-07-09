@@ -8,18 +8,6 @@
 #include "OnlineSessionSettings.h"
 #include "EOSGameInstance.generated.h"
 
-
-//USTRUCT(BlueprintType)
-//struct FSessionResult
-//{
-//	GENERATED_USTRUCT_BODY()
-//public:
-//	FOnlineSessionSearchResult OnlineResult;
-//	FString sessionID;
-//
-//	FSessionResult() {}
-//};
-
 namespace EOnJoinSessionCompleteResult { enum Type; }
 
 UENUM(BlueprintType)

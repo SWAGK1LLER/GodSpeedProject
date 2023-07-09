@@ -37,14 +37,15 @@ struct FItemLooted
 	class AItem& GetItem();
 };
 
-class PROJECTRANSACK_API Inventory
+UCLASS()
+class PROJECTRANSACK_API UInventory : public UObject
 {
+	GENERATED_BODY()
+
 public:
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	TArray<FItemLooted> items;
 	class AItem* space[2][4];
-
-	Inventory();
-	~Inventory();
 
 	bool ValidateSpace(class AItem& pItem);
 	bool ValidateSpace(class AItem& pItem, FPosition& pOut);

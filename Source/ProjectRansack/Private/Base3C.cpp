@@ -30,14 +30,8 @@ ABase3C::ABase3C()
 void ABase3C::BeginPlay()
 {
 	Super::BeginPlay();
-	//Add Input Mapping Context
-	if (APlayerController* PlayerController = Cast<APlayerController>(Controller))
-	{
-		if (UEnhancedInputLocalPlayerSubsystem* Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(PlayerController->GetLocalPlayer()))
-		{
-			Subsystem->AddMappingContext(inputHandler, 0);
-		}
-	}
+
+	BindInputHandler();
 }
 
 // Called every frame
@@ -85,4 +79,12 @@ void ABase3C::Move(const FInputActionValue& Value)
 void ABase3C::Interact()
 {
 	//GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("Some debug message!"));
+}
+
+void ABase3C::BindInputHandler()
+{
+	//Add Input Mapping Context
+	if (APlayerController* PlayerController = Cast<APlayerController>(Controller))
+		if (UEnhancedInputLocalPlayerSubsystem* Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(PlayerController->GetLocalPlayer()))
+			Subsystem->AddMappingContext(inputHandler, 0);
 }

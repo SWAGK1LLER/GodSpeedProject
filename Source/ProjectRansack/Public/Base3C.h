@@ -53,4 +53,5 @@ public:
 	void Move(const FInputActionValue& Value);
 	void Interact();
 
+	void BindInputHandler();
 };

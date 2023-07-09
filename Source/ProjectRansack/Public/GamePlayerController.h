@@ -19,5 +19,9 @@ public:
 
 	UFUNCTION(BlueprintImplementableEvent)
 	void UpdateInventoryUI(const TArray<FItemLooted>& pItems);
-	
+
+	virtual void SetPawn(APawn* InPawn) override;
+
+	UFUNCTION(BlueprintImplementableEvent)
+	void PawnIsPossess(APawn* InPawn);
 };
