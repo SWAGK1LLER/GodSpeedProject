@@ -20,7 +20,7 @@ protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
-public:	
+public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
@@ -47,10 +47,15 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
 		class UInputAction* interactAction;
 
-
+	/*Health Component*/
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Health, meta = (AllowPrivateAccess = "true"))
+		class UHealthComponent* healthComp;
 
 	/** Called for movement input */
 	void Move(const FInputActionValue& Value);
+
 	void Interact();
 
+	UFUNCTION(Server, Unreliable)
+		void TestDamage(AActor* DamageActor);
 };
