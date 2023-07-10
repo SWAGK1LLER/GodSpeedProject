@@ -53,6 +53,7 @@ void ABase3C::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 	{
 		EnhancedInputComponent->BindAction(moveAction, ETriggerEvent::Triggered, this, &ABase3C::Move);
 		EnhancedInputComponent->BindAction(interactAction, ETriggerEvent::Started, this, &ABase3C::Interact);
+		EnhancedInputComponent->BindAction(lookAction, ETriggerEvent::Triggered, this, &ABase3C::TestLook);
 	}
 }
 
@@ -97,4 +98,11 @@ void ABase3C::BindInputHandler()
 	if (APlayerController* PlayerController = Cast<APlayerController>(Controller))
 		if (UEnhancedInputLocalPlayerSubsystem* Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(PlayerController->GetLocalPlayer()))
 			Subsystem->AddMappingContext(inputHandler, 0);
+}
+
+void ABase3C::TestLook(const FInputActionValue& Value)
+{
+	FVector2D Direction = Value.Get<FVector2D>();
+	AddControllerYawInput(Direction.X);
+	AddControllerPitchInput(Direction.Y);
 }

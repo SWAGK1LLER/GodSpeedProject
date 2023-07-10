@@ -46,6 +46,8 @@ public:
 		class UInputAction* moveAction;
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
 		class UInputAction* interactAction;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
+		class UInputAction* lookAction;
 
 	/*Health Component*/
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Health, meta = (AllowPrivateAccess = "true"))
@@ -61,4 +63,6 @@ public:
 	
 	UFUNCTION(Server, Unreliable)
 	void TestDamage(AActor* DamageActor);
+
+	void TestLook(const FInputActionValue& Value);
 };
