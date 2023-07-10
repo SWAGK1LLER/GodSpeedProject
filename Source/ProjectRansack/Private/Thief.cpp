@@ -31,9 +31,12 @@ void AThief::AddItem(AItem& pItem)
 
 	inventory->AddItem(pItem);
 
+
 	AGamePlayerController* PC = Cast<AGamePlayerController>(Controller);
 	if (PC == nullptr || !PC->IsLocalPlayerController())
 		return;
 
 	PC->UpdateInventoryUI(inventory->items);
+	PC->UpdateInventoryTeamUI();
+	
 }
