@@ -9,6 +9,7 @@
 #include "HealthComponent.h"
 #include "CameraComp.h"
 #include <Kismet/GameplayStatics.h>
+#include "GameFramework/CharacterMovementComponent.h"
 
 // Sets default values
 ABase3C::ABase3C()
@@ -38,6 +39,7 @@ void ABase3C::MulticastSetClientNickname_Implementation(const FString& pNickName
 void ABase3C::BeginPlay()
 {
 	Super::BeginPlay();
+	NormalWalkSpeed = GetCharacterMovement()->MaxWalkSpeed;
 
 	BindInputHandler();
 }
@@ -59,6 +61,9 @@ void ABase3C::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 		EnhancedInputComponent->BindAction(interactAction, ETriggerEvent::Started, this, &ABase3C::Interact);
 		EnhancedInputComponent->BindAction(AimAction, ETriggerEvent::Triggered, this, &ABase3C::Aim);
 		EnhancedInputComponent->BindAction(FireAction, ETriggerEvent::Started, this, &ABase3C::Fire);
+
+		EnhancedInputComponent->BindAction(SprintAction, ETriggerEvent::Started, this, &ABase3C::Sprint);
+		EnhancedInputComponent->BindAction(SprintAction, ETriggerEvent::Completed, this, &ABase3C::StopSprint);
 	}
 	cameraComponent->SetupInputComponent(PlayerInputComponent, lookAction);
 }
@@ -76,10 +81,10 @@ void ABase3C::Move(const FInputActionValue& Value)
 		const FRotator YawRotation(0, Rotation.Yaw, 0);
 
 		// get forward vector
-		const FVector ForwardDirection = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::X);
+		FVector ForwardDirection = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::X);
 
 		// get right vector 
-		const FVector RightDirection = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::Y);
+		FVector RightDirection = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::Y);
 
 		// add movement 
 		AddMovementInput(ForwardDirection, MovementVector.Y);
@@ -102,10 +107,20 @@ void ABase3C::Fire()
 	GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("Firing!"));
 }
 
+void ABase3C::Sprint()
+{
+	GetCharacterMovement()->MaxWalkSpeed *= SprintSpeed;
+}
+
 void ABase3C::TestDamage_Implementation(AActor* DamageActor)
 {
 	GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("Working!"));
 	UGameplayStatics::ApplyDamage(DamageActor, 1, this->GetInstigatorController(), this, UDamageType::StaticClass());
+}
+
+void ABase3C::StopSprint()
+{
+	GetCharacterMovement()->MaxWalkSpeed = NormalWalkSpeed;
 }
 
 void ABase3C::BindInputHandler()

@@ -34,6 +34,8 @@ public:
 		class UInputAction* AimAction;
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
 		class UInputAction* FireAction;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
+		class UInputAction* SprintAction;
 
 	/*Health Component*/
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Health, meta = (AllowPrivateAccess = "true"))
@@ -41,6 +43,13 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	FString nickName = "";
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
+		float MovementSpeed = 1;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
+		float SprintSpeed = 1.5f;
+
+	float NormalWalkSpeed;
 
 	ABase3C();
 
@@ -70,6 +79,9 @@ public:
 
 	void Fire();
 
+	void Sprint();
+
+	void StopSprint();
 
 	void BindInputHandler();
 	
