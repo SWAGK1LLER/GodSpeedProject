@@ -57,6 +57,8 @@ void ABase3C::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 	{
 		EnhancedInputComponent->BindAction(moveAction, ETriggerEvent::Triggered, this, &ABase3C::Move);
 		EnhancedInputComponent->BindAction(interactAction, ETriggerEvent::Started, this, &ABase3C::Interact);
+		EnhancedInputComponent->BindAction(AimAction, ETriggerEvent::Triggered, this, &ABase3C::Aim);
+		EnhancedInputComponent->BindAction(FireAction, ETriggerEvent::Started, this, &ABase3C::Fire);
 	}
 	cameraComponent->SetupInputComponent(PlayerInputComponent, lookAction);
 }
@@ -88,6 +90,16 @@ void ABase3C::Move(const FInputActionValue& Value)
 void ABase3C::Interact()
 {
 	TestDamage(this);
+}
+
+void ABase3C::Aim()
+{
+	GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("Aiming!"));
+}
+
+void ABase3C::Fire()
+{
+	GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("Firing!"));
 }
 
 void ABase3C::TestDamage_Implementation(AActor* DamageActor)

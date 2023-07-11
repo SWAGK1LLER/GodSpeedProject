@@ -30,6 +30,10 @@ public:
 	class UInputAction* interactAction;
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
 	class UInputAction* lookAction;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
+		class UInputAction* AimAction;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
+		class UInputAction* FireAction;
 
 	/*Health Component*/
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Health, meta = (AllowPrivateAccess = "true"))
@@ -61,6 +65,10 @@ public:
 	void Move(const FInputActionValue& Value);
 
 	void Interact();
+
+	void Aim();
+
+	void Fire();
 
 
 	void BindInputHandler();
