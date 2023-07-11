@@ -7,7 +7,6 @@
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
 #include "HealthComponent.h"
-#include "CameraComp.h"
 #include <Kismet/GameplayStatics.h>
 
 // Sets default values
@@ -15,23 +14,20 @@ ABase3C::ABase3C()
 {
  	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
-	bReplicates = true;
 
-	cameraComponent = CreateDefaultSubobject<UCameraComp>(TEXT("Camera Component"));
-	cameraComponent->SetupCamera(RootComponent);
+
+	// Create a camera boom (pulls in towards the player if there is a collision)
+	cameraBoom = CreateDefaultSubobject<USpringArmComponent>(TEXT("CameraBoom"));
+	cameraBoom->SetupAttachment(RootComponent);
+	cameraBoom->TargetArmLength = 400.0f; // The camera follows at this distance behind the character	
+	cameraBoom->bUsePawnControlRotation = true; // Rotate the arm based on the controller
+
+	// Create a follow camera
+	camera = CreateDefaultSubobject<UCameraComponent>(TEXT("Camera"));
+	camera->SetupAttachment(cameraBoom, USpringArmComponent::SocketName); // Attach the camera to the end of the boom and let the boom adjust to match the controller orientation
+	camera->bUsePawnControlRotation = false; // Camera does not rotate relative to arm
 	//Health Comp
 	healthComp = CreateDefaultSubobject<UHealthComponent>(TEXT("HealthComponent"));
-}
-
-void ABase3C::SetClientNickname_Implementation(const FString& pNickName)
-{
-	MulticastSetClientNickname(pNickName);
-	nickName = pNickName;
-}
-
-void ABase3C::MulticastSetClientNickname_Implementation(const FString& pNickName)
-{
-	nickName = pNickName;
 }
 
 // Called when the game starts or when spawned
@@ -57,8 +53,8 @@ void ABase3C::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 	{
 		EnhancedInputComponent->BindAction(moveAction, ETriggerEvent::Triggered, this, &ABase3C::Move);
 		EnhancedInputComponent->BindAction(interactAction, ETriggerEvent::Started, this, &ABase3C::Interact);
+		EnhancedInputComponent->BindAction(lookAction, ETriggerEvent::Triggered, this, &ABase3C::TestLook);
 	}
-	cameraComponent->SetupInputComponent(PlayerInputComponent, lookAction);
 }
 
 
@@ -102,4 +98,11 @@ void ABase3C::BindInputHandler()
 	if (APlayerController* PlayerController = Cast<APlayerController>(Controller))
 		if (UEnhancedInputLocalPlayerSubsystem* Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(PlayerController->GetLocalPlayer()))
 			Subsystem->AddMappingContext(inputHandler, 0);
+}
+
+void ABase3C::TestLook(const FInputActionValue& Value)
+{
+	FVector2D Direction = Value.Get<FVector2D>();
+	AddControllerYawInput(Direction.X);
+	AddControllerPitchInput(Direction.Y);
 }

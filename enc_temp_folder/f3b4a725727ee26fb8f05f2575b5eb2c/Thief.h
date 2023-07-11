@@ -20,6 +20,9 @@ public:
 	UInventory* inventory = nullptr;
 
 	AThief();
+
+	//To replicate inventory on network
+	virtual void GetLifetimeReplicatedProps(TArray< FLifetimeProperty >& OutLifetimeProps) const;
 	
 	void AddItem(class AItem& pItem);
 	bool ValidateSpaceItem(class AItem& pItem);
