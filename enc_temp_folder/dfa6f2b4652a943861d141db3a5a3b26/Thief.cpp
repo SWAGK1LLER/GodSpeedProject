@@ -4,6 +4,7 @@
 #include "Thief.h"
 #include <GamePlayerController.h>
 #include <Kismet/GameplayStatics.h>
+#include <Net/UnrealNetwork.h>
 
 AThief::AThief()
 {
@@ -11,6 +12,11 @@ AThief::AThief()
 	bReplicates = true;
 
 	inventory = NewObject<UInventory>();
+}
+
+void AThief::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 }
 
 bool AThief::ValidateSpaceItem(AItem& pItem)

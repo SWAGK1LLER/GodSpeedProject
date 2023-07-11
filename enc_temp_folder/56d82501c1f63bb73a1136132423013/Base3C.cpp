@@ -14,7 +14,6 @@ ABase3C::ABase3C()
 {
  	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
-	bReplicates = true;
 
 
 	// Create a camera boom (pulls in towards the player if there is a collision)
@@ -29,17 +28,6 @@ ABase3C::ABase3C()
 	camera->bUsePawnControlRotation = false; // Camera does not rotate relative to arm
 	//Health Comp
 	healthComp = CreateDefaultSubobject<UHealthComponent>(TEXT("HealthComponent"));
-}
-
-void ABase3C::SetClientNickname_Implementation(const FString& pNickName)
-{
-	MulticastSetClientNickname(pNickName);
-	nickName = pNickName;
-}
-
-void ABase3C::MulticastSetClientNickname_Implementation(const FString& pNickName)
-{
-	nickName = pNickName;
 }
 
 // Called when the game starts or when spawned
