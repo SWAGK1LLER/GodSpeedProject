@@ -31,11 +31,7 @@ public:
 		class USkeletalMeshComponent* skeletalMesh;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
-		class USpringArmComponent* cameraBoom;
-
-	/* Camera */
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
-		class UCameraComponent* camera;
+		class UCameraComp* cameraComponent;
 
 	/* Input */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
@@ -63,6 +59,4 @@ public:
 	
 	UFUNCTION(Server, Unreliable)
 	void TestDamage(AActor* DamageActor);
-
-	void TestLook(const FInputActionValue& Value);
 };

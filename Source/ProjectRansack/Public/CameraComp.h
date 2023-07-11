@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
+#include "InputActionValue.h"
 #include "CameraComp.generated.h"
 
 
@@ -29,5 +30,17 @@ public:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
 		class UCameraComponent* camera;
+
+	UPROPERTY(editAnywhere, BlueprintReadWrite, Category = CameraParameters, meta = (AllowPrivateAccess = "true"))
+		float MaxPitchBottom = 30;
+
+	UPROPERTY(editAnywhere, BlueprintReadWrite, Category = CameraParameters, meta = (AllowPrivateAccess = "true"))
+		float MaxPitchTop = 30;
+
+	void SetupCamera(USceneComponent* root);
+
+	void SetupInputComponent(class UInputComponent* PlayerInputComponent, class UInputAction* Action);
 		
+
+	void look(const FInputActionValue& Value);
 };
