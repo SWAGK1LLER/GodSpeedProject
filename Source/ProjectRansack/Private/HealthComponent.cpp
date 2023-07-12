@@ -20,6 +20,12 @@ void UHealthComponent::BeginPlay()
 	GetOwner()->OnTakeAnyDamage.AddDynamic(this, &UHealthComponent::OnTakeDamage);
 }
 
+void UHealthComponent::fetchData(float pCurrentHealth, float pMaxHealth)
+{
+	currentHealth = pCurrentHealth;
+	maxHealth = pMaxHealth;
+}
+
 void UHealthComponent::OnTakeDamage(AActor* DamagedActor, float Damage, const class UDamageType* DamageType, class AController* InstigatedBy, AActor* DamageCauser)
 {
 	currentHealth -= Damage;
