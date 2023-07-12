@@ -13,11 +13,7 @@ struct FBase3CTable : public FTableRowBase
 {
 GENERATED_BODY()
 public:
-	//Movement
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
-		float movementSpeed = 1;
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
-		float sprintSpeed = 1.5f;
+
 	//Health
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Base, meta = (AllowPrivateAccess = "true"))
 		float currentHealth;
@@ -29,6 +25,12 @@ public:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
 		class UCameraComponent* camera;
+
+	//Movement
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = MovementValues, meta = (AllowPrivateAccess = "true"))
+		float movementSpeed = 1;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = MovementValues, meta = (AllowPrivateAccess = "true"))
+		float sprintSpeed = 1.5f;
 
 	UPROPERTY(editAnywhere, BlueprintReadWrite, Category = CameraParameters, meta = (AllowPrivateAccess = "true"))
 		float maxPitchBottom = 30;
