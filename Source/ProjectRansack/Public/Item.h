@@ -51,4 +51,8 @@ public:
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent)
 	void Interact();
 	virtual void Interact_Implementation() override;
+
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent)
+	void StopInteract();
+	virtual void StopInteract_Implementation() override;
 };

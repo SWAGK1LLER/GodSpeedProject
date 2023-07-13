@@ -18,6 +18,7 @@ class PROJECTRANSACK_API AThief : public ABase3C
 
 public:
 	TArray<IThiefInteractibleActor*> closeItems;
+	IThiefInteractibleActor* ItemUsing = nullptr;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	UInventory* inventory = nullptr;
@@ -28,4 +29,5 @@ public:
 	bool ValidateSpaceItem(class AItem& pItem);
 
 	virtual void Interact() override;
+	virtual void StopInteract() override;
 };

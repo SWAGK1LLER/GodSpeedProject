@@ -40,5 +40,16 @@ void AThief::Interact()
 	if (closeItems.Num() == 0)
 		return;
 
-	IThiefInteractibleActor::Execute_Interact((UObject*)(closeItems[0]));
+	//Should use the camera forward to check wich item to use if multiple in array
+	ItemUsing = closeItems[0];
+	IThiefInteractibleActor::Execute_Interact((UObject*)(ItemUsing));
+}
+
+void AThief::StopInteract()
+{
+	if (ItemUsing == nullptr)
+		return;
+
+	IThiefInteractibleActor::Execute_StopInteract((UObject*)(ItemUsing));
+	ItemUsing = nullptr;
 }

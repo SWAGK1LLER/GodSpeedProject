@@ -59,5 +59,9 @@ void AItem::OnTriggerOverlapEnd(UPrimitiveComponent* OverlappedComp, AActor* Oth
 void AItem::Interact_Implementation() 
 {
     
+}
+
+void AItem::StopInteract_Implementation()
+{
     
 }

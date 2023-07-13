@@ -8,5 +8,16 @@ void AOfficer::Interact()
 	if (closeItems.Num() == 0)
 		return;
 
-	IOfficerInteractibleActor::Execute_Interact((UObject*)(closeItems[0]));
+	//Should use the camera forward to check wich item to use if multiple in array
+	ItemUsing = closeItems[0];
+	IOfficerInteractibleActor::Execute_Interact((UObject*)(ItemUsing));
+}
+
+void AOfficer::StopInteract()
+{
+	if (ItemUsing == nullptr)
+		return;
+
+	IOfficerInteractibleActor::Execute_StopInteract((UObject*)(ItemUsing));
+	ItemUsing = nullptr;
 }

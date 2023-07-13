@@ -24,4 +24,7 @@ class PROJECTRANSACK_API IInteractibleActor
 public:
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
 	void Interact(); 
+
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
+	void StopInteract();
 };
