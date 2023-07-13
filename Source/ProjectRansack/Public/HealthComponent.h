@@ -25,11 +25,12 @@ public:
 	//virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 	
 	/*Base values*/
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Base, meta = (AllowPrivateAccess = "true"))
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = Base, meta = (AllowPrivateAccess = "true"))
 		float currentHealth;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Base, meta = (AllowPrivateAccess = "true"))
 		float maxHealth;
+
+	void fetchData(float pCurrentHealth, float pMaxHealth);
 
 	UFUNCTION()
 		void OnTakeDamage(AActor* DamagedActor, float Damage, const class UDamageType* DamageType, class AController* InstigatedBy, AActor* DamageCauser);

@@ -11,6 +11,8 @@
 #include <Kismet/GameplayStatics.h>
 #include "GameFramework/CharacterMovementComponent.h"
 
+
+
 // Sets default values
 ABase3C::ABase3C()
 {
@@ -22,6 +24,24 @@ ABase3C::ABase3C()
 	cameraComponent->SetupCamera(RootComponent);
 	//Health Comp
 	healthComp = CreateDefaultSubobject<UHealthComponent>(TEXT("HealthComponent"));
+	
+}
+
+bool ABase3C::CheckTableInstance()
+{
+	if (tableInstance)
+		return true;
+
+	tableInstance = base3CDataTable->FindRow<FBase3CTable>(FName(TEXT("Base3C")), "");
+
+	return tableInstance != nullptr;
+}
+
+void ABase3C::SendDataToComponents()
+{
+	CheckTableInstance();
+	cameraComponent->fetchData(tableInstance->maxPitchBottom, tableInstance->maxPitchTop);
+	healthComp->fetchData(tableInstance->currentHealth, tableInstance->maxHealth);
 }
 
 void ABase3C::SetClientNickname_Implementation(const FString& pNickName)
@@ -39,9 +59,21 @@ void ABase3C::MulticastSetClientNickname_Implementation(const FString& pNickName
 void ABase3C::BeginPlay()
 {
 	Super::BeginPlay();
-	NormalWalkSpeed = GetCharacterMovement()->MaxWalkSpeed;
+	CheckTableInstance();
+	normalWalkSpeed = GetCharacterMovement()->MaxWalkSpeed;
+	GetCharacterMovement()->MaxWalkSpeed *= tableInstance->movementSpeed;
 
 	BindInputHandler();
+
+	tableInstance = base3CDataTable->FindRow<FBase3CTable>(FName(TEXT("Base3C")), "");
+
+	if (tableInstance != nullptr)
+	{
+		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("Working0"));
+	}
+
+	SendDataToComponents();
+
 }
 
 // Called every frame
@@ -54,18 +86,21 @@ void ABase3C::Tick(float DeltaTime)
 void ABase3C::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
+	
+	CheckTableInstance();
+
 	//Moving
 	if (UEnhancedInputComponent* EnhancedInputComponent = CastChecked<UEnhancedInputComponent>(PlayerInputComponent)) 
 	{
-		EnhancedInputComponent->BindAction(moveAction, ETriggerEvent::Triggered, this, &ABase3C::Move);
-		EnhancedInputComponent->BindAction(interactAction, ETriggerEvent::Started, this, &ABase3C::Interact);
-		EnhancedInputComponent->BindAction(AimAction, ETriggerEvent::Triggered, this, &ABase3C::Aim);
-		EnhancedInputComponent->BindAction(FireAction, ETriggerEvent::Started, this, &ABase3C::Fire);
+		EnhancedInputComponent->BindAction(tableInstance->moveAction, ETriggerEvent::Triggered, this, &ABase3C::Move);
+		EnhancedInputComponent->BindAction(tableInstance->interactAction, ETriggerEvent::Started, this, &ABase3C::Interact);
+		EnhancedInputComponent->BindAction(tableInstance->AimAction, ETriggerEvent::Triggered, this, &ABase3C::Aim);
+		EnhancedInputComponent->BindAction(tableInstance->FireAction, ETriggerEvent::Started, this, &ABase3C::Fire);
 
-		EnhancedInputComponent->BindAction(SprintAction, ETriggerEvent::Started, this, &ABase3C::Sprint);
-		EnhancedInputComponent->BindAction(SprintAction, ETriggerEvent::Completed, this, &ABase3C::StopSprint);
+		EnhancedInputComponent->BindAction(tableInstance->SprintAction, ETriggerEvent::Started, this, &ABase3C::Sprint);
+		EnhancedInputComponent->BindAction(tableInstance->SprintAction, ETriggerEvent::Completed, this, &ABase3C::StopSprint);
 	}
-	cameraComponent->SetupInputComponent(PlayerInputComponent, lookAction);
+	cameraComponent->SetupInputComponent(PlayerInputComponent, tableInstance->lookAction);
 }
 
 
@@ -109,7 +144,7 @@ void ABase3C::Fire()
 
 void ABase3C::Sprint()
 {
-	GetCharacterMovement()->MaxWalkSpeed *= SprintSpeed;
+	GetCharacterMovement()->MaxWalkSpeed = normalWalkSpeed * tableInstance->sprintSpeed;
 }
 
 void ABase3C::TestDamage_Implementation(AActor* DamageActor)
@@ -120,7 +155,7 @@ void ABase3C::TestDamage_Implementation(AActor* DamageActor)
 
 void ABase3C::StopSprint()
 {
-	GetCharacterMovement()->MaxWalkSpeed = NormalWalkSpeed;
+	GetCharacterMovement()->MaxWalkSpeed = normalWalkSpeed * tableInstance->movementSpeed;
 }
 
 void ABase3C::BindInputHandler()
@@ -128,5 +163,5 @@ void ABase3C::BindInputHandler()
 	//Add Input Mapping Context
 	if (APlayerController* PlayerController = Cast<APlayerController>(Controller))
 		if (UEnhancedInputLocalPlayerSubsystem* Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(PlayerController->GetLocalPlayer()))
-			Subsystem->AddMappingContext(inputHandler, 0);
+			Subsystem->AddMappingContext(tableInstance->inputHandler, 0);
 }

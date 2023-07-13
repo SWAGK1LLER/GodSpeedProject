@@ -58,6 +58,12 @@ void UCameraComp::SetupInputComponent(UInputComponent* PlayerInputComponent, UIn
 	}
 }
 
+void UCameraComp::fetchData(float pmaxPitchBottom, float pmaxPitchTop)
+{
+	maxPitchBottom = pmaxPitchBottom;
+	maxPitchTop = pmaxPitchTop;
+}
+
 void UCameraComp::look(const FInputActionValue& Value)
 {
 	FVector2D Direction = Value.Get<FVector2D>();
@@ -65,9 +71,9 @@ void UCameraComp::look(const FInputActionValue& Value)
 	{
 		Character->AddControllerYawInput(Direction.X);
 		float CurrentPitch = Character->GetControlRotation().Pitch;
-		if (Direction.Y > 0 && (CurrentPitch < 270 || CurrentPitch > 360 - MaxPitchTop))
+		if (Direction.Y > 0 && (CurrentPitch < 270 || CurrentPitch > 360 - maxPitchTop))
 			Character->AddControllerPitchInput(Direction.Y);
-		else if(Direction.Y < 0 && (CurrentPitch > 90 || CurrentPitch < 0 + MaxPitchBottom))
+		else if(Direction.Y < 0 && (CurrentPitch > 90 || CurrentPitch < 0 + maxPitchBottom))
 			Character->AddControllerPitchInput(Direction.Y);
 
 		
