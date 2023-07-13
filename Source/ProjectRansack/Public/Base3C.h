@@ -81,7 +81,7 @@ public:
 	FString nickName = "";
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Data, meta = (AllowPrivateAccess = "true"))
-		class UDataTable* base3CDataTable;
+		class UDataTable* dataTable;
 
 	FBase3CTable* tableInstance = nullptr;
 

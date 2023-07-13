@@ -32,14 +32,19 @@ bool ABase3C::CheckTableInstance()
 	if (tableInstance)
 		return true;
 
-	tableInstance = base3CDataTable->FindRow<FBase3CTable>(FName(TEXT("Base3C")), "");
+	if (!dataTable)
+		return false;
+
+	tableInstance = dataTable->FindRow<FBase3CTable>(FName(TEXT("Base3C")), "");
 
 	return tableInstance != nullptr;
 }
 
 void ABase3C::SendDataToComponents()
 {
-	CheckTableInstance();
+	if(!CheckTableInstance())
+		return;
+
 	cameraComponent->fetchData(tableInstance->maxPitchBottom, tableInstance->maxPitchTop);
 	healthComp->fetchData(tableInstance->currentHealth, tableInstance->maxHealth);
 }
@@ -59,19 +64,13 @@ void ABase3C::MulticastSetClientNickname_Implementation(const FString& pNickName
 void ABase3C::BeginPlay()
 {
 	Super::BeginPlay();
-	CheckTableInstance();
+	if(!CheckTableInstance())
+		return;
+
 	normalWalkSpeed = GetCharacterMovement()->MaxWalkSpeed;
 	GetCharacterMovement()->MaxWalkSpeed *= tableInstance->movementSpeed;
 
 	BindInputHandler();
-
-	tableInstance = base3CDataTable->FindRow<FBase3CTable>(FName(TEXT("Base3C")), "");
-
-	if (tableInstance != nullptr)
-	{
-		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("Working0"));
-	}
-
 	SendDataToComponents();
 
 }
@@ -87,7 +86,8 @@ void ABase3C::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
 	
-	CheckTableInstance();
+	if(!CheckTableInstance())
+		return;
 
 	//Moving
 	if (UEnhancedInputComponent* EnhancedInputComponent = CastChecked<UEnhancedInputComponent>(PlayerInputComponent)) 
