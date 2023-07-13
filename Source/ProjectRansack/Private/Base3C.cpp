@@ -24,7 +24,7 @@ ABase3C::ABase3C()
 	cameraComponent->SetupCamera(RootComponent);
 	//Health Comp
 	healthComp = CreateDefaultSubobject<UHealthComponent>(TEXT("HealthComponent"));
-	
+	currentState = CharacterState::Idle;
 }
 
 bool ABase3C::CheckTableInstance()

@@ -52,6 +52,14 @@ public:
 		class UInputAction* SprintAction;
 };
 
+UENUM()
+enum CharacterState
+{
+	Idle		UMETA(DisplayName = "Idle"),
+	Attacking   UMETA(DisplayName = "Attacking"),
+	Stunned		UMETA(DisplayName = "Stunned"),
+};
+
 
 UCLASS()
 class PROJECTRANSACK_API ABase3C : public ACharacter
@@ -78,6 +86,8 @@ public:
 	FBase3CTable* tableInstance = nullptr;
 
 	float normalWalkSpeed;
+
+	CharacterState currentState;
 
 
 	ABase3C();
