@@ -41,4 +41,10 @@ public:
 	void fetchData(float pmaxPitchBottom,float pmaxPitchTop);
 
 	void look(const FInputActionValue& Value);
+
+	UFUNCTION(BlueprintCallable)
+	void setFov(float newFov);
+
+	UFUNCTION(BlueprintCallable)
+	float getFov();
 };

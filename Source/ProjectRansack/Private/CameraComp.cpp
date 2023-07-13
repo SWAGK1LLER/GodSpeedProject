@@ -81,3 +81,13 @@ void UCameraComp::look(const FInputActionValue& Value)
 
 }
 
+float UCameraComp::getFov()
+{
+	return camera->FieldOfView;
+}
+
+void UCameraComp::setFov(float newFov)
+{
+	camera->SetFieldOfView(newFov);
+}
+

@@ -133,4 +133,7 @@ public:
 	
 	UFUNCTION(Server, Unreliable)
 	void TestDamage(AActor* DamageActor);
+
+	UFUNCTION(BlueprintCallable)
+		UCameraComp* GetCameraComponent();
 };

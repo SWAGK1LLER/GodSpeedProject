@@ -180,3 +180,8 @@ void ABase3C::BindInputHandler()
 		if (UEnhancedInputLocalPlayerSubsystem* Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(PlayerController->GetLocalPlayer()))
 			Subsystem->AddMappingContext(tableInstance->inputHandler, 0);
 }
+
+UCameraComp* ABase3C::GetCameraComponent()
+{
+	return cameraComponent;
+}
