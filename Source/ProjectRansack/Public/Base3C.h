@@ -106,8 +106,12 @@ public:
 	void Move(const FInputActionValue& Value);
 
 	virtual void Interact();
+	
+	virtual void StopInteract();
 
-	void Aim();
+	void StartAim();
+
+	void StopAim();
 
 	void Fire();
 

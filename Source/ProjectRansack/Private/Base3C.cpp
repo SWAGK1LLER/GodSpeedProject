@@ -93,9 +93,14 @@ void ABase3C::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 	if (UEnhancedInputComponent* EnhancedInputComponent = CastChecked<UEnhancedInputComponent>(PlayerInputComponent)) 
 	{
 		EnhancedInputComponent->BindAction(tableInstance->moveAction, ETriggerEvent::Triggered, this, &ABase3C::Move);
+
 		EnhancedInputComponent->BindAction(tableInstance->interactAction, ETriggerEvent::Started, this, &ABase3C::Interact);
-		EnhancedInputComponent->BindAction(tableInstance->AimAction, ETriggerEvent::Triggered, this, &ABase3C::Aim);
-		EnhancedInputComponent->BindAction(tableInstance->FireAction, ETriggerEvent::Started, this, &ABase3C::Fire);
+		EnhancedInputComponent->BindAction(tableInstance->interactAction, ETriggerEvent::Completed, this, &ABase3C::StopInteract);
+
+		EnhancedInputComponent->BindAction(tableInstance->AimAction, ETriggerEvent::Started, this, &ABase3C::StartAim);
+		EnhancedInputComponent->BindAction(tableInstance->AimAction, ETriggerEvent::Completed, this, &ABase3C::StopAim);
+
+		EnhancedInputComponent->BindAction(tableInstance->FireAction, ETriggerEvent::Triggered, this, &ABase3C::Fire);
 
 		EnhancedInputComponent->BindAction(tableInstance->SprintAction, ETriggerEvent::Started, this, &ABase3C::Sprint);
 		EnhancedInputComponent->BindAction(tableInstance->SprintAction, ETriggerEvent::Completed, this, &ABase3C::StopSprint);
@@ -132,9 +137,19 @@ void ABase3C::Interact()
 	TestDamage(this);
 }
 
-void ABase3C::Aim()
+void ABase3C::StopInteract()
+{
+	GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("Stop Interact!"));
+}
+
+void ABase3C::StartAim()
 {
 	GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("Aiming!"));
+}
+
+void ABase3C::StopAim()
+{
+	GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("StopAiming!"));
 }
 
 void ABase3C::Fire()
