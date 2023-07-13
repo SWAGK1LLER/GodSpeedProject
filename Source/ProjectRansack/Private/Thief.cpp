@@ -34,3 +34,11 @@ void AThief::AddItem(AItem& pItem)
 	PC->UpdateTeamDuffleBagUI();
 	
 }
+
+void AThief::Interact()
+{
+	if (closeItems.Num() == 0)
+		return;
+
+	IThiefInteractibleActor::Execute_Interact((UObject*)(closeItems[0]));
+}

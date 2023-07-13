@@ -16,14 +16,11 @@ void AItem::BeginPlay()
 
     Trigger->OnComponentBeginOverlap.AddDynamic(this, &AItem::OnTriggerOverlapBegin);
     Trigger->OnComponentEndOverlap.AddDynamic(this, &AItem::OnTriggerOverlapEnd);
-
-    
 }
 
 void AItem::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-
 }
 
 void AItem::OnTriggerOverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
@@ -32,7 +29,9 @@ void AItem::OnTriggerOverlapBegin(UPrimitiveComponent* OverlappedComponent, AAct
     if (player == nullptr)
         return;
 
-    player->AddItem(*this);
+    player->closeItems.Add(this);
+
+    //player->AddItem(*this);
 
     AController* PC = player->GetController();
     if (PC != nullptr && PC->IsLocalPlayerController())
@@ -47,10 +46,18 @@ void AItem::OnTriggerOverlapEnd(UPrimitiveComponent* OverlappedComp, AActor* Oth
     AThief* player = Cast<AThief>(OtherActor);
     if (player == nullptr)
         return;
+
+    player->closeItems.Remove(this);
     
     AController* PC = player->GetController();
     if (PC != nullptr && PC->IsLocalPlayerController())
     {
         Widget->RemoveFromParent();
     }
+}
+
+void AItem::Interact_Implementation() 
+{
+    
+    
 }

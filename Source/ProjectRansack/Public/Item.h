@@ -3,6 +3,7 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
 #include "Blueprint/UserWidget.h"
+#include "ThiefInteractibleActor.h"
 #include "Item.generated.h"
 
 USTRUCT(BlueprintType)
@@ -18,7 +19,7 @@ struct FSize
 };
 
 UCLASS()
-class PROJECTRANSACK_API AItem : public AActor
+class PROJECTRANSACK_API AItem : public AActor, public IThiefInteractibleActor
 {
 	GENERATED_BODY()
 	
@@ -46,4 +47,8 @@ public:
 
 	UFUNCTION()
 	void OnTriggerOverlapEnd(class UPrimitiveComponent* OverlappedComp, AActor* OtherActor, class UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);
+
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent)
+	void Interact();
+	virtual void Interact_Implementation() override;
 };

@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "Base3C.h"
 #include "Inventory.h"
+#include "ThiefInteractibleActor.h"
 #include "Thief.generated.h"
 
 /**
@@ -16,11 +17,15 @@ class PROJECTRANSACK_API AThief : public ABase3C
 	GENERATED_BODY()
 
 public:
-	UPROPERTY(/*replicated,*/ EditAnywhere, BlueprintReadWrite)
+	TArray<IThiefInteractibleActor*> closeItems;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	UInventory* inventory = nullptr;
 
 	AThief();
 	
 	void AddItem(class AItem& pItem);
 	bool ValidateSpaceItem(class AItem& pItem);
+
+	virtual void Interact() override;
 };

@@ -105,7 +105,7 @@ public:
 	/** Called for movement input */
 	void Move(const FInputActionValue& Value);
 
-	void Interact();
+	virtual void Interact();
 
 	void Aim();
 
