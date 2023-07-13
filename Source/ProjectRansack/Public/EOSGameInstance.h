@@ -6,6 +6,7 @@
 #include "Engine/GameInstance.h"
 
 #include "OnlineSessionSettings.h"
+#include "EnumTeam.h"
 #include "EOSGameInstance.generated.h"
 
 namespace EOnJoinSessionCompleteResult { enum Type; }
@@ -15,14 +16,6 @@ enum EOutcomePins
 {
 	Failure,
 	Success
-};
-
-UENUM(BlueprintType)
-enum class ETeam : uint8
-{
-	A,
-	B,
-	NONE
 };
 
 UCLASS()

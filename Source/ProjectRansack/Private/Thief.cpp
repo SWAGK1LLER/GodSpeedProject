@@ -30,7 +30,7 @@ void AThief::AddItem(AItem& pItem)
 	if (PC == nullptr || !PC->IsLocalPlayerController())
 		return;
 
-	PC->UpdateInventoryUI(inventory->items);
-	PC->UpdateInventoryTeamUI();
+	PC->UpdateDuffleBagUI(inventory->items);
+	PC->UpdateTeamDuffleBagUI();
 	
 }
