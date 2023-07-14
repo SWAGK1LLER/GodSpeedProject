@@ -32,7 +32,6 @@ void AThief::AddItem(AItem& pItem)
 
 	PC->UpdateDuffleBagUI(inventory->items);
 	PC->UpdateTeamDuffleBagUI();
-	
 }
 
 void AThief::Interact()
@@ -42,7 +41,7 @@ void AThief::Interact()
 
 	//Should use the camera forward to check wich item to use if multiple in array
 	ItemUsing = closeItems[0];
-	IThiefInteractibleActor::Execute_Interact((UObject*)(ItemUsing));
+	IThiefInteractibleActor::Execute_Interact(ItemUsing->_getUObject(), this);
 }
 
 void AThief::StopInteract()
@@ -50,6 +49,6 @@ void AThief::StopInteract()
 	if (ItemUsing == nullptr)
 		return;
 
-	IThiefInteractibleActor::Execute_StopInteract((UObject*)(ItemUsing));
+	IThiefInteractibleActor::Execute_StopInteract(ItemUsing->_getUObject(), this);
 	ItemUsing = nullptr;
 }

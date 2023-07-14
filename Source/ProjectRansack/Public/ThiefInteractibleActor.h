@@ -22,4 +22,9 @@ class PROJECTRANSACK_API IThiefInteractibleActor : public IInteractibleActor
 	GENERATED_BODY()
 
 public:
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
+	void Interact(class AActor* pActor);
+
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
+	void StopInteract(class AActor* pActor);
 };

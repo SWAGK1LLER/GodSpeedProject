@@ -10,6 +10,7 @@
 #include <Thief.h>
 #include "RoundUI.h"
 #include "DuffleBagUI.h"
+#include "Item.h"
 #include "TeamDuffleBagUI.h"
 
 void AGamePlayerController::BeginPlay()
@@ -154,4 +155,26 @@ void AGamePlayerController::ClientUpdateRoundTimeRemaining_Implementation(const 
 
 
 	RoundUIWidget->SetTime(pTime);
+}
+
+void AGamePlayerController::AddInteractibleWidgetUI(AItem* pItem, TSubclassOf<UItemWidgetUI> pWidget)
+{
+	UItemWidgetUI* Widget = CreateWidget<UItemWidgetUI>(GetWorld(), pWidget);
+	Widget->AddToViewport();
+
+	interactibleUI.Add(pItem, Widget);
+}
+
+void AGamePlayerController::RemoveInteractibleWidgetUI(AItem* pItem)
+{
+	if (interactibleUI.Find(pItem) == nullptr)
+		return;
+
+	interactibleUI[pItem]->RemoveFromParent();
+	interactibleUI.Remove(pItem);
+}
+
+UItemWidgetUI* AGamePlayerController::GetWidget(AItem* pItem)
+{
+	return interactibleUI[pItem];
 }

@@ -4,6 +4,7 @@
 #include "GameFramework/Actor.h"
 #include "Blueprint/UserWidget.h"
 #include "ThiefInteractibleActor.h"
+#include "ItemWidgetUI.h"
 #include "Item.generated.h"
 
 USTRUCT(BlueprintType)
@@ -29,13 +30,17 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	float TimeToPickUp = 0;
+	float currentTime = 0;
+	bool currentlyInteracting = false;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	TSubclassOf<UUserWidget> WidgetClass;
-	UUserWidget* Widget = nullptr;
+	TSubclassOf<UItemWidgetUI> WidgetClass;
+	UItemWidgetUI* Widget = nullptr;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	class UShapeComponent* Trigger = nullptr;
+
+	class AActor* acteurUsingThis = nullptr;
 
 	AItem();
 
@@ -48,11 +53,12 @@ public:
 	UFUNCTION()
 	void OnTriggerOverlapEnd(class UPrimitiveComponent* OverlappedComp, AActor* OtherActor, class UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);
 
-	UFUNCTION(BlueprintCallable, BlueprintNativeEvent)
-	void Interact();
-	virtual void Interact_Implementation() override;
 
-	UFUNCTION(BlueprintCallable, BlueprintNativeEvent)
-	void StopInteract();
-	virtual void StopInteract_Implementation() override;
+	virtual void Interact_Implementation(class AActor* pActor) override;
+	virtual void StopInteract_Implementation(class AActor* pActor) override;
+
+	float map(float x, float in_min, float in_max, float out_min, float out_max)
+	{
+		return (x - in_min) * (out_max - out_min) / (in_max - in_min) + out_min;
+	}
 };

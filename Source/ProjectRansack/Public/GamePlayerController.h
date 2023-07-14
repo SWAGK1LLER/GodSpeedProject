@@ -6,6 +6,7 @@
 #include "GameFramework/PlayerController.h"
 #include "Inventory.h"
 #include "EnumTeam.h"
+#include "Blueprint/UserWidget.h"
 #include "GamePlayerController.generated.h"
 
 /**
@@ -34,6 +35,8 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	TArray<class ABase3C*> TeamB;
+
+	TMap<class AItem*, class UItemWidgetUI*> interactibleUI;
 
 	virtual void BeginPlay() override;
 
@@ -79,4 +82,9 @@ public:
 	void ClientUpdateRoundTimeRemaining(const FString& pTime);
 	void ClientUpdateRoundTimeRemaining_Implementation(const FString& pTime);
 
+
+	void AddInteractibleWidgetUI(class AItem* pItem, TSubclassOf<UItemWidgetUI> pWidget);
+	void RemoveInteractibleWidgetUI(class AItem* pItem);
+
+	UItemWidgetUI* GetWidget(class AItem* pItem);
 };

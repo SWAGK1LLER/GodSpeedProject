@@ -10,7 +10,7 @@ void AOfficer::Interact()
 
 	//Should use the camera forward to check wich item to use if multiple in array
 	ItemUsing = closeItems[0];
-	IOfficerInteractibleActor::Execute_Interact((UObject*)(ItemUsing));
+	IOfficerInteractibleActor::Execute_Interact(ItemUsing->_getUObject(), this);
 }
 
 void AOfficer::StopInteract()
@@ -18,6 +18,6 @@ void AOfficer::StopInteract()
 	if (ItemUsing == nullptr)
 		return;
 
-	IOfficerInteractibleActor::Execute_StopInteract((UObject*)(ItemUsing));
+	IOfficerInteractibleActor::Execute_StopInteract(ItemUsing->_getUObject(), this);
 	ItemUsing = nullptr;
 }

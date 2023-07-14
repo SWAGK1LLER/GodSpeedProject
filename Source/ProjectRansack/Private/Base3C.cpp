@@ -175,6 +175,11 @@ void ABase3C::StopSprint()
 
 void ABase3C::BindInputHandler()
 {
+	if (tableInstance == nullptr)
+		if (!CheckTableInstance())
+			return;
+
+
 	//Add Input Mapping Context
 	if (APlayerController* PlayerController = Cast<APlayerController>(Controller))
 		if (UEnhancedInputLocalPlayerSubsystem* Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(PlayerController->GetLocalPlayer()))

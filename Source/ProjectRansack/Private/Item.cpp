@@ -1,6 +1,7 @@
 #include "Item.h"
 #include "Components/BoxComponent.h"
 #include "Thief.h"
+#include <GamePlayerController.h>
 
 AItem::AItem()
 {
@@ -21,6 +22,31 @@ void AItem::BeginPlay()
 void AItem::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+
+    if (currentlyInteracting)
+    {
+        currentTime += DeltaTime;
+        
+        //Update ui progress bar
+        AThief* thief = Cast<AThief>(acteurUsingThis);
+        AGamePlayerController* playerController = Cast<AGamePlayerController>(thief->GetController());
+        UItemWidgetUI* widget = playerController->GetWidget(this);
+        widget->setProgressBarValue(map(currentTime, 0, TimeToPickUp, 0, 1));
+    }
+
+    if (currentTime >= TimeToPickUp && currentlyInteracting)
+    {
+        AThief* player = Cast<AThief>(acteurUsingThis);
+        player->AddItem(*this);
+
+        AThief* thief = Cast<AThief>(acteurUsingThis);
+        AGamePlayerController* playerController = Cast<AGamePlayerController>(thief->GetController());
+        playerController->RemoveInteractibleWidgetUI(this);
+        currentlyInteracting = false;
+        acteurUsingThis = nullptr;
+
+        //Tell to server no body can take it anymore
+    }
 }
 
 void AItem::OnTriggerOverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
@@ -31,13 +57,11 @@ void AItem::OnTriggerOverlapBegin(UPrimitiveComponent* OverlappedComponent, AAct
 
     player->closeItems.Add(this);
 
-    //player->AddItem(*this);
-
     AController* PC = player->GetController();
     if (PC != nullptr && PC->IsLocalPlayerController())
     {
-        Widget = CreateWidget<UUserWidget>(GetWorld(), WidgetClass);
-        Widget->AddToViewport();
+        AGamePlayerController* playerController = Cast<AGamePlayerController>(PC);
+        playerController->AddInteractibleWidgetUI(this, WidgetClass);
     }
 }
 
@@ -52,16 +76,35 @@ void AItem::OnTriggerOverlapEnd(UPrimitiveComponent* OverlappedComp, AActor* Oth
     AController* PC = player->GetController();
     if (PC != nullptr && PC->IsLocalPlayerController())
     {
-        Widget->RemoveFromParent();
+        AGamePlayerController* playerController = Cast<AGamePlayerController>(PC);
+        playerController->RemoveInteractibleWidgetUI(this);
     }
 }
 
-void AItem::Interact_Implementation() 
+void AItem::Interact_Implementation(AActor* pActor)
 {
-    
+    currentlyInteracting = true;
+    currentTime = 0;
+    acteurUsingThis = pActor;
+
+    //Show progress bar
+    AThief* thief = Cast<AThief>(pActor);
+    AGamePlayerController* playerController = Cast<AGamePlayerController>(thief->GetController());
+    UItemWidgetUI* widget = playerController->GetWidget(this);
+    widget->ActivateProgressBar();
 }
 
-void AItem::StopInteract_Implementation()
+void AItem::StopInteract_Implementation(AActor* pActor)
 {
-    
+    if (acteurUsingThis == nullptr)
+        return;
+
+    currentlyInteracting = false;
+    acteurUsingThis = nullptr;
+
+    //Show basic message
+    AThief* thief = Cast<AThief>(pActor);
+    AGamePlayerController* playerController = Cast<AGamePlayerController>(thief->GetController());
+    UItemWidgetUI* widget = playerController->GetWidget(this);
+    widget->ActivateDefaultText();
 }
