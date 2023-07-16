@@ -157,15 +157,15 @@ void AGamePlayerController::ClientUpdateRoundTimeRemaining_Implementation(const 
 	RoundUIWidget->SetTime(pTime);
 }
 
-void AGamePlayerController::AddInteractibleWidgetUI(AItem* pItem, TSubclassOf<UItemWidgetUI> pWidget)
+void AGamePlayerController::AddInteractibleWidgetUI(AActor* pItem, TSubclassOf<UUserWidget> pWidget)
 {
-	UItemWidgetUI* Widget = CreateWidget<UItemWidgetUI>(GetWorld(), pWidget);
+	UUserWidget* Widget = CreateWidget<UUserWidget>(GetWorld(), pWidget);
 	Widget->AddToViewport();
 
 	interactibleUI.Add(pItem, Widget);
 }
 
-void AGamePlayerController::RemoveInteractibleWidgetUI(AItem* pItem)
+void AGamePlayerController::RemoveInteractibleWidgetUI(AActor* pItem)
 {
 	if (interactibleUI.Find(pItem) == nullptr)
 		return;
@@ -174,7 +174,7 @@ void AGamePlayerController::RemoveInteractibleWidgetUI(AItem* pItem)
 	interactibleUI.Remove(pItem);
 }
 
-UItemWidgetUI* AGamePlayerController::GetWidget(AItem* pItem)
+UUserWidget* AGamePlayerController::GetWidget(AActor* pItem)
 {
 	if (interactibleUI.Find(pItem) == nullptr)
 		return nullptr;

@@ -35,8 +35,8 @@ void AItem::Tick(float DeltaTime)
         //Update ui progress bar
         AThief* thief = Cast<AThief>(acteurUsingThis);
         AGamePlayerController* playerController = Cast<AGamePlayerController>(thief->GetController());
-        UItemWidgetUI* widget = playerController->GetWidget(this);
-        widget->setProgressBarValue(map(currentTime, 0, TimeToPickUp, 0, 1));
+        UItemWidgetUI* widget = Cast<UItemWidgetUI>(playerController->GetWidget(this));
+        widget->setProgressBarValue(HelperClass::mapValue(currentTime, 0, TimeToPickUp, 0, 1));
     }
 
     if (currentTime >= TimeToPickUp && currentlyInteracting)
@@ -90,7 +90,7 @@ void AItem::Interact_Implementation(AActor* pActor)
     //Show progress bar
     AThief* thief = Cast<AThief>(pActor);
     AGamePlayerController* playerController = Cast<AGamePlayerController>(thief->GetController());
-    UItemWidgetUI* widget = playerController->GetWidget(this);
+    UItemWidgetUI* widget = Cast<UItemWidgetUI>(playerController->GetWidget(this));
     widget->ActivateProgressBar();
 }
 
@@ -105,7 +105,7 @@ void AItem::StopInteract_Implementation(AActor* pActor)
     //Show basic message
     AThief* thief = Cast<AThief>(pActor);
     AGamePlayerController* playerController = Cast<AGamePlayerController>(thief->GetController());
-    UItemWidgetUI* widget = playerController->GetWidget(this);
+    UItemWidgetUI* widget = Cast<UItemWidgetUI>(playerController->GetWidget(this));
     if (widget == nullptr)
         return;
 

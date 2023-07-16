@@ -36,7 +36,7 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	TArray<class ABase3C*> TeamB;
 
-	TMap<class AItem*, class UItemWidgetUI*> interactibleUI;
+	TMap<class AActor*, class UUserWidget*> interactibleUI;
 
 	virtual void BeginPlay() override;
 
@@ -83,8 +83,8 @@ public:
 	void ClientUpdateRoundTimeRemaining_Implementation(const FString& pTime);
 
 
-	void AddInteractibleWidgetUI(class AItem* pItem, TSubclassOf<UItemWidgetUI> pWidget);
-	void RemoveInteractibleWidgetUI(class AItem* pItem);
+	void AddInteractibleWidgetUI(class AActor* pItem, TSubclassOf<UUserWidget> pWidget);
+	void RemoveInteractibleWidgetUI(class AActor* pItem);
 
-	UItemWidgetUI* GetWidget(class AItem* pItem);
+	UUserWidget* GetWidget(class AActor* pItem);
 };
