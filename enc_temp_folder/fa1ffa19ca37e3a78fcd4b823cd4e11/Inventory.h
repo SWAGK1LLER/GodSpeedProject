@@ -47,9 +47,6 @@ public:
 	TArray<FItemLooted> items;
 	class AItem* space[2][4];
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	int score = 0;
-
 	bool ValidateSpace(class AItem& pItem);
 	bool ValidateSpace(class AItem& pItem, FPosition& pOut);
 	void AddItem(class AItem& pItem, FPosition& pPos);

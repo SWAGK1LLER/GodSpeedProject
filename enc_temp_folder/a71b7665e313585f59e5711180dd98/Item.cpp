@@ -7,7 +7,6 @@
 AItem::AItem()
 {
 	PrimaryActorTick.bCanEverTick = true;
-    bReplicates = true;
 
     RootComponent = Trigger = CreateDefaultSubobject<UBoxComponent>(FName("Root"));
     Trigger->SetGenerateOverlapEvents(true);
@@ -46,6 +45,8 @@ void AItem::Tick(float DeltaTime)
         //Tell to server no body can take it anymore
         AThief* player = Cast<AThief>(acteurUsingThis);
         player->SRAddItem(this);
+
+        HelperClass::deactivateActor(this);
     }
 }
 
@@ -121,4 +122,14 @@ void AItem::MulPlayerLootIt_Implementation()
 
     lootedItem = true;
     locked = true;
+
+    /*if (player != nullptr)
+    {
+        AGamePlayerController* playerController = Cast<AGamePlayerController>(player->GetController());
+        playerController->RemoveInteractibleWidgetUI(this);
+        currentlyInteracting = false;
+        acteurUsingThis = nullptr;
+    }*/
+
+    
 }

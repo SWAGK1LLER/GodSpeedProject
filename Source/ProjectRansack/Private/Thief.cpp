@@ -2,6 +2,7 @@
 
 
 #include "Thief.h"
+#include "Item.h"
 #include <GamePlayerController.h>
 #include <Kismet/GameplayStatics.h>
 
@@ -18,20 +19,25 @@ bool AThief::ValidateSpaceItem(AItem& pItem)
 	return inventory->ValidateSpace(pItem);
 }
 
-void AThief::AddItem(AItem& pItem)
+void AThief::SRAddItem_Implementation(AItem* pItem)
+{
+	pItem->MulPlayerLootIt();
+	MUlAddItem(pItem);
+}
+
+void AThief::MUlAddItem_Implementation(AItem* pItem)
 {
 	if (inventory == nullptr)
 		inventory = NewObject<UInventory>();
 
-	inventory->AddItem(pItem);
-
+	inventory->AddItem(*pItem);
 
 	AGamePlayerController* PC = Cast<AGamePlayerController>(Controller);
-	if (PC == nullptr || !PC->IsLocalPlayerController())
-		return;
-
-	PC->UpdateDuffleBagUI(inventory->items);
-	PC->UpdateTeamDuffleBagUI();
+	if (PC != nullptr)
+	{
+		PC->UpdateDuffleBagUI(inventory->items);
+		PC->UpdateTeamDuffleBagUI();
+	}
 }
 
 void AThief::Interact()

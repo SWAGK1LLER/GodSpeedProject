@@ -103,7 +103,6 @@ void UInventory::AddItem(AItem& pItem, FPosition& pPos)
 	if (pPos.X == -1 || pPos.Y == -1)
 		return;
 
-	score += pItem.score;
 	items.Add(FItemLooted(pItem, pPos));
 
 	for ( int i = pPos.X; i < pPos.X + pItem.SizeNeeded.SizeX; i++)

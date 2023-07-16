@@ -36,9 +36,6 @@ public:
 	bool locked = false;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	int score = 0;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	TSubclassOf<UItemWidgetUI> WidgetClass;
 	UItemWidgetUI* Widget = nullptr;
 

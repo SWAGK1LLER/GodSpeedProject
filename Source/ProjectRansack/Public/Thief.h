@@ -25,7 +25,14 @@ public:
 
 	AThief();
 	
-	void AddItem(class AItem& pItem);
+	UFUNCTION(Server, Reliable, BlueprintCallable)
+	void SRAddItem(class AItem* pItem);
+	void SRAddItem_Implementation(class AItem* pItem);
+
+	UFUNCTION(NetMulticast, Reliable, BlueprintCallable)
+	void MUlAddItem(class AItem* pItem);
+	void MUlAddItem_Implementation(class AItem* pItem);
+
 	bool ValidateSpaceItem(class AItem& pItem);
 
 	virtual void Interact() override;

@@ -176,5 +176,8 @@ void AGamePlayerController::RemoveInteractibleWidgetUI(AItem* pItem)
 
 UItemWidgetUI* AGamePlayerController::GetWidget(AItem* pItem)
 {
+	if (interactibleUI.Find(pItem) == nullptr)
+		return nullptr;
+
 	return interactibleUI[pItem];
 }
