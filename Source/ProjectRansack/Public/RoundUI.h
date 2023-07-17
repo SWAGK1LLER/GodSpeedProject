@@ -17,4 +17,10 @@ public:
 
 	UFUNCTION(BlueprintImplementableEvent)
 	void SetTime(const FString& time);
+
+	UFUNCTION(BlueprintImplementableEvent)
+	void SetScoreA(const int& pScore);
+
+	UFUNCTION(BlueprintImplementableEvent)
+	void SetScoreB(const int& pScore);
 };

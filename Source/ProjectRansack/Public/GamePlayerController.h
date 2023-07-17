@@ -82,8 +82,12 @@ public:
 	void ClientUpdateRoundTimeRemaining(const FString& pTime);
 	void ClientUpdateRoundTimeRemaining_Implementation(const FString& pTime);
 
+	UFUNCTION(Client, Unreliable, BlueprintCallable)
+	void ClientUpdateScore(int pTeamA, int pTeamB);
+	void ClientUpdateScore_Implementation(int pTeamA, int pTeamB);
 
-	void AddInteractibleWidgetUI(class AActor* pItem, TSubclassOf<UUserWidget> pWidget);
+
+	UUserWidget* AddInteractibleWidgetUI(class AActor* pItem, TSubclassOf<UUserWidget> pWidget);
 	void RemoveInteractibleWidgetUI(class AActor* pItem);
 
 	UUserWidget* GetWidget(class AActor* pItem);

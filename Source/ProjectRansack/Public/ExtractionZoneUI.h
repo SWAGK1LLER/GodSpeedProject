@@ -9,6 +9,7 @@
 /**
  * 
  */
+
 UCLASS()
 class PROJECTRANSACK_API UExtractionZoneUI : public UUserWidget
 {
@@ -18,4 +19,9 @@ public:
 	UFUNCTION(BlueprintImplementableEvent)
 	void setProgressBarValue(float percentage);
 
+	UFUNCTION(BlueprintImplementableEvent)
+	void ShowProgressBar();
+
+	UFUNCTION(BlueprintImplementableEvent)
+	void ShowEmptyInventory();
 };

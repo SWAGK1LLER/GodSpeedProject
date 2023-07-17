@@ -6,6 +6,7 @@
 #include "Base3C.h"
 #include "Inventory.h"
 #include "ThiefInteractibleActor.h"
+#include "EOSGameInstance.h"
 #include "Thief.generated.h"
 
 /**
@@ -32,6 +33,14 @@ public:
 	UFUNCTION(NetMulticast, Reliable, BlueprintCallable)
 	void MUlAddItem(class AItem* pItem);
 	void MUlAddItem_Implementation(class AItem* pItem);
+
+	UFUNCTION(Server, Reliable, BlueprintCallable)
+	void SRClearItems(int score, ETeam pTeam);
+	void SRClearItems_Implementation(int score, ETeam pTeam);
+
+	UFUNCTION(NetMulticast, Reliable, BlueprintCallable)
+	void MUlClearItems();
+	void MUlClearItems_Implementation();
 
 	bool ValidateSpaceItem(class AItem& pItem);
 

@@ -1,7 +1,9 @@
 #include "ExtractionZone.h"
 #include "Components/BoxComponent.h"
 #include "GamePlayerController.h"
+#include "EOSGameInstance.h"
 #include "HelperClass.h"
+#include "Kismet/GameplayStatics.h"
 #include "Thief.h"
 
 
@@ -28,14 +30,31 @@ void AExtractionZone::Tick(float DeltaTime)
     if (playerInZone == nullptr)
         return;
 
-    timeInZone += DeltaTime;
-
     AGamePlayerController* playerController = Cast<AGamePlayerController>(playerInZone->GetController());
     if (playerController == nullptr)
         return;
 
     UExtractionZoneUI* widget = Cast<UExtractionZoneUI>(playerController->GetWidget(this));
+
+    if (playerInZone->inventory == nullptr || playerInZone->inventory->items.Num() == 0)
+    {
+        widget->ShowEmptyInventory();
+        return;
+    }
+
+    timeInZone += DeltaTime;
+
+    widget->ShowProgressBar();
     widget->setProgressBarValue(HelperClass::mapValue(timeInZone, 0, timeToExtract, 0, 1));
+
+    if (timeInZone >= timeToExtract)
+    {
+        UEOSGameInstance* gameInstance = Cast<UEOSGameInstance>(UGameplayStatics::GetGameInstance(GetWorld()));
+
+        playerInZone->SRClearItems(playerInZone->inventory->score, gameInstance->team);
+        playerInZone->inventory->ClearInventory();
+        timeInZone = 0;
+    }
 }
 
 void AExtractionZone::OnTriggerOverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
@@ -47,11 +66,15 @@ void AExtractionZone::OnTriggerOverlapBegin(UPrimitiveComponent* OverlappedCompo
     AController* PC = player->GetController();
     if (PC != nullptr && PC->IsLocalPlayerController())
     {
-        AGamePlayerController* playerController = Cast<AGamePlayerController>(PC);
-        playerController->AddInteractibleWidgetUI(this, WidgetClass);
-
         playerInZone = player;
         timeInZone = 0;
+
+        AGamePlayerController* playerController = Cast<AGamePlayerController>(PC);
+        UExtractionZoneUI* widget = Cast<UExtractionZoneUI>(playerController->AddInteractibleWidgetUI(this, WidgetClass));
+
+
+        if (playerInZone->inventory == nullptr || playerInZone->inventory->items.Num() == 0)
+            widget->ShowEmptyInventory();
     }
 }
 

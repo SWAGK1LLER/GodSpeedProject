@@ -26,6 +26,12 @@ public:
 	bool RoundStarted = false;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	int ScoreTeamA = 0;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	int ScoreTeamB = 0;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	TSubclassOf<AActor> ThiefClass;
 	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
@@ -62,4 +68,6 @@ public:
 	UFUNCTION(BlueprintCallable)
 	FString getRemainingTimeText();
 	FString convertTimeToText();
+
+	void AddToScore(int pValue, int& pScore);
 };

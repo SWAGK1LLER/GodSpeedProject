@@ -153,16 +153,26 @@ void AGamePlayerController::ClientUpdateRoundTimeRemaining_Implementation(const 
 	if (RoundUIWidget == nullptr)
 		return;
 
-
 	RoundUIWidget->SetTime(pTime);
 }
 
-void AGamePlayerController::AddInteractibleWidgetUI(AActor* pItem, TSubclassOf<UUserWidget> pWidget)
+void AGamePlayerController::ClientUpdateScore_Implementation(int pTeamA, int pTeamB)
+{
+	if (RoundUIWidget == nullptr)
+		return;
+
+	RoundUIWidget->SetScoreA(pTeamA);
+	RoundUIWidget->SetScoreB(pTeamB);
+}
+
+UUserWidget* AGamePlayerController::AddInteractibleWidgetUI(AActor* pItem, TSubclassOf<UUserWidget> pWidget)
 {
 	UUserWidget* Widget = CreateWidget<UUserWidget>(GetWorld(), pWidget);
 	Widget->AddToViewport();
 
 	interactibleUI.Add(pItem, Widget);
+
+	return Widget;
 }
 
 void AGamePlayerController::RemoveInteractibleWidgetUI(AActor* pItem)

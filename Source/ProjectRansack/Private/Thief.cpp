@@ -5,6 +5,7 @@
 #include "Item.h"
 #include <GamePlayerController.h>
 #include <Kismet/GameplayStatics.h>
+#include <GameGameMode.h>
 
 AThief::AThief()
 {
@@ -31,6 +32,33 @@ void AThief::MUlAddItem_Implementation(AItem* pItem)
 		inventory = NewObject<UInventory>();
 
 	inventory->AddItem(*pItem);
+
+	AGamePlayerController* PC = Cast<AGamePlayerController>(Controller);
+	if (PC != nullptr)
+	{
+		PC->UpdateDuffleBagUI(inventory->items);
+		PC->UpdateTeamDuffleBagUI();
+	}
+}
+
+void AThief::SRClearItems_Implementation(int score, ETeam pTeam)
+{
+	AGameGameMode* gameMode = Cast<AGameGameMode>(UGameplayStatics::GetGameMode(GetWorld()));
+
+	switch (pTeam)
+	{
+		case ETeam::A : gameMode->AddToScore(score, gameMode->ScoreTeamA);
+			break;
+		case ETeam::B : gameMode->AddToScore(score, gameMode->ScoreTeamB);
+			break;
+	}
+
+	MUlClearItems();
+}
+
+void AThief::MUlClearItems_Implementation()
+{
+	inventory->ClearInventory();
 
 	AGamePlayerController* PC = Cast<AGamePlayerController>(Controller);
 	if (PC != nullptr)

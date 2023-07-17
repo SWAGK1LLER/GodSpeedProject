@@ -153,3 +153,11 @@ FString AGameGameMode::convertTimeToText()
 
 	return FString::FromInt(minute) + FString(" : ") + (second < 10 ? FString("0") : FString("")) + FString::FromInt(second);
 }
+
+void AGameGameMode::AddToScore(int pValue, int& pScore)
+{
+	pScore += pValue;
+
+	for (APlayerController* aPC : PC)
+		(Cast<AGamePlayerController>(aPC))->ClientUpdateScore(ScoreTeamA, ScoreTeamB);
+}
