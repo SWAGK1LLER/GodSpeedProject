@@ -1,11 +1,9 @@
 #include "Weapon.h"
 
-UWeapon::UWeapon()
+UWeapon::UWeapon(const FObjectInitializer& ObjectInitializer) : UStaticMeshComponent(ObjectInitializer)
 {
 	PrimaryComponentTick.bCanEverTick = true;
-
-	/*mesh = CreateDefaultSubobject<UStaticMeshComponent>(FName("Mesh"));
-	mesh->RegisterComponent();*/
+	MaxAmmo = ammo;
 }
 
 void UWeapon::BeginPlay()
@@ -18,4 +16,5 @@ void UWeapon::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponen
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 
+	currentTime += DeltaTime;
 }

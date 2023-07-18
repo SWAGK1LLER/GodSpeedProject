@@ -8,6 +8,7 @@
 #include "EnhancedInputSubsystems.h"
 #include "HealthComponent.h"
 #include "CameraComp.h"
+#include "StunWeapon.h"
 #include <Kismet/GameplayStatics.h>
 #include "GameFramework/CharacterMovementComponent.h"
 
@@ -25,6 +26,8 @@ ABase3C::ABase3C()
 	//Health Comp
 	healthComp = CreateDefaultSubobject<UHealthComponent>(TEXT("HealthComponent"));
 	currentState = CharacterState::Idle;
+
+	StunWeapon = CreateDefaultSubobject<UStunWeapon>(TEXT("StunWeapon"));
 }
 
 bool ABase3C::CheckTableInstance()
@@ -60,6 +63,16 @@ void ABase3C::MulticastSetClientNickname_Implementation(const FString& pNickName
 	nickName = pNickName;
 }
 
+void ABase3C::ClientFreezeInput_Implementation(float duration)
+{
+	if (bFreezeInput)
+		return;
+
+	bFreezeInput = true;
+	FreezeDuration = duration;
+	TimeFreezed = 0;
+}
+
 // Called when the game starts or when spawned
 void ABase3C::BeginPlay()
 {
@@ -73,12 +86,21 @@ void ABase3C::BeginPlay()
 	BindInputHandler();
 	SendDataToComponents();
 
+	WidgetUI = CreateWidget<UPlayerUI>(GetWorld(), WidgetClass);
+	WidgetUI->AddToViewport();
 }
 
 // Called every frame
 void ABase3C::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+
+	if (bFreezeInput)
+	{
+		TimeFreezed += DeltaTime;
+		if (TimeFreezed >= FreezeDuration)
+			bFreezeInput = false;
+	}
 }
 
 // Called to bind functionality to input
@@ -111,6 +133,9 @@ void ABase3C::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 
 void ABase3C::Move(const FInputActionValue& Value)
 {
+	if (bFreezeInput)
+		return;
+
 	// input is a Vector2D
 	FVector2D MovementVector = Value.Get<FVector2D>();
 
@@ -134,6 +159,9 @@ void ABase3C::Move(const FInputActionValue& Value)
 
 void ABase3C::Interact()
 {
+	if (bFreezeInput)
+		return;
+
 	TestDamage(this);
 }
 
@@ -144,6 +172,9 @@ void ABase3C::StopInteract()
 
 void ABase3C::StartAim()
 {
+	if (bFreezeInput)
+		return;
+
 	GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("Aiming!"));
 }
 
@@ -154,11 +185,17 @@ void ABase3C::StopAim()
 
 void ABase3C::Fire()
 {
-	GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("Firing!"));
+	if (bFreezeInput)
+		return;
+
+	StunWeapon->Fire();
 }
 
 void ABase3C::Sprint()
 {
+	if (bFreezeInput)
+		return;
+
 	GetCharacterMovement()->MaxWalkSpeed = normalWalkSpeed * tableInstance->sprintSpeed;
 }
 

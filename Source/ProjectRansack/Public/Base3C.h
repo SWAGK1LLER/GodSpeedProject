@@ -6,6 +6,7 @@
 #include "GameFramework/Character.h"
 #include "InputActionValue.h"
 #include "Engine/DataTable.h"
+#include "PlayerUI.h"
 #include "Base3C.generated.h"
 
 USTRUCT(BlueprintType)
@@ -39,17 +40,17 @@ public:
 
 	/**Input Action */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
-		class UInputAction* moveAction;
+		class UInputAction* moveAction = nullptr;
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
-		class UInputAction* interactAction;
+		class UInputAction* interactAction = nullptr;
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
-		class UInputAction* lookAction;
+		class UInputAction* lookAction = nullptr;
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
-		class UInputAction* AimAction;
+		class UInputAction* AimAction = nullptr;
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
-		class UInputAction* FireAction;
+		class UInputAction* FireAction = nullptr;
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
-		class UInputAction* SprintAction;
+		class UInputAction* SprintAction = nullptr;
 };
 
 UENUM()
@@ -67,27 +68,37 @@ class PROJECTRANSACK_API ABase3C : public ACharacter
 	GENERATED_BODY()
 
 public:
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	TSubclassOf<UPlayerUI> WidgetClass;
+	UPlayerUI* WidgetUI = nullptr;
+
 	UPROPERTY(editAnywhere, blueprintReadWrite)
-	class USkeletalMeshComponent* skeletalMesh;
+	class USkeletalMeshComponent* skeletalMesh = nullptr;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
-		class UCameraComp* cameraComponent;
+	class UCameraComp* cameraComponent = nullptr;
 
-	/*Health Component*/
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
+	class UStunWeapon* StunWeapon = nullptr;
+
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Health, meta = (AllowPrivateAccess = "true"))
-	class UHealthComponent* healthComp;
+	class UHealthComponent* healthComp = nullptr;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	FString nickName = "";
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Data, meta = (AllowPrivateAccess = "true"))
-		class UDataTable* dataTable;
+	class UDataTable* dataTable = nullptr;
 
 	FBase3CTable* tableInstance = nullptr;
 
 	float normalWalkSpeed;
 
 	CharacterState currentState;
+
+	bool bFreezeInput = false;
+	float FreezeDuration = 0;
+	float TimeFreezed = 0;
 
 
 	ABase3C();
@@ -102,6 +113,10 @@ public:
 	UFUNCTION(NetMulticast, Reliable, BlueprintCallable)
 	void MulticastSetClientNickname(const FString& pNickName);
 	void MulticastSetClientNickname_Implementation(const FString& pNickName);
+
+	UFUNCTION(Client, Reliable, BlueprintCallable)
+	void ClientFreezeInput(float duration);
+	void ClientFreezeInput_Implementation(float duration);
 
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;

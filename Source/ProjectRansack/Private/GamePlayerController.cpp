@@ -117,8 +117,6 @@ void AGamePlayerController::SRUpdateTeamDuffleBagUI_Implementation()
 {
 	AGameGameMode* gameMode = Cast<AGameGameMode>(UGameplayStatics::GetGameMode(GetWorld()));
 
-	//Maybe will need a delay
-
 	if (gameMode != nullptr)
 		gameMode->UpdateTeamDuffleBag();
 }
@@ -190,4 +188,12 @@ UUserWidget* AGamePlayerController::GetWidget(AActor* pItem)
 		return nullptr;
 
 	return interactibleUI[pItem];
+}
+
+void AGamePlayerController::SRFreezeInput_Implementation(float duration, ABase3C* actor)
+{
+	AGameGameMode* gameMode = Cast<AGameGameMode>(UGameplayStatics::GetGameMode(GetWorld()));
+
+	if (gameMode != nullptr)
+		gameMode->FreezeInput(duration, actor);
 }

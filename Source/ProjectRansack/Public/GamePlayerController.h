@@ -87,6 +87,10 @@ public:
 	void ClientUpdateScore_Implementation(int pTeamA, int pTeamB);
 
 
+	UFUNCTION(Server, Reliable, BlueprintCallable)
+	void SRFreezeInput(float duration, ABase3C* actor);
+	void SRFreezeInput_Implementation(float duration, ABase3C* actor);
+
 	UUserWidget* AddInteractibleWidgetUI(class AActor* pItem, TSubclassOf<UUserWidget> pWidget);
 	void RemoveInteractibleWidgetUI(class AActor* pItem);
 

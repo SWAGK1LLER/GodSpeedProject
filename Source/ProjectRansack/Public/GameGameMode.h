@@ -70,4 +70,6 @@ public:
 	FString convertTimeToText();
 
 	void AddToScore(int pValue, int& pScore);
+
+	void FreezeInput(float duration, ABase3C* actor);
 };

@@ -161,3 +161,8 @@ void AGameGameMode::AddToScore(int pValue, int& pScore)
 	for (APlayerController* aPC : PC)
 		(Cast<AGamePlayerController>(aPC))->ClientUpdateScore(ScoreTeamA, ScoreTeamB);
 }
+
+void AGameGameMode::FreezeInput(float duration, ABase3C* actor)
+{
+	actor->ClientFreezeInput(duration);
+}
