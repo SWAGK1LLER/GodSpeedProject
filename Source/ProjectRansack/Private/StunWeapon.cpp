@@ -5,7 +5,10 @@
 #include "GamePlayerController.h"
 #include "CameraComp.h"
 #include "Camera/CameraComponent.h"
+#include "Kismet/GameplayStatics.h"
 #include "Kismet/KismetMathLibrary.h"
+#include "Particles/ParticleSystemComponent.h"
+#include "GenericParticleSystemComponent.h"
 
 UStunWeapon::UStunWeapon(const FObjectInitializer& ObjectInitializer) : UWeapon(ObjectInitializer)
 {
@@ -37,21 +40,36 @@ void UStunWeapon::TickComponent(float DeltaTime, ELevelTick TickType, FActorComp
 
 void UStunWeapon::Fire()
 {
-	if (currentTime < coolDown || ammo - 1 < 0)
+	if (CoolDownCurrentTime < coolDown || ammo - 1 < 0)
 		return;
 
-	currentTime = 0;
+    CoolDownCurrentTime = 0;
 	ammo--;
 
     ABase3C* player = Cast<ABase3C>(GetOwner());
     player->WidgetUI->UpdateRemainingAmmo(ammo);
 
-    AActor* actor = HitScan();
+    FVector hitLocation;
+    AActor* actor = HitScan(hitLocation);
     if (actor == nullptr)
         return;
 
-    if (!actor->IsA(EnemyHittable))
+    bool hitableEnemy = actor->IsA(EnemyHittable);
+
+    FTransform position = FTransform(hitLocation);
+    UGenericParticleSystemComponent* particle = (UGenericParticleSystemComponent*)UGameplayStatics::SpawnEmitterAtLocation(
+                                                                                GetWorld(),
+                                                                                particleEffect,
+                                                                                position,
+                                                                                !hitableEnemy,
+                                                                                EPSCPoolMethod::AutoRelease,
+                                                                                true
+                                                                                );
+
+    if (!hitableEnemy)
         return;
+
+    particle->setLifeSpan(StunDuration);
 
     APawn* owner = Cast<APawn>(GetOwner());
     AGamePlayerController* playerController = Cast<AGamePlayerController>(owner->GetController());
@@ -61,7 +79,7 @@ void UStunWeapon::Fire()
     GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("Actor hitted!"));
 }
 
-AActor* UStunWeapon::HitScan()
+AActor* UStunWeapon::HitScan(FVector& hitLocation)
 {
     ABase3C* player = Cast<ABase3C>(GetOwner());
 
@@ -82,6 +100,8 @@ AActor* UStunWeapon::HitScan()
         FCollisionObjectQueryParams(ECollisionChannel::ECC_WorldStatic),
         TraceParams
     );
+
+    hitLocation = Hit.Location;
 
     return Hit.GetActor();
 }

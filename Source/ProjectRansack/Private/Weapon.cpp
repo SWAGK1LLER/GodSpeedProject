@@ -16,5 +16,5 @@ void UWeapon::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponen
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 
-	currentTime += DeltaTime;
+	CoolDownCurrentTime += DeltaTime;
 }

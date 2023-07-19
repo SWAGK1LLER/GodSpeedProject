@@ -6,6 +6,7 @@
 #include "Weapon.h"
 #include "Base3C.h"
 #include "Templates/SubclassOf.h"
+#include "Particles/ParticleSystem.h"
 #include "StunWeapon.generated.h"
 
 /**
@@ -20,8 +21,11 @@ public:
 	UPROPERTY(EditDefaultsOnly, Category = "Setup")
 	TSubclassOf<ABase3C> EnemyHittable;
 
+	UPROPERTY(EditDefaultsOnly, Category = "Setup")
+	UParticleSystem* particleEffect = nullptr;
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	float Reach = 1000;
+	float Reach = 10000;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	float StunDuration = 5;
@@ -34,5 +38,5 @@ public:
 
 	void Fire() override;
 
-	AActor* HitScan();
+	AActor* HitScan(FVector& hitLocation);
 };
