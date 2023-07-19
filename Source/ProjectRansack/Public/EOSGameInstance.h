@@ -90,7 +90,21 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void StartGame();
 
+	UFUNCTION(BlueprintCallable)
+	void SaveGame();
+	UFUNCTION(BlueprintCallable)
+	void LoadGame();
 
+	TArray<uint8> ConvertSaveGameToUint();
+	class USaveGame* ConvertUintToSaveGame(TArray<uint8> pData);
+
+	void UploadPlayerData(TArray<uint8> pData);
+	void OnWritePlayerDataCompleted(bool bWasSuccessful, const FUniqueNetId& user, const FString& FileName);
+
+	void GetPlayerData();
+	void OnGetPlayerDataCompleted(bool bWasSuccessful, const FUniqueNetId& user, const FString& FileName);
+
+	void ReadPlayerData(const FString& FileName);
 
 public:
 	class IOnlineSubsystem* OnlineSubsystem;
@@ -103,4 +117,9 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	ETeam team = ETeam::A;
+
+	UPROPERTY(BlueprintReadOnly)
+	FString SaveGameSlotName = "SaveGame.sav";
+
+	class UPlayerSaveGame* saveGame = nullptr;
 };

@@ -9,6 +9,7 @@
 #include <Kismet/GameplayStatics.h>
 #include "OnlineSubsystemUtils.h"
 #include "Interfaces/OnlinePartyInterface.h"
+#include "PlayerSaveGame.h"
 
 const FName FSessionName = FName("Lobby");
 const FString FSearchName = FString("ProjectRansackLobby");
@@ -94,6 +95,7 @@ void UEOSGameInstance::OnLoginCompleteTry(int32 LocalUserNum, bool bWasSuccessfu
 		EOSLogin();
 	else
 	{
+		LoadGame();
 		LoginSuccessful();
 		CreateParty();
 	}
@@ -114,6 +116,7 @@ void UEOSGameInstance::OnLoginCompleteEOS(int32 LocalUserNum, bool bWasSuccessfu
 
 	if (bIsLogin)
 	{
+		LoadGame();
 		LoginSuccessful();
 		CreateParty();
 	}
@@ -581,4 +584,117 @@ void UEOSGameInstance::StartGame()
 		return;
 
 	SessionPtr->StartSession(FGameSessionName);
+}
+
+void UEOSGameInstance::SaveGame()
+{
+	UGameplayStatics::SaveGameToSlot(saveGame, SaveGameSlotName, 0);
+	UploadPlayerData(ConvertSaveGameToUint());
+}
+
+void UEOSGameInstance::LoadGame()
+{
+	GetPlayerData();
+}
+
+TArray<uint8> UEOSGameInstance::ConvertSaveGameToUint()
+{
+	TArray<uint8> data;
+	if (saveGame == nullptr)
+		return data;
+
+	UGameplayStatics::SaveGameToMemory(saveGame, data);
+	return data;
+}
+
+USaveGame* UEOSGameInstance::ConvertUintToSaveGame(TArray<uint8> pData)
+{
+	USaveGame* aSaveGame = nullptr;
+
+	if (pData.IsEmpty())
+		return aSaveGame;
+
+	return UGameplayStatics::LoadGameFromMemory(pData);
+}
+
+void UEOSGameInstance::UploadPlayerData(TArray<uint8> pData)
+{
+	if (pData.IsEmpty())
+		return;
+
+	IOnlineSubsystem* subsystem = Online::GetSubsystem(GetWorld());
+	if (subsystem == nullptr)
+		return;
+
+	IOnlineIdentityPtr identityPointerRef = subsystem->GetIdentityInterface();
+	if (!identityPointerRef)
+		return;
+
+	IOnlineUserCloudPtr cloundPointerRef = subsystem->GetUserCloudInterface();
+	if (!cloundPointerRef)
+		return;
+
+	TSharedPtr<const FUniqueNetId> userIdRef = identityPointerRef->GetUniquePlayerId(0);
+	cloundPointerRef->OnWriteUserFileCompleteDelegates.AddUObject(this, &UEOSGameInstance::OnWritePlayerDataCompleted);
+	cloundPointerRef->WriteUserFile(*userIdRef, SaveGameSlotName, pData);
+}
+
+void UEOSGameInstance::OnWritePlayerDataCompleted(bool bWasSuccessful, const FUniqueNetId& user, const FString& FileName)
+{
+
+}
+
+void UEOSGameInstance::GetPlayerData()
+{
+	IOnlineSubsystem* subsystem = Online::GetSubsystem(GetWorld());
+	if (subsystem == nullptr)
+		return;
+
+	IOnlineIdentityPtr identityPointerRef = subsystem->GetIdentityInterface();
+	if (!identityPointerRef)
+		return;
+
+	IOnlineUserCloudPtr cloundPointerRef = subsystem->GetUserCloudInterface();
+	if (!cloundPointerRef)
+		return;
+
+	TSharedPtr<const FUniqueNetId> userIdRef = identityPointerRef->GetUniquePlayerId(0);
+	cloundPointerRef->OnReadUserFileCompleteDelegates.AddUObject(this, &UEOSGameInstance::OnGetPlayerDataCompleted);
+	cloundPointerRef->ReadUserFile(*userIdRef, SaveGameSlotName);
+}
+
+void UEOSGameInstance::OnGetPlayerDataCompleted(bool bWasSuccessful, const FUniqueNetId& user, const FString& FileName)
+{
+	if (bWasSuccessful)
+	{
+		ReadPlayerData(FileName);
+	}
+	else
+	{
+		//New account, no file on server
+		saveGame = (UPlayerSaveGame*)(UGameplayStatics::CreateSaveGameObject(UPlayerSaveGame::StaticClass()));
+		SaveGame();
+	}
+}
+
+void UEOSGameInstance::ReadPlayerData(const FString& FileName)
+{
+	IOnlineSubsystem* subsystem = Online::GetSubsystem(GetWorld());
+	if (subsystem == nullptr)
+		return;
+
+	IOnlineIdentityPtr identityPointerRef = subsystem->GetIdentityInterface();
+	if (!identityPointerRef)
+		return;
+
+	IOnlineUserCloudPtr cloundPointerRef = subsystem->GetUserCloudInterface();
+	if (!cloundPointerRef)
+		return;
+
+	TSharedPtr<const FUniqueNetId> userIdRef = identityPointerRef->GetUniquePlayerId(0);
+
+	TArray<uint8> data;
+	cloundPointerRef->GetFileContents(*userIdRef, FileName, data);
+
+	saveGame = Cast<UPlayerSaveGame>(ConvertUintToSaveGame(data));
 }
