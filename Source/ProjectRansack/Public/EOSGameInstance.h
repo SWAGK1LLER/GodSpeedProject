@@ -11,11 +11,14 @@
 
 namespace EOnJoinSessionCompleteResult { enum Type; }
 
-template <typename T>
-struct SaveGameSlot
+
+template <typename T> 
+struct FSaveGameSlot
 {
 	FString fileName = "";
 	int slotIdx = 0;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	T* saveGame = nullptr;
 };
 
@@ -125,6 +128,9 @@ public:
 
 	void ReadPlayerData(const FString& FileName);
 
+	UFUNCTION(BlueprintCallable)
+	class UPlayerSetting* GetPlayerSettings();
+
 public:
 	class IOnlineSubsystem* OnlineSubsystem;
 	bool bIsLogin = false;
@@ -137,19 +143,7 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	ETeam team = ETeam::A;
 
-	/*UPROPERTY(BlueprintReadOnly)
-	FString SaveGameSlotName = "SaveGame.sav";*/
 
-	
-	//class UPlayerSaveGame* saveGame = nullptr;
-
-	/*UPROPERTY(BlueprintReadOnly)
-	FString SettingsGameSlotName = "SaveGame.sav";*/
-
-	
-	//class UPlayerSetting* Settings = nullptr;
-
-
-	SaveGameSlot<class UPlayerSaveGame> ServerGameSlot = { "SaveGame.sav", 0, nullptr };
-	SaveGameSlot<class UPlayerSetting> SettingsGameSlot = { "Settings.sav", 1, nullptr };
+	FSaveGameSlot<class UPlayerSaveGame> ServerGameSlot = { "SaveGame.sav", 0, nullptr };
+	FSaveGameSlot<class UPlayerSetting> SettingsGameSlot = { "Settings.sav", 1, nullptr };
 };

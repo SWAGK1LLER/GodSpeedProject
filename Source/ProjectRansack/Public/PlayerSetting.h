@@ -17,11 +17,11 @@ public:
 
 	//Security
 	UPROPERTY(BlueprintReadWrite, Category = "Player Info")
-	int SecuFov = 0;
+	float SecuFov = 0;
 
 	//Thief
 	UPROPERTY(BlueprintReadWrite, Category = "Player Info")
-	int ThiefFov = 0;
+	float ThiefFov = 0;
 
 	//General
 	UPROPERTY(BlueprintReadWrite, Category = "Player Info")

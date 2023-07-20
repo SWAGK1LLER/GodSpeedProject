@@ -28,6 +28,7 @@ void UEOSGameInstance::Init()
 	Super::Init();
 
 	OnlineSubsystem = IOnlineSubsystem::Get();
+	LoadSaveSettings();
 }
 
 //Login
@@ -595,14 +596,15 @@ void UEOSGameInstance::SaveSettings()
 
 void UEOSGameInstance::LoadSaveSettings()
 {
-	if (SettingsGameSlot.saveGame == nullptr)
+	USaveGame* aSaveGame = UGameplayStatics::LoadGameFromSlot(SettingsGameSlot.fileName, SettingsGameSlot.slotIdx);
+	if (aSaveGame == nullptr)
 	{
 		//New account, no file on server
 		SettingsGameSlot.saveGame = (UPlayerSetting*)(UGameplayStatics::CreateSaveGameObject(UPlayerSetting::StaticClass()));
 		SaveSettings();
 	}
 	else
-		SettingsGameSlot.saveGame = (UPlayerSetting*)UGameplayStatics::LoadGameFromSlot(SettingsGameSlot.fileName, SettingsGameSlot.slotIdx);
+		SettingsGameSlot.saveGame = (UPlayerSetting*)aSaveGame;	
 }
 
 void UEOSGameInstance::SaveGame()
@@ -718,4 +720,9 @@ void UEOSGameInstance::ReadPlayerData(const FString& FileName)
 	ServerGameSlot.saveGame = Cast<UPlayerSaveGame>(ConvertUintToSaveGame(data));
 
 	LoadSaveGameSuccessful(ServerGameSlot.saveGame->GetPercent(), ServerGameSlot.saveGame->level);
+}
+
+UPlayerSetting* UEOSGameInstance::GetPlayerSettings()
+{
+	return SettingsGameSlot.saveGame;
 }
