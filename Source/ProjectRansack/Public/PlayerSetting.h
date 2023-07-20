@@ -4,27 +4,29 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/SaveGame.h"
-#include "PlayerSaveGame.generated.h"
+#include "PlayerSetting.generated.h"
 
 /**
  * 
  */
 UCLASS()
-class PROJECTRANSACK_API UPlayerSaveGame : public USaveGame
+class PROJECTRANSACK_API UPlayerSetting : public USaveGame
 {
 	GENERATED_BODY()
-
 public:
-	UPROPERTY(BlueprintReadWrite, Category = "Player Info")
-	int level = 1;
-	UPROPERTY(BlueprintReadWrite, Category = "Player Info")
-	int xp = 0;
-	UPROPERTY(BlueprintReadWrite, Category = "Player Info")
-	int xpMax = 100;
-	UPROPERTY(BlueprintReadWrite, Category = "Player Info")
-	float xpCoefPerLevel = 0.25;
 
-	float GetPercent();
-	void levelUp();
-	void addXp(int pXp);
+	//Security
+	UPROPERTY(BlueprintReadWrite, Category = "Player Info")
+	int SecuFov = 0;
+
+	//Thief
+	UPROPERTY(BlueprintReadWrite, Category = "Player Info")
+	int ThiefFov = 0;
+
+	//General
+	UPROPERTY(BlueprintReadWrite, Category = "Player Info")
+	int resolutionX = 1920;
+
+	UPROPERTY(BlueprintReadWrite, Category = "Player Info")
+	int resolutionY = 1080;
 };

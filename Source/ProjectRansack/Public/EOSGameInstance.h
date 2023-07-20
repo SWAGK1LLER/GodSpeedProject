@@ -11,6 +11,14 @@
 
 namespace EOnJoinSessionCompleteResult { enum Type; }
 
+template <typename T>
+struct SaveGameSlot
+{
+	FString fileName = "";
+	int slotIdx = 0;
+	T* saveGame = nullptr;
+};
+
 UENUM(BlueprintType)
 enum EOutcomePins
 {
@@ -90,10 +98,21 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void StartGame();
 
+
+	//-------------
+	//SaveGame / saveSettings
+	UFUNCTION(BlueprintCallable)
+	void SaveSettings();
+	UFUNCTION(BlueprintCallable)
+	void LoadSaveSettings();
+
 	UFUNCTION(BlueprintCallable)
 	void SaveGame();
 	UFUNCTION(BlueprintCallable)
-	void LoadGame();
+	void LoadSaveGame();
+
+	UFUNCTION(BlueprintImplementableEvent)
+	void LoadSaveGameSuccessful(float percent, int level);
 
 	TArray<uint8> ConvertSaveGameToUint();
 	class USaveGame* ConvertUintToSaveGame(TArray<uint8> pData);
@@ -118,8 +137,19 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	ETeam team = ETeam::A;
 
-	UPROPERTY(BlueprintReadOnly)
-	FString SaveGameSlotName = "SaveGame.sav";
+	/*UPROPERTY(BlueprintReadOnly)
+	FString SaveGameSlotName = "SaveGame.sav";*/
 
-	class UPlayerSaveGame* saveGame = nullptr;
+	
+	//class UPlayerSaveGame* saveGame = nullptr;
+
+	/*UPROPERTY(BlueprintReadOnly)
+	FString SettingsGameSlotName = "SaveGame.sav";*/
+
+	
+	//class UPlayerSetting* Settings = nullptr;
+
+
+	SaveGameSlot<class UPlayerSaveGame> ServerGameSlot = { "SaveGame.sav", 0, nullptr };
+	SaveGameSlot<class UPlayerSetting> SettingsGameSlot = { "Settings.sav", 1, nullptr };
 };

@@ -10,6 +10,7 @@
 #include "OnlineSubsystemUtils.h"
 #include "Interfaces/OnlinePartyInterface.h"
 #include "PlayerSaveGame.h"
+#include "PlayerSetting.h"
 
 const FName FSessionName = FName("Lobby");
 const FString FSearchName = FString("ProjectRansackLobby");
@@ -95,7 +96,6 @@ void UEOSGameInstance::OnLoginCompleteTry(int32 LocalUserNum, bool bWasSuccessfu
 		EOSLogin();
 	else
 	{
-		LoadGame();
 		LoginSuccessful();
 		CreateParty();
 	}
@@ -116,7 +116,6 @@ void UEOSGameInstance::OnLoginCompleteEOS(int32 LocalUserNum, bool bWasSuccessfu
 
 	if (bIsLogin)
 	{
-		LoadGame();
 		LoginSuccessful();
 		CreateParty();
 	}
@@ -586,13 +585,33 @@ void UEOSGameInstance::StartGame()
 	SessionPtr->StartSession(FGameSessionName);
 }
 
+//--------
+//SaveGame / saveSettings
+
+void UEOSGameInstance::SaveSettings()
+{
+	UGameplayStatics::SaveGameToSlot(SettingsGameSlot.saveGame, SettingsGameSlot.fileName, SettingsGameSlot.slotIdx);
+}
+
+void UEOSGameInstance::LoadSaveSettings()
+{
+	if (SettingsGameSlot.saveGame == nullptr)
+	{
+		//New account, no file on server
+		SettingsGameSlot.saveGame = (UPlayerSetting*)(UGameplayStatics::CreateSaveGameObject(UPlayerSetting::StaticClass()));
+		SaveSettings();
+	}
+	else
+		SettingsGameSlot.saveGame = (UPlayerSetting*)UGameplayStatics::LoadGameFromSlot(SettingsGameSlot.fileName, SettingsGameSlot.slotIdx);
+}
+
 void UEOSGameInstance::SaveGame()
 {
-	UGameplayStatics::SaveGameToSlot(saveGame, SaveGameSlotName, 0);
+	UGameplayStatics::SaveGameToSlot(ServerGameSlot.saveGame, ServerGameSlot.fileName, ServerGameSlot.slotIdx);
 	UploadPlayerData(ConvertSaveGameToUint());
 }
 
-void UEOSGameInstance::LoadGame()
+void UEOSGameInstance::LoadSaveGame()
 {
 	GetPlayerData();
 }
@@ -600,10 +619,10 @@ void UEOSGameInstance::LoadGame()
 TArray<uint8> UEOSGameInstance::ConvertSaveGameToUint()
 {
 	TArray<uint8> data;
-	if (saveGame == nullptr)
+	if (ServerGameSlot.saveGame == nullptr)
 		return data;
 
-	UGameplayStatics::SaveGameToMemory(saveGame, data);
+	UGameplayStatics::SaveGameToMemory(ServerGameSlot.saveGame, data);
 	return data;
 }
 
@@ -636,12 +655,11 @@ void UEOSGameInstance::UploadPlayerData(TArray<uint8> pData)
 
 	TSharedPtr<const FUniqueNetId> userIdRef = identityPointerRef->GetUniquePlayerId(0);
 	cloundPointerRef->OnWriteUserFileCompleteDelegates.AddUObject(this, &UEOSGameInstance::OnWritePlayerDataCompleted);
-	cloundPointerRef->WriteUserFile(*userIdRef, SaveGameSlotName, pData);
+	cloundPointerRef->WriteUserFile(*userIdRef, ServerGameSlot.fileName, pData);
 }
 
 void UEOSGameInstance::OnWritePlayerDataCompleted(bool bWasSuccessful, const FUniqueNetId& user, const FString& FileName)
 {
-
 }
 
 void UEOSGameInstance::GetPlayerData()
@@ -660,7 +678,7 @@ void UEOSGameInstance::GetPlayerData()
 
 	TSharedPtr<const FUniqueNetId> userIdRef = identityPointerRef->GetUniquePlayerId(0);
 	cloundPointerRef->OnReadUserFileCompleteDelegates.AddUObject(this, &UEOSGameInstance::OnGetPlayerDataCompleted);
-	cloundPointerRef->ReadUserFile(*userIdRef, SaveGameSlotName);
+	cloundPointerRef->ReadUserFile(*userIdRef, ServerGameSlot.fileName);
 }
 
 void UEOSGameInstance::OnGetPlayerDataCompleted(bool bWasSuccessful, const FUniqueNetId& user, const FString& FileName)
@@ -672,8 +690,9 @@ void UEOSGameInstance::OnGetPlayerDataCompleted(bool bWasSuccessful, const FUniq
 	else
 	{
 		//New account, no file on server
-		saveGame = (UPlayerSaveGame*)(UGameplayStatics::CreateSaveGameObject(UPlayerSaveGame::StaticClass()));
+		ServerGameSlot.saveGame = (UPlayerSaveGame*)(UGameplayStatics::CreateSaveGameObject(UPlayerSaveGame::StaticClass()));
 		SaveGame();
+		LoadSaveGameSuccessful(ServerGameSlot.saveGame->GetPercent(), ServerGameSlot.saveGame->level);
 	}
 }
 
@@ -696,5 +715,7 @@ void UEOSGameInstance::ReadPlayerData(const FString& FileName)
 	TArray<uint8> data;
 	cloundPointerRef->GetFileContents(*userIdRef, FileName, data);
 
-	saveGame = Cast<UPlayerSaveGame>(ConvertUintToSaveGame(data));
+	ServerGameSlot.saveGame = Cast<UPlayerSaveGame>(ConvertUintToSaveGame(data));
+
+	LoadSaveGameSuccessful(ServerGameSlot.saveGame->GetPercent(), ServerGameSlot.saveGame->level);
 }
