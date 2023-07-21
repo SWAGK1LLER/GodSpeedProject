@@ -1,0 +1,22 @@
+# Blender 3.6.0 MTL File: 'gadgets.blend'
+# www.blender.org
+
+newmtl m_2819c417-c2c7-68ff-fa55-9e6cfa7eb0f2
+Ns 0.000000
+Ka 1.000000 1.000000 1.000000
+Ks 0.000000 0.000000 0.000000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+illum 1
+map_Kd C:/comb.png
+map_d C:/comb.png
+
+newmtl m_6b6f5925-5dda-7451-e0ae-6040442c609b
+Ns 0.000000
+Ka 1.000000 1.000000 1.000000
+Ks 0.000000 0.000000 0.000000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+illum 1
+map_Kd C:/door.png
+map_d C:/door.png

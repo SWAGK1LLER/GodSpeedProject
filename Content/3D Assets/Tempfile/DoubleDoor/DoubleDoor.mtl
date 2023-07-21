@@ -1,0 +1,292 @@
+# Blender 3.6.0 MTL File: 'gadgets.blend'
+# www.blender.org
+
+newmtl Diamond
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ni 1.450000
+d 1.000000
+illum 2
+map_Kd C:/Pedestal_Diamond_BaseColor.png
+map_Ns C:/Pedestal_Diamond_OcclusionRoughnessMetallic.png
+map_Ke C:/Pedestal_Diamond_Emissive.png
+
+newmtl Diamond.001
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ni 1.450000
+d 1.000000
+illum 2
+map_Kd C:/Pedestal_Diamond_BaseColor.png
+map_Ns C:/Pedestal_Diamond_OcclusionRoughnessMetallic.png
+map_Ke C:/Pedestal_Diamond_Emissive.png
+
+newmtl Diamond.002
+Ns 136.958267
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ni 1.450000
+d 1.000000
+illum 2
+map_Kd C:/Pedestal_Diamond_BaseColor.png
+map_Ke C:/Pedestal_Diamond_Emissive.png
+
+newmtl MainLight
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ni 1.450000
+d 1.000000
+illum 2
+map_Kd C:/LightFixtureMain_MainLight_BaseColor.png
+map_Ns C:/LightFixtureMain_MainLight_OcclusionRoughnessMetallic.png
+map_Ke C:/LightFixtureMain_MainLight_Emissive.png
+
+newmtl MainLight.001
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ni 1.450000
+d 1.000000
+illum 2
+map_Kd C:/LightFixtureMain_MainLight_BaseColor.png
+map_Ns C:/LightFixtureMain_MainLight_OcclusionRoughnessMetallic.png
+map_Ke C:/LightFixtureMain_MainLight_Emissive.png
+
+newmtl MainLight.002
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ni 1.450000
+d 1.000000
+illum 2
+map_Kd C:/LightFixtureMain_MainLight_BaseColor.png
+map_Ns C:/LightFixtureMain_MainLight_OcclusionRoughnessMetallic.png
+map_Ke C:/LightFixtureMain_MainLight_Emissive.png
+
+newmtl MainLight.004
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ni 1.450000
+d 1.000000
+illum 2
+map_Kd C:/LightFixtureMain_MainLight_BaseColor.png
+map_Ns C:/LightFixtureMain_MainLight_OcclusionRoughnessMetallic.png
+map_Ke C:/LightFixtureMain_MainLight_Emissive.png
+
+newmtl Material
+Ns 250.000000
+Ka 1.000000 1.000000 1.000000
+Kd 0.800000 0.800000 0.800000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 2
+
+newmtl Material.001
+Ns 0.000000
+Ka 1.000000 1.000000 1.000000
+Kd 0.035601 0.033105 0.042311
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 2
+
+newmtl Material.002
+Ns 250.000000
+Ka 1.000000 1.000000 1.000000
+Kd 0.800000 0.068397 0.068397
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 2
+
+newmtl Material.003
+Ns 250.000000
+Ka 1.000000 1.000000 1.000000
+Kd 0.800000 0.800000 0.800000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 2
+
+newmtl Material.004
+Ns 0.000000
+Ka 1.000000 1.000000 1.000000
+Kd 0.034340 0.031896 0.046665
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 2
+
+newmtl Material.005
+Ns 250.000000
+Ka 1.000000 1.000000 1.000000
+Kd 0.000000 0.000000 0.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 2
+
+newmtl Pedestal
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ni 1.450000
+d 1.000000
+illum 2
+map_Kd C:/Pedestal_Pedestal_BaseColor.png
+map_Ns C:/Pedestal_Pedestal_OcclusionRoughnessMetallic.png
+map_Ke C:/Pedestal_Pedestal_Emissive.png
+
+newmtl Pedestal.001
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ni 1.450000
+d 1.000000
+illum 2
+map_Kd C:/Pedestal_Pedestal_BaseColor.png
+map_Ns C:/Pedestal_Pedestal_OcclusionRoughnessMetallic.png
+map_Ke C:/Pedestal_Pedestal_Emissive.png
+
+newmtl Pedestal.002
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ni 1.450000
+d 1.000000
+illum 2
+map_Kd C:/Pedestal_Pedestal_BaseColor.png
+map_Ns C:/Pedestal_Pedestal_OcclusionRoughnessMetallic.png
+map_Ke C:/Pedestal_Pedestal_Emissive.png
+
+newmtl PedestalLasers
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ni 1.450000
+d 1.000000
+illum 2
+map_Kd C:/Pedestal_PedestalLasers_BaseColor.png
+map_Ns C:/Pedestal_PedestalLasers_OcclusionRoughnessMetallic.png
+map_Ke C:/Pedestal_PedestalLasers_Emissive.png
+
+newmtl PedestalLasers.001
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ni 1.450000
+d 1.000000
+illum 2
+map_Kd C:/Pedestal_PedestalLasers_BaseColor.png
+map_Ns C:/Pedestal_PedestalLasers_OcclusionRoughnessMetallic.png
+map_Ke C:/Pedestal_PedestalLasers_Emissive.png
+
+newmtl PedestalLasers.002
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ni 1.450000
+d 1.000000
+illum 2
+map_Kd C:/Pedestal_PedestalLasers_BaseColor.png
+map_Ns C:/Pedestal_PedestalLasers_OcclusionRoughnessMetallic.png
+map_Ke C:/Pedestal_PedestalLasers_Emissive.png
+
+newmtl m_08bf7c0d-e8a6-415d-387c-becd87455248
+Ns 0.000000
+Ka 1.000000 1.000000 1.000000
+Ks 0.000000 0.000000 0.000000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+illum 1
+map_Kd C:/TechDoorFrame.png
+map_d C:/TechDoorFrame.png
+
+newmtl m_08bf7c0d-e8a6-415d-387c-becd87455248.001
+Ns 0.000000
+Ka 1.000000 1.000000 1.000000
+Ks 0.000000 0.000000 0.000000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+illum 1
+map_Kd C:/TechDoorFrame.png
+map_d C:/TechDoorFrame.png
+
+newmtl m_15e53eb8-6230-f2f0-93c7-c08a88364d4a
+Ka 1.000000 1.000000 1.000000
+Ks 0.000000 0.000000 0.000000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 1
+map_Kd C:/TerminalScreen_m_15e53eb8-6230-f2f0-93c7-c08a88364d4a_BaseColor.png
+map_Ns C:/TerminalScreen_m_15e53eb8-6230-f2f0-93c7-c08a88364d4a_OcclusionRoughnessMetallic.png
+
+newmtl m_3691d608-9bcc-bd03-0fd2-57de5045e7ba.001
+Ns 0.000000
+Ka 1.000000 1.000000 1.000000
+Ks 0.000000 0.000000 0.000000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+illum 1
+map_Kd C:/Camera.png
+map_d C:/Camera.png
+
+newmtl m_6b6f5925-5dda-7451-e0ae-6040442c609b
+Ka 1.000000 1.000000 1.000000
+Ks 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 1
+map_Kd C:/TechDoorUnlocked.png
+map_Ns C:/TechDoorUnlockedrgh.png
+map_Ke C:/TechDoorUnlockedem.png
+
+newmtl m_6b6f5925-5dda-7451-e0ae-6040442c609b.001
+Ka 1.000000 1.000000 1.000000
+Ks 0.000000 0.000000 0.000000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 1
+map_Kd C:/TerminalTest_m_7f6ddea3-13f9-a835-986f-29501a970af0_BaseColor.png
+map_Ns C:/TerminalTest_m_7f6ddea3-13f9-a835-986f-29501a970af0_OcclusionRoughnessMetallic.png
+
+newmtl m_6b6f5925-5dda-7451-e0ae-6040442c609b.002
+Ka 1.000000 1.000000 1.000000
+Ks 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 1
+map_Kd C:/HexDoor_techdoorunlocked_BaseColor.png
+map_Ns C:/HexDoor_techdoorunlocked_OcclusionRoughnessMetallic.png
+map_Ke C:/HexDoor_techdoorunlocked_Emissive.png
+
+newmtl m_6b6f5925-5dda-7451-e0ae-6040442c609b.003
+Ka 1.000000 1.000000 1.000000
+Ks 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 1
+map_Kd C:/HexDoor_techdoorlocked_BaseColor.png
+map_Ns C:/HexDoor_techdoorlocked_OcclusionRoughnessMetallic.png
+map_Ke C:/HexDoor_techdoorlocked_Emissive.png
+
+newmtl m_6b6f5925-5dda-7451-e0ae-6040442c609b.004
+Ka 1.000000 1.000000 1.000000
+Ks 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 1
+map_Kd C:/TechDoorUnlocked.png
+map_Ns C:/TechDoorUnlockedrgh.png
+map_Ke C:/TechDoorUnlockedem.png
+
+newmtl screenemissive
+Ns 250.000000
+Ka 1.000000 1.000000 1.000000
+Kd 0.011421 0.777145 0.800000
+Ks 0.500000 0.500000 0.500000
+Ni 1.450000
+d 1.000000
+illum 2
+map_Ke C:/TerminalScreen_m_15e53eb8-6230-f2f0-93c7-c08a88364d4a_Emissive.png

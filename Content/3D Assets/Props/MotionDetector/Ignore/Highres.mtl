@@ -1,0 +1,34 @@
+# Blender 3.6.0 MTL File: 'gadgets.blend'
+# www.blender.org
+
+newmtl Material.014
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ni 1.450000
+d 1.000000
+illum 2
+map_Kd C:/Lowres_Material.006_BaseColor.png
+map_Ns C:/Lowres_Material.006_OcclusionRoughnessMetallic.png
+map_refl C:/Lowres_Material.006_OcclusionRoughnessMetallic.png
+map_Ke C:/Lowres_Material.006_Emissive.png
+map_Bump -bm 1.000000 C:/Lowres_Material.006_Normal.png
+
+newmtl m_15e53eb8-6230-f2f0-93c7-c08a88364d4a.003
+Ka 1.000000 1.000000 1.000000
+Ks 0.000000 0.000000 0.000000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 1
+map_Kd C:/TerminalScreen_m_15e53eb8-6230-f2f0-93c7-c08a88364d4a_BaseColor.png
+map_Ns C:/TerminalScreen_m_15e53eb8-6230-f2f0-93c7-c08a88364d4a_OcclusionRoughnessMetallic.png
+
+newmtl screenemissive.003
+Ns 250.000000
+Ka 1.000000 1.000000 1.000000
+Kd 0.011421 0.777145 0.800000
+Ks 0.500000 0.500000 0.500000
+Ni 1.450000
+d 1.000000
+illum 2
+map_Ke C:/TerminalScreen_m_15e53eb8-6230-f2f0-93c7-c08a88364d4a_Emissive.png
