@@ -9,8 +9,6 @@
 #include <Kismet/GameplayStatics.h>
 #include "OnlineSubsystemUtils.h"
 #include "Interfaces/OnlinePartyInterface.h"
-#include "PlayerSaveGame.h"
-#include "PlayerSetting.h"
 
 const FName FSessionName = FName("Lobby");
 const FString FSearchName = FString("ProjectRansackLobby");
@@ -28,7 +26,6 @@ void UEOSGameInstance::Init()
 	Super::Init();
 
 	OnlineSubsystem = IOnlineSubsystem::Get();
-	LoadSaveSettings();
 }
 
 //Login
@@ -98,7 +95,7 @@ void UEOSGameInstance::OnLoginCompleteTry(int32 LocalUserNum, bool bWasSuccessfu
 	else
 	{
 		LoginSuccessful();
-		CreateParty();
+		//CreateParty();
 	}
 }
 
@@ -118,7 +115,7 @@ void UEOSGameInstance::OnLoginCompleteEOS(int32 LocalUserNum, bool bWasSuccessfu
 	if (bIsLogin)
 	{
 		LoginSuccessful();
-		CreateParty();
+		//CreateParty();
 	}
 	else
 		LoginFail();
@@ -596,6 +593,9 @@ void UEOSGameInstance::SaveSettings()
 
 void UEOSGameInstance::LoadSaveSettings()
 {
+	if (SettingsGameSlot.saveGame != nullptr)
+		return;
+
 	USaveGame* aSaveGame = UGameplayStatics::LoadGameFromSlot(SettingsGameSlot.fileName, SettingsGameSlot.slotIdx);
 	if (aSaveGame == nullptr)
 	{
@@ -605,6 +605,8 @@ void UEOSGameInstance::LoadSaveSettings()
 	}
 	else
 		SettingsGameSlot.saveGame = (UPlayerSetting*)aSaveGame;	
+
+	SettingsGameSlot.saveGame->InitializeSettings();
 }
 
 void UEOSGameInstance::SaveGame()
@@ -654,7 +656,7 @@ void UEOSGameInstance::UploadPlayerData(TArray<uint8> pData)
 	IOnlineUserCloudPtr cloundPointerRef = subsystem->GetUserCloudInterface();
 	if (!cloundPointerRef)
 		return;
-
+		
 	TSharedPtr<const FUniqueNetId> userIdRef = identityPointerRef->GetUniquePlayerId(0);
 	cloundPointerRef->OnWriteUserFileCompleteDelegates.AddUObject(this, &UEOSGameInstance::OnWritePlayerDataCompleted);
 	cloundPointerRef->WriteUserFile(*userIdRef, ServerGameSlot.fileName, pData);
@@ -679,6 +681,13 @@ void UEOSGameInstance::GetPlayerData()
 		return;
 
 	TSharedPtr<const FUniqueNetId> userIdRef = identityPointerRef->GetUniquePlayerId(0);
+	if (!userIdRef.IsValid())
+	{
+		//In editor
+		ServerGameSlot.saveGame = (UPlayerSaveGame*)(UGameplayStatics::CreateSaveGameObject(UPlayerSaveGame::StaticClass()));
+		return;
+	}
+
 	cloundPointerRef->OnReadUserFileCompleteDelegates.AddUObject(this, &UEOSGameInstance::OnGetPlayerDataCompleted);
 	cloundPointerRef->ReadUserFile(*userIdRef, ServerGameSlot.fileName);
 }
@@ -725,4 +734,9 @@ void UEOSGameInstance::ReadPlayerData(const FString& FileName)
 UPlayerSetting* UEOSGameInstance::GetPlayerSettings()
 {
 	return SettingsGameSlot.saveGame;
+}
+
+UPlayerSaveGame* UEOSGameInstance::GetPlayerSaveGame()
+{
+	return ServerGameSlot.saveGame;
 }

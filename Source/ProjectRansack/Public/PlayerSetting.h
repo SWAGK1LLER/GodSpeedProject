@@ -23,10 +23,18 @@ public:
 	UPROPERTY(BlueprintReadWrite, Category = "Player Info")
 	float ThiefFov = 0;
 
-	//General
+	//Video
 	UPROPERTY(BlueprintReadWrite, Category = "Player Info")
-	int resolutionX = 1920;
+	FString resolution = "1920X1080";
 
 	UPROPERTY(BlueprintReadWrite, Category = "Player Info")
-	int resolutionY = 1080;
+	FString texture = "High";
+
+	UPROPERTY(BlueprintReadWrite, Category = "Player Info")
+	FString shadow = "High";
+
+
+	void InitializeSettings();
+
+	int GetEnumNumber(const FString& pValue);
 };

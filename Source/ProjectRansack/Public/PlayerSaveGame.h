@@ -24,6 +24,23 @@ public:
 	UPROPERTY(BlueprintReadWrite, Category = "Player Info")
 	float xpCoefPerLevel = 0.25;
 
+	UPROPERTY(BlueprintReadWrite, Category = "Player Info")
+	int totalWin = 0;
+	UPROPERTY(BlueprintReadWrite, Category = "Player Info")
+	int totalLoose = 0;
+	UPROPERTY(BlueprintReadWrite, Category = "Player Info")
+	int timePlayThief = 0;
+	UPROPERTY(BlueprintReadWrite, Category = "Player Info")
+	int timePlaySecurity = 0;
+	UPROPERTY(BlueprintReadWrite, Category = "Player Info")
+	int totalCapture = 0;
+	UPROPERTY(BlueprintReadWrite, Category = "Player Info")
+	int totalCash = 0;
+	UPROPERTY(BlueprintReadWrite, Category = "Player Info")
+	int totalExtraction = 0;
+	UPROPERTY(BlueprintReadWrite, Category = "Player Info")
+	int totalHightLoot = 0;
+
 	float GetPercent();
 	void levelUp();
 	void addXp(int pXp);

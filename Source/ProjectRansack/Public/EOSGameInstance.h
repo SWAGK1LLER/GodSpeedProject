@@ -7,6 +7,8 @@
 
 #include "OnlineSessionSettings.h"
 #include "EnumTeam.h"
+#include "PlayerSetting.h"
+#include "PlayerSaveGame.h"
 #include "EOSGameInstance.generated.h"
 
 namespace EOnJoinSessionCompleteResult { enum Type; }
@@ -129,7 +131,10 @@ public:
 	void ReadPlayerData(const FString& FileName);
 
 	UFUNCTION(BlueprintCallable)
-	class UPlayerSetting* GetPlayerSettings();
+	UPlayerSetting* GetPlayerSettings();
+
+	UFUNCTION(BlueprintCallable)
+	UPlayerSaveGame* GetPlayerSaveGame();
 
 public:
 	class IOnlineSubsystem* OnlineSubsystem;
