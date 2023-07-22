@@ -582,11 +582,7 @@ void UEOSGameInstance::StartGame()
 
 	SessionPtr->StartSession(FGameSessionName);
 }
-//--------
-//Friend
-void UEOSGameInstance::ShowFriendOverlay()
-{
-}
+
 //--------
 //SaveGame / saveSettings
 
@@ -649,11 +645,15 @@ void UEOSGameInstance::UploadPlayerData(TArray<uint8> pData)
 	if (pData.IsEmpty())
 		return;
 
-	IOnlineIdentityPtr identityPointerRef = OnlineSubsystem->GetIdentityInterface();
+	IOnlineSubsystem* subsystem = Online::GetSubsystem(GetWorld());
+	if (subsystem == nullptr)
+		return;
+
+	IOnlineIdentityPtr identityPointerRef = subsystem->GetIdentityInterface();
 	if (!identityPointerRef)
 		return;
 
-	IOnlineUserCloudPtr cloundPointerRef = OnlineSubsystem->GetUserCloudInterface();
+	IOnlineUserCloudPtr cloundPointerRef = subsystem->GetUserCloudInterface();
 	if (!cloundPointerRef)
 		return;
 		
@@ -664,20 +664,19 @@ void UEOSGameInstance::UploadPlayerData(TArray<uint8> pData)
 
 void UEOSGameInstance::OnWritePlayerDataCompleted(bool bWasSuccessful, const FUniqueNetId& user, const FString& FileName)
 {
-	IOnlineExternalUIPtr ExternalUI = OnlineSubsystem->GetExternalUIInterface();
-	if (!ExternalUI)
-		return;
-
-	ExternalUI->ShowFriendsUI(0);
 }
 
 void UEOSGameInstance::GetPlayerData()
 {
-	IOnlineIdentityPtr identityPointerRef = OnlineSubsystem->GetIdentityInterface();
+	IOnlineSubsystem* subsystem = Online::GetSubsystem(GetWorld());
+	if (subsystem == nullptr)
+		return;
+
+	IOnlineIdentityPtr identityPointerRef = subsystem->GetIdentityInterface();
 	if (!identityPointerRef)
 		return;
 
-	IOnlineUserCloudPtr cloundPointerRef = OnlineSubsystem->GetUserCloudInterface();
+	IOnlineUserCloudPtr cloundPointerRef = subsystem->GetUserCloudInterface();
 	if (!cloundPointerRef)
 		return;
 
@@ -710,11 +709,15 @@ void UEOSGameInstance::OnGetPlayerDataCompleted(bool bWasSuccessful, const FUniq
 
 void UEOSGameInstance::ReadPlayerData(const FString& FileName)
 {
-	IOnlineIdentityPtr identityPointerRef = OnlineSubsystem->GetIdentityInterface();
+	IOnlineSubsystem* subsystem = Online::GetSubsystem(GetWorld());
+	if (subsystem == nullptr)
+		return;
+
+	IOnlineIdentityPtr identityPointerRef = subsystem->GetIdentityInterface();
 	if (!identityPointerRef)
 		return;
 
-	IOnlineUserCloudPtr cloundPointerRef = OnlineSubsystem->GetUserCloudInterface();
+	IOnlineUserCloudPtr cloundPointerRef = subsystem->GetUserCloudInterface();
 	if (!cloundPointerRef)
 		return;
 

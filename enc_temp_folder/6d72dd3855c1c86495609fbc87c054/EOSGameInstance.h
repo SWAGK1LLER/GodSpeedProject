@@ -102,10 +102,8 @@ public:
 	//start Game
 	UFUNCTION(BlueprintCallable)
 	void StartGame();
-	//------------
-	//Friend
-	UFUNCTION(BlueprintCallable)
-	void ShowFriendOverlay();
+
+
 	//-------------
 	//SaveGame / saveSettings
 	UFUNCTION(BlueprintCallable)
