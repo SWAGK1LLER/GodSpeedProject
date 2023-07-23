@@ -17,9 +17,9 @@ public:
 
 	//Health
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Health, meta = (AllowPrivateAccess = "true"))
-		float currentHealth;
+		float currentHealth = 0;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Health, meta = (AllowPrivateAccess = "true"))
-		float maxHealth;
+		float maxHealth = 0;
 
 	//Movement
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = MovementValues, meta = (AllowPrivateAccess = "true"))
@@ -36,7 +36,7 @@ public:
 
 	/* Input */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
-		class UInputMappingContext* inputHandler;
+		class UInputMappingContext* inputHandler = nullptr;
 
 	/**Input Action */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))

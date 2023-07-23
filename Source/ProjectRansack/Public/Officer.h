@@ -21,11 +21,11 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = MotionVision, meta = (AllowPrivateAccess = "true"))
 		class UInputAction* MotionVisionAction = nullptr;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = MotionVision, meta = (AllowPrivateAccess = "true"))
-		UCurveFloat* MotionVisionFloatCurve;
+		UCurveFloat* MotionVisionFloatCurve = nullptr;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = MotionVision, meta = (AllowPrivateAccess = "true"))
-		class UMaterialParameterCollection* MotionVisionMPC;
+		class UMaterialParameterCollection* MotionVisionMPC = nullptr;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = MotionVision, meta = (AllowPrivateAccess = "true"))
-		int MotionSensorStencilBufNumber;
+		int MotionSensorStencilBufNumber = 0;
 };
 
 UCLASS()
