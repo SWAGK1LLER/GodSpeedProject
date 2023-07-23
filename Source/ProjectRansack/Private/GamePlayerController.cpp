@@ -12,6 +12,8 @@
 #include "DuffleBagUI.h"
 #include "Item.h"
 #include "TeamDuffleBagUI.h"
+#include "Particles/ParticleSystemComponent.h"
+#include "GenericParticleSystemComponent.h"
 
 void AGamePlayerController::BeginPlay()
 {
@@ -24,6 +26,8 @@ void AGamePlayerController::BeginPlay()
 	if (instance == nullptr)
 		return;
 
+	instance->LoadSaveGame();
+	instance->LoadSaveSettings();
 	SRSpawnPlayer(instance->team);
 }
 
@@ -37,12 +41,16 @@ void AGamePlayerController::PawnIsPossess(APawn* InPawn)
 	if (!IsLocalPlayerController())
 		return;
 
+
+	if (RoundUIWidget == nullptr)
+	{
+		RoundUIWidget = CreateWidget<URoundUI>(GetWorld(), RoundUIClass);
+		RoundUIWidget->AddToViewport();
+	}
+
 	AThief* thief = Cast<AThief>(InPawn);
 	if (thief == nullptr)
 		return;
-
-	RoundUIWidget = CreateWidget<URoundUI>(GetWorld(), RoundUIClass);
-	RoundUIWidget->AddToViewport();
 
 	DuffleBagUIWidget = CreateWidget<UDuffleBagUI>(GetWorld(), DuffleBagUIClass);
 	DuffleBagUIWidget->AddToViewport();
@@ -148,7 +156,7 @@ void AGamePlayerController::ClientUpdateTeamDuffleBagUI_Implementation()
 
 void AGamePlayerController::ClientUpdateRoundTimeRemaining_Implementation(const FString& pTime)
 {
-	if (RoundUIWidget == nullptr)
+	if (RoundUIWidget == nullptr || !IsLocalPlayerController())
 		return;
 
 	RoundUIWidget->SetTime(pTime);
@@ -196,4 +204,26 @@ void AGamePlayerController::SRFreezeInput_Implementation(float duration, ABase3C
 
 	if (gameMode != nullptr)
 		gameMode->FreezeInput(duration, actor);
+}
+
+void AGamePlayerController::SRSpawnParticle_Implementation(UParticleSystem* particleEffect, const FTransform& position, const float& duration)
+{
+	AGameGameMode* gameMode = Cast<AGameGameMode>(UGameplayStatics::GetGameMode(GetWorld()));
+
+	if (gameMode != nullptr)
+		gameMode->SpawnParticle(particleEffect, position, duration);
+}
+
+void AGamePlayerController::ClientSpawnParticle_Implementation(UParticleSystem* particleEffect, const FTransform& position, const float& duration)
+{
+	UGenericParticleSystemComponent* particle = (UGenericParticleSystemComponent*)UGameplayStatics::SpawnEmitterAtLocation(
+																															GetWorld(),
+																															particleEffect,
+																															position,
+																															true,
+																															EPSCPoolMethod::AutoRelease,
+																															true
+																														);
+	if (duration != -1)
+		particle->setLifeSpan(duration);
 }

@@ -57,25 +57,17 @@ void UStunWeapon::Fire()
     bool hitableEnemy = actor->IsA(EnemyHittable);
 
     FTransform position = FTransform(hitLocation);
-    UGenericParticleSystemComponent* particle = (UGenericParticleSystemComponent*)UGameplayStatics::SpawnEmitterAtLocation(
-                                                                                GetWorld(),
-                                                                                particleEffect,
-                                                                                position,
-                                                                                !hitableEnemy,
-                                                                                EPSCPoolMethod::AutoRelease,
-                                                                                true
-                                                                                );
+
+    APawn* owner = Cast<APawn>(GetOwner());
+    AGamePlayerController* playerController = Cast<AGamePlayerController>(owner->GetController());
+
+    playerController->SRSpawnParticle(particleEffect, position, (hitableEnemy ? StunDuration : -1) );
 
     if (!hitableEnemy)
         return;
 
-    particle->setLifeSpan(StunDuration);
-
-    APawn* owner = Cast<APawn>(GetOwner());
-    AGamePlayerController* playerController = Cast<AGamePlayerController>(owner->GetController());
     playerController->SRFreezeInput(StunDuration, Cast<ABase3C>(actor));
 
-    //Spawn particle effect
     GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("Actor hitted!"));
 }
 

@@ -11,6 +11,7 @@
 #include "Officer.h"
 #include "GameFramework/PlayerState.h"
 #include "GamePlayerController.h"
+#include "Particles/ParticleSystemComponent.h"
 
 void AGameGameMode::BeginPlay()
 {
@@ -36,7 +37,15 @@ void AGameGameMode::Tick(float DeltaTime)
 
 	FString timeRemaining = getRemainingTimeText();
 	for (APlayerController* aPC : PC)
+	{
+		if (!aPC->IsValidLowLevel())
+		{
+			PC.Remove(aPC);
+			continue;
+		}
+
 		(Cast<AGamePlayerController>(aPC))->ClientUpdateRoundTimeRemaining(timeRemaining);
+	}
 }
 
 void AGameGameMode::PostLogin(APlayerController* NewPlayer)
@@ -132,6 +141,12 @@ void AGameGameMode::UpdateTeamDuffleBag()
 		AGamePlayerController* aPC = Cast<AGamePlayerController>(player->GetController());
 		aPC->ClientUpdateTeamDuffleBagUI();
 	}
+}
+
+void AGameGameMode::SpawnParticle(UParticleSystem* particleEffect, const FTransform& position, const float& duration)
+{
+	for (APlayerController* aPC : PC)
+		(Cast<AGamePlayerController>(aPC))->ClientSpawnParticle(particleEffect, position, duration);
 }
 
 void AGameGameMode::startRound()

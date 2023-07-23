@@ -36,7 +36,7 @@ public:
 
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
-	void Fire() override;
+	virtual void Fire() override;
 
 	AActor* HitScan(FVector& hitLocation);
 };

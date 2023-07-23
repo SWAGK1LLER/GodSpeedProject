@@ -26,6 +26,12 @@ void UEOSGameInstance::Init()
 	Super::Init();
 
 	OnlineSubsystem = IOnlineSubsystem::Get();
+
+	IOnlineSessionPtr SessionPtr = OnlineSubsystem->GetSessionInterface();
+	if (!SessionPtr)
+		return;
+
+	SessionPtr->OnSessionUserInviteAcceptedDelegates.AddUObject(this, &UEOSGameInstance::OnFriendAcceptInvite);
 }
 
 //Login
@@ -153,7 +159,6 @@ void UEOSGameInstance::CreateParty(bool pTravel)
 	else
 		bHasSession = true;
 	
-	SessionPtr->OnSessionUserInviteAcceptedDelegates.AddUObject(this, &UEOSGameInstance::OnFriendAcceptInvite);
 	SessionPtr->CreateSession(0, FSessionName, SessionSettings);
 }
 
@@ -177,6 +182,8 @@ void UEOSGameInstance::OnFriendAcceptInvite(const bool bWasSuccessful, const int
 
 	if (bWasSuccessful)
 	{	
+		UE_LOG(LogTemp, Warning, TEXT("Accept invite"));
+
 		PartyToJoin = InviteResult;
 
 		SessionPtr->OnDestroySessionCompleteDelegates.AddUObject(this, &UEOSGameInstance::OnClosePartyAndJoin);
@@ -186,9 +193,13 @@ void UEOSGameInstance::OnFriendAcceptInvite(const bool bWasSuccessful, const int
 
 void UEOSGameInstance::OnClosePartyAndJoin(FName SessionName, bool bWasSuccess)
 {
+	UE_LOG(LogTemp, Warning, TEXT("Hello"));
+
 	IOnlineSessionPtr SessionPtr = OnlineSubsystem->GetSessionInterface();
 	if (!SessionPtr)
 		return;
+
+	UE_LOG(LogTemp, Warning, TEXT("join"));
 
 	SessionPtr->ClearOnDestroySessionCompleteDelegates(this);
 	bHasSession = false;

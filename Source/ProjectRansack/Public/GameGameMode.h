@@ -62,6 +62,8 @@ public:
 
 	void UpdateTeamDuffleBag();
 
+	void SpawnParticle(class UParticleSystem* particleEffect, const FTransform& position, const float& duration);
+
 	UFUNCTION(BlueprintCallable)
 	void startRound();
 

@@ -86,6 +86,9 @@ void ABase3C::BeginPlay()
 	BindInputHandler();
 	SendDataToComponents();
 
+	if (WidgetUI != nullptr)
+		return;
+
 	WidgetUI = CreateWidget<UPlayerUI>(GetWorld(), WidgetClass);
 	WidgetUI->AddToViewport();
 }

@@ -95,4 +95,13 @@ public:
 	void RemoveInteractibleWidgetUI(class AActor* pItem);
 
 	UUserWidget* GetWidget(class AActor* pItem);
+
+
+	UFUNCTION(Server, Reliable, BlueprintCallable)
+	void SRSpawnParticle(class UParticleSystem* particleEffect, const FTransform& position, const float& duration);
+	void SRSpawnParticle_Implementation(class UParticleSystem* particleEffect, const FTransform& position, const float& duration);
+
+	UFUNCTION(Client, Reliable, BlueprintCallable)
+	void ClientSpawnParticle(class UParticleSystem* particleEffect, const FTransform& position, const float& duration);
+	void ClientSpawnParticle_Implementation(class UParticleSystem* particleEffect, const FTransform& position, const float& duration);
 };
