@@ -241,6 +241,25 @@ void UEOSGameInstance::OnPartyQuitComplete(FName SessionName, bool bWasSuccess)
 
 	CreateParty();
 }
+void UEOSGameInstance::CloseParty()
+{
+	IOnlineSessionPtr SessionPtr = OnlineSubsystem->GetSessionInterface();
+	if (!SessionPtr)
+		return;
+
+	SessionPtr->OnDestroySessionCompleteDelegates.AddUObject(this, &UEOSGameInstance::OnPartyCloseComplete);
+	SessionPtr->DestroySession(FSessionName);
+}
+void UEOSGameInstance::OnPartyCloseComplete(FName SessionName, bool bWasSuccess)
+{
+	IOnlineSessionPtr SessionPtr = OnlineSubsystem->GetSessionInterface();
+	if (!SessionPtr)
+		return;
+
+	SessionPtr->ClearOnDestroySessionCompleteDelegates(this);
+
+	UGameplayStatics::OpenLevel(GetWorld(), "Game/Maps/MainMenu", true);
+}
 //--------
 //Find Game
 void UEOSGameInstance::CreateGame()
@@ -582,7 +601,16 @@ void UEOSGameInstance::StartGame()
 
 	SessionPtr->StartSession(FGameSessionName);
 }
+//--------
+//Friend
+void UEOSGameInstance::ShowFriendOverlay()
+{
+	IOnlineExternalUIPtr ExternalUI = OnlineSubsystem->GetExternalUIInterface();
+	if (!ExternalUI.IsValid())
+		return;
 
+	ExternalUI->ShowFriendsUI(0);
+}
 //--------
 //SaveGame / saveSettings
 
@@ -645,15 +673,11 @@ void UEOSGameInstance::UploadPlayerData(TArray<uint8> pData)
 	if (pData.IsEmpty())
 		return;
 
-	IOnlineSubsystem* subsystem = Online::GetSubsystem(GetWorld());
-	if (subsystem == nullptr)
-		return;
-
-	IOnlineIdentityPtr identityPointerRef = subsystem->GetIdentityInterface();
+	IOnlineIdentityPtr identityPointerRef = OnlineSubsystem->GetIdentityInterface();
 	if (!identityPointerRef)
 		return;
 
-	IOnlineUserCloudPtr cloundPointerRef = subsystem->GetUserCloudInterface();
+	IOnlineUserCloudPtr cloundPointerRef = OnlineSubsystem->GetUserCloudInterface();
 	if (!cloundPointerRef)
 		return;
 		
@@ -664,19 +688,20 @@ void UEOSGameInstance::UploadPlayerData(TArray<uint8> pData)
 
 void UEOSGameInstance::OnWritePlayerDataCompleted(bool bWasSuccessful, const FUniqueNetId& user, const FString& FileName)
 {
+	IOnlineExternalUIPtr ExternalUI = OnlineSubsystem->GetExternalUIInterface();
+	if (!ExternalUI)
+		return;
+
+	ExternalUI->ShowFriendsUI(0);
 }
 
 void UEOSGameInstance::GetPlayerData()
 {
-	IOnlineSubsystem* subsystem = Online::GetSubsystem(GetWorld());
-	if (subsystem == nullptr)
-		return;
-
-	IOnlineIdentityPtr identityPointerRef = subsystem->GetIdentityInterface();
+	IOnlineIdentityPtr identityPointerRef = OnlineSubsystem->GetIdentityInterface();
 	if (!identityPointerRef)
 		return;
 
-	IOnlineUserCloudPtr cloundPointerRef = subsystem->GetUserCloudInterface();
+	IOnlineUserCloudPtr cloundPointerRef = OnlineSubsystem->GetUserCloudInterface();
 	if (!cloundPointerRef)
 		return;
 
@@ -709,15 +734,11 @@ void UEOSGameInstance::OnGetPlayerDataCompleted(bool bWasSuccessful, const FUniq
 
 void UEOSGameInstance::ReadPlayerData(const FString& FileName)
 {
-	IOnlineSubsystem* subsystem = Online::GetSubsystem(GetWorld());
-	if (subsystem == nullptr)
-		return;
-
-	IOnlineIdentityPtr identityPointerRef = subsystem->GetIdentityInterface();
+	IOnlineIdentityPtr identityPointerRef = OnlineSubsystem->GetIdentityInterface();
 	if (!identityPointerRef)
 		return;
 
-	IOnlineUserCloudPtr cloundPointerRef = subsystem->GetUserCloudInterface();
+	IOnlineUserCloudPtr cloundPointerRef = OnlineSubsystem->GetUserCloudInterface();
 	if (!cloundPointerRef)
 		return;
 

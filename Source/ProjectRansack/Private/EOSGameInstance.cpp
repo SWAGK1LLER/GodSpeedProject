@@ -241,6 +241,25 @@ void UEOSGameInstance::OnPartyQuitComplete(FName SessionName, bool bWasSuccess)
 
 	CreateParty();
 }
+void UEOSGameInstance::CloseParty()
+{
+	IOnlineSessionPtr SessionPtr = OnlineSubsystem->GetSessionInterface();
+	if (!SessionPtr)
+		return;
+
+	SessionPtr->OnDestroySessionCompleteDelegates.AddUObject(this, &UEOSGameInstance::OnPartyCloseComplete);
+	SessionPtr->DestroySession(FSessionName);
+}
+void UEOSGameInstance::OnPartyCloseComplete(FName SessionName, bool bWasSuccess)
+{
+	IOnlineSessionPtr SessionPtr = OnlineSubsystem->GetSessionInterface();
+	if (!SessionPtr)
+		return;
+
+	SessionPtr->ClearOnDestroySessionCompleteDelegates(this);
+
+	UGameplayStatics::OpenLevel(GetWorld(), "/Game/Maps/MainMenu", true);
+}
 //--------
 //Find Game
 void UEOSGameInstance::CreateGame()
@@ -586,6 +605,11 @@ void UEOSGameInstance::StartGame()
 //Friend
 void UEOSGameInstance::ShowFriendOverlay()
 {
+	IOnlineExternalUIPtr ExternalUI = OnlineSubsystem->GetExternalUIInterface();
+	if (!ExternalUI.IsValid())
+		return;
+
+	ExternalUI->ShowFriendsUI(0);
 }
 //--------
 //SaveGame / saveSettings

@@ -69,6 +69,9 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void QuitParty();
 	void OnPartyQuitComplete(FName SessionName, bool bWasSuccess);
+	UFUNCTION(BlueprintCallable)
+	void CloseParty();
+	void OnPartyCloseComplete(FName SessionName, bool bWasSuccess);
 	//------------
 	//Find game
 	UFUNCTION(BlueprintCallable)

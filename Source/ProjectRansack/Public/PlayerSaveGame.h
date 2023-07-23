@@ -41,7 +41,9 @@ public:
 	UPROPERTY(BlueprintReadWrite, Category = "Player Info")
 	int totalHightLoot = 0;
 
+	UFUNCTION(BlueprintCallable)
 	float GetPercent();
+
 	void levelUp();
 	void addXp(int pXp);
 };
