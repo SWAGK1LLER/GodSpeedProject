@@ -15,9 +15,28 @@ AThief::AThief()
 	inventory = NewObject<UInventory>();
 }
 
+void AThief::Tick(float DeltaTime)
+{
+	ChangeStencilOnMovement();
+}
+
 bool AThief::ValidateSpaceItem(AItem& pItem)
 {
 	return inventory->ValidateSpace(pItem);
+}
+
+void AThief::ChangeStencilOnMovement()
+{
+	if (GetVelocity().Length() > 0)
+	{
+		if (GetMesh())
+			GetMesh()->SetCustomDepthStencilValue(2); //TODO Implement datatable for thief and add a value for stencil buffer
+	}
+	else
+	{
+		if (GetMesh())
+			GetMesh()->SetCustomDepthStencilValue(0);
+	}
 }
 
 void AThief::SRAddItem_Implementation(AItem* pItem)

@@ -100,7 +100,7 @@ void ABase3C::Tick(float DeltaTime)
 		TimeFreezed += DeltaTime;
 		if (TimeFreezed >= FreezeDuration)
 			bFreezeInput = false;
-	}
+	}		
 }
 
 // Called to bind functionality to input
@@ -126,6 +126,8 @@ void ABase3C::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 
 		EnhancedInputComponent->BindAction(tableInstance->SprintAction, ETriggerEvent::Started, this, &ABase3C::Sprint);
 		EnhancedInputComponent->BindAction(tableInstance->SprintAction, ETriggerEvent::Completed, this, &ABase3C::StopSprint);
+
+
 	}
 	cameraComponent->SetupInputComponent(PlayerInputComponent, tableInstance->lookAction);
 }

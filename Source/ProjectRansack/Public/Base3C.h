@@ -51,6 +51,7 @@ public:
 		class UInputAction* FireAction = nullptr;
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
 		class UInputAction* SprintAction = nullptr;
+
 };
 
 UENUM()
@@ -72,8 +73,8 @@ public:
 	TSubclassOf<UPlayerUI> WidgetClass;
 	UPlayerUI* WidgetUI = nullptr;
 
-	UPROPERTY(editAnywhere, blueprintReadWrite)
-	class USkeletalMeshComponent* skeletalMesh = nullptr;
+	//UPROPERTY(editAnywhere, blueprintReadWrite)
+	//class USkeletalMeshComponent* skeletalMesh = nullptr;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
 	class UCameraComp* cameraComponent = nullptr;
@@ -99,7 +100,6 @@ public:
 	bool bFreezeInput = false;
 	float FreezeDuration = 0;
 	float TimeFreezed = 0;
-
 
 	ABase3C();
 

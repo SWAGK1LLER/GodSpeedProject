@@ -25,6 +25,7 @@ public:
 	UInventory* inventory = nullptr;
 
 	AThief();
+	virtual void Tick(float DeltaTime) override;
 	
 	UFUNCTION(Server, Reliable, BlueprintCallable)
 	void SRAddItem(class AItem* pItem);
@@ -43,6 +44,8 @@ public:
 	void MUlClearItems_Implementation();
 
 	bool ValidateSpaceItem(class AItem& pItem);
+
+	void ChangeStencilOnMovement();
 
 	virtual void Interact() override;
 	virtual void StopInteract() override;
