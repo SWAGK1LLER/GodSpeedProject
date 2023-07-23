@@ -26,6 +26,9 @@ public:
 		class UMaterialParameterCollection* MotionVisionMPC = nullptr;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = MotionVision, meta = (AllowPrivateAccess = "true"))
 		int MotionSensorStencilBufNumber = 0;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = MotionVision, meta = (AllowPrivateAccess = "true"))
+		class UInputAction* FlashlightAction = nullptr;
 };
 
 UCLASS()
@@ -42,15 +45,20 @@ public:
 
 	FOfficerTable* officerTableInstance = nullptr;
 
-
-
 	FTimeline MotionVisionTimeline;
 
 	bool MotionTimelineRunning = false;
 
 	bool motionSensorActive = false;
 
+	UPROPERTY(editAnywhere, BlueprintReadWrite, Category = Light, meta = (AllowPrivateAccess = "true"))
+		class USpotLightComponent* flashLight;
+
+	bool flashLightOn = false;
+
 	// Called to bind functionality to input
+	AOfficer();
+
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
 	void CreateTimeline();
@@ -71,6 +79,8 @@ public:
 	bool CheckTableInstance();
 
 	void HandleMotionVision();
+
+	void ToggleFlashight();
 
 	virtual void Interact() override;
 	virtual void StopInteract() override;

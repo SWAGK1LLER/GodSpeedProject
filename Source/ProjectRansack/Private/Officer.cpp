@@ -7,6 +7,15 @@
 #include "Components/TimelineComponent.h"
 #include "Materials/MaterialParameterCollection.h"
 #include "Runtime/Engine/Classes/Kismet/KismetMaterialLibrary.h"
+#include "Components/SpotLightComponent.h"
+#include "CameraComp.h"
+AOfficer::AOfficer()
+{
+	flashLight = CreateDefaultSubobject<USpotLightComponent>(TEXT("FlashLight"));
+	flashLight->SetupAttachment((USceneComponent*)cameraComponent->camera);
+	
+}
+
 void AOfficer::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
@@ -14,9 +23,12 @@ void AOfficer::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 	if (!CheckTableInstance())
 		return;
 
+
+
 	if (UEnhancedInputComponent* EnhancedInputComponent = CastChecked<UEnhancedInputComponent>(PlayerInputComponent))
 	{
 		EnhancedInputComponent->BindAction(officerTableInstance->MotionVisionAction, ETriggerEvent::Started, this, &AOfficer::HandleMotionVision);
+		EnhancedInputComponent->BindAction(officerTableInstance->FlashlightAction, ETriggerEvent::Started, this, &AOfficer::ToggleFlashight);
 	}
 }
 
@@ -29,6 +41,7 @@ void AOfficer::BeginPlay()
 		return;
 
 	CreateTimeline();
+	flashLight->SetIntensity(0.f);
 }
 
 void AOfficer::Tick(float DeltaTime)
@@ -110,6 +123,21 @@ void AOfficer::HandleMotionVision()
 		MotionVisionTimeline.ReverseFromEnd();
 		motionSensorActive = false;
 	}
+}
+
+void AOfficer::ToggleFlashight()
+{
+	if (flashLightOn)
+	{
+		flashLight->SetIntensity(0.f);
+		flashLightOn = false;
+	}
+	else
+	{
+		flashLight->SetIntensity(5000.f); 
+		flashLightOn = true;
+	}
+		
 }
 
 void AOfficer::Interact()
