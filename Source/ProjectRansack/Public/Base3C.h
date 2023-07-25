@@ -57,9 +57,8 @@ public:
 UENUM()
 enum CharacterState
 {
-	Idle		UMETA(DisplayName = "Idle"),
-	Attacking   UMETA(DisplayName = "Attacking"),
-	Stunned		UMETA(DisplayName = "Stunned"),
+	Gun		UMETA(DisplayName = "Gun"),
+	SensorGadget	UMETA(DisplayName = "SensorGadget"),
 };
 
 
@@ -70,26 +69,26 @@ class PROJECTRANSACK_API ABase3C : public ACharacter
 
 public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	TSubclassOf<UPlayerUI> WidgetClass;
+		TSubclassOf<UPlayerUI> WidgetClass;
 	UPlayerUI* WidgetUI = nullptr;
 
 	//UPROPERTY(editAnywhere, blueprintReadWrite)
 	//class USkeletalMeshComponent* skeletalMesh = nullptr;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
-	class UCameraComp* cameraComponent = nullptr;
+		class UCameraComp* cameraComponent = nullptr;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
-	class UStunWeapon* StunWeapon = nullptr;
+		class UStunWeapon* StunWeapon = nullptr;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Health, meta = (AllowPrivateAccess = "true"))
-	class UHealthComponent* healthComp = nullptr;
+		class UHealthComponent* healthComp = nullptr;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	FString nickName = "";
+		FString nickName = "";
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Data, meta = (AllowPrivateAccess = "true"))
-	class UDataTable* dataTable = nullptr;
+		class UDataTable* dataTable = nullptr;
 
 	FBase3CTable* tableInstance = nullptr;
 
@@ -107,15 +106,15 @@ public:
 	void SendDataToComponents();
 
 	UFUNCTION(Server, Reliable, BlueprintCallable)
-	void SetClientNickname(const FString& pNickName);
+		void SetClientNickname(const FString& pNickName);
 	void SetClientNickname_Implementation(const FString& pNickName);
 
 	UFUNCTION(NetMulticast, Reliable, BlueprintCallable)
-	void MulticastSetClientNickname(const FString& pNickName);
+		void MulticastSetClientNickname(const FString& pNickName);
 	void MulticastSetClientNickname_Implementation(const FString& pNickName);
 
 	UFUNCTION(Client, Reliable, BlueprintCallable)
-	void ClientFreezeInput(float duration);
+		void ClientFreezeInput(float duration);
 	void ClientFreezeInput_Implementation(float duration);
 
 	// Called when the game starts or when spawned
@@ -131,12 +130,14 @@ public:
 	void Move(const FInputActionValue& Value);
 
 	virtual void Interact();
-	
+
 	virtual void StopInteract();
 
 	void StartAim();
 
 	void StopAim();
+
+	virtual void StartFire() {};
 
 	void Fire();
 

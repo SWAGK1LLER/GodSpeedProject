@@ -29,6 +29,9 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = MotionVision, meta = (AllowPrivateAccess = "true"))
 		class UInputAction* FlashlightAction = nullptr;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = MotionVision, meta = (AllowPrivateAccess = "true"))
+		class UInputAction* SensorGadgetAction = nullptr;
 };
 
 UCLASS()
@@ -54,7 +57,12 @@ public:
 	UPROPERTY(editAnywhere, BlueprintReadWrite, Category = Light, meta = (AllowPrivateAccess = "true"))
 		class USpotLightComponent* flashLight;
 
+	UPROPERTY(editAnywhere, BlueprintReadWrite, Category = SensorGadget, meta = (AllowPrivateAccess = "true"))
+		class USensorGadgetOfficerComponent* sensorGadgetOfficer;
+
 	bool flashLightOn = false;
+
+	bool usingSensorGadget = false;
 
 	// Called to bind functionality to input
 	AOfficer();
@@ -81,6 +89,10 @@ public:
 	void HandleMotionVision();
 
 	void ToggleFlashight();
+
+	void SensorGadgetAction();
+
+	virtual void StartFire() override;
 
 	virtual void Interact() override;
 	virtual void StopInteract() override;

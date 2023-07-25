@@ -25,7 +25,7 @@ ABase3C::ABase3C()
 	cameraComponent->SetupCamera(RootComponent);
 	//Health Comp
 	healthComp = CreateDefaultSubobject<UHealthComponent>(TEXT("HealthComponent"));
-	currentState = CharacterState::Idle;
+	currentState = CharacterState::Gun;
 
 	StunWeapon = CreateDefaultSubobject<UStunWeapon>(TEXT("StunWeapon"));
 }
@@ -125,6 +125,7 @@ void ABase3C::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 		EnhancedInputComponent->BindAction(tableInstance->AimAction, ETriggerEvent::Started, this, &ABase3C::StartAim);
 		EnhancedInputComponent->BindAction(tableInstance->AimAction, ETriggerEvent::Completed, this, &ABase3C::StopAim);
 
+		EnhancedInputComponent->BindAction(tableInstance->FireAction, ETriggerEvent::Started, this, &ABase3C::StartFire);
 		EnhancedInputComponent->BindAction(tableInstance->FireAction, ETriggerEvent::Triggered, this, &ABase3C::Fire);
 
 		EnhancedInputComponent->BindAction(tableInstance->SprintAction, ETriggerEvent::Started, this, &ABase3C::Sprint);
@@ -190,7 +191,7 @@ void ABase3C::StopAim()
 
 void ABase3C::Fire()
 {
-	if (bFreezeInput)
+	if (bFreezeInput || currentState != CharacterState::Gun)
 		return;
 
 	StunWeapon->Fire();

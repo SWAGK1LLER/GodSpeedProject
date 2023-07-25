@@ -9,11 +9,16 @@
 #include "Runtime/Engine/Classes/Kismet/KismetMaterialLibrary.h"
 #include "Components/SpotLightComponent.h"
 #include "CameraComp.h"
+#include "SensorGadget.h"
+#include "Engine/World.h"
+#include "Camera/CameraComponent.h"
+#include "SensorGadgetOfficerComponent.h"
 AOfficer::AOfficer()
 {
 	flashLight = CreateDefaultSubobject<USpotLightComponent>(TEXT("FlashLight"));
 	flashLight->SetupAttachment((USceneComponent*)cameraComponent->camera);
-	
+
+	sensorGadgetOfficer = CreateDefaultSubobject<USensorGadgetOfficerComponent>(TEXT("Sensor Gadget Component"));
 }
 
 void AOfficer::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
@@ -29,6 +34,7 @@ void AOfficer::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 	{
 		EnhancedInputComponent->BindAction(officerTableInstance->MotionVisionAction, ETriggerEvent::Started, this, &AOfficer::HandleMotionVision);
 		EnhancedInputComponent->BindAction(officerTableInstance->FlashlightAction, ETriggerEvent::Started, this, &AOfficer::ToggleFlashight);
+		EnhancedInputComponent->BindAction(officerTableInstance->SensorGadgetAction, ETriggerEvent::Started, this, &AOfficer::SensorGadgetAction);
 	}
 }
 
@@ -42,6 +48,7 @@ void AOfficer::BeginPlay()
 
 	CreateTimeline();
 	flashLight->SetIntensity(0.f);
+	sensorGadgetOfficer->ToggleEnable(false);
 }
 
 void AOfficer::Tick(float DeltaTime)
@@ -50,6 +57,10 @@ void AOfficer::Tick(float DeltaTime)
 
 	MotionVisionTimeline.TickTimeline(DeltaTime);
 	ChangeStencilOnMovement();
+
+	if (usingSensorGadget)
+		sensorGadgetOfficer->CalculateFirstPosition(this, cameraComponent->camera->GetComponentLocation(),
+			cameraComponent->camera->GetForwardVector());
 }
 
 void AOfficer::TimelineProgress(float value)
@@ -138,6 +149,32 @@ void AOfficer::ToggleFlashight()
 		flashLightOn = true;
 	}
 		
+}
+
+void AOfficer::SensorGadgetAction()
+{
+	GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("SensorGadget!"));
+	if (currentState == CharacterState::SensorGadget)
+	{
+		currentState = CharacterState::Gun;
+		usingSensorGadget = false;
+		sensorGadgetOfficer->ToggleEnable(false);
+		return;
+	}
+
+	currentState = CharacterState::SensorGadget;
+	sensorGadgetOfficer->ToggleEnable(true);
+	usingSensorGadget = true;
+	
+}
+
+void AOfficer::StartFire()
+{
+	Super::StartFire();
+	if (currentState == CharacterState::SensorGadget)
+	{
+		sensorGadgetOfficer->TryPlace();
+	}
 }
 
 void AOfficer::Interact()
