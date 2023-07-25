@@ -33,12 +33,15 @@ public:
 
 	void ToggleEnable(bool Enabled);
 
+	UFUNCTION(NetMultiCast, Reliable) //TODO Fix the multiplayer
 	void CalculateFirstPosition(AActor* IgnoredSelf, FVector CamLocation, FVector CamForward);
 
+	UFUNCTION(NetMultiCast, Reliable)
 	void CalculateSecondPosition(FVector FirstLocation, FVector ForwardVector, AActor* IgnoredSelf);
 
 	void ChangeMaterial(bool approved);
 
+	UFUNCTION(NetMultiCast, Reliable)
 	void TryPlace();
 
 	int Range = 1000;

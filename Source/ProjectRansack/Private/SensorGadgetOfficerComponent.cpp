@@ -27,7 +27,7 @@ void USensorGadgetOfficerComponent::ToggleEnable(bool Enabled)
 	sensorGadgetOfficerMesh2->SetVisibility(Enabled);
 }
 
-void USensorGadgetOfficerComponent::CalculateFirstPosition(AActor* IgnoredSelf, FVector CamLocation, FVector CamForward)
+void USensorGadgetOfficerComponent::CalculateFirstPosition_Implementation(AActor* IgnoredSelf, FVector CamLocation, FVector CamForward)
 {
 	FHitResult Hit(ForceInit);
 	FVector Start = CamLocation;
@@ -68,7 +68,7 @@ void USensorGadgetOfficerComponent::CalculateFirstPosition(AActor* IgnoredSelf, 
 	}
 }
 
-void USensorGadgetOfficerComponent::CalculateSecondPosition(FVector FirstLocation, FVector ForwardVector, AActor* IgnoredSelf)
+void USensorGadgetOfficerComponent::CalculateSecondPosition_Implementation(FVector FirstLocation, FVector ForwardVector, AActor* IgnoredSelf)
 {
 	FHitResult Hit(ForceInit);
 	FVector Start = FirstLocation;
@@ -118,7 +118,7 @@ void USensorGadgetOfficerComponent::ChangeMaterial(bool approved)
 	}
 }
 
-void USensorGadgetOfficerComponent::TryPlace()
+void USensorGadgetOfficerComponent::TryPlace_Implementation()
 {
 	if (!CanPlace)
 		return;
@@ -135,6 +135,7 @@ void USensorGadgetOfficerComponent::TryPlace()
 	Sensor->sensorGadgetMesh2->SetWorldLocation(sensorGadgetOfficerMesh2->GetComponentLocation());
 	Sensor->sensorGadgetMesh2->SetWorldRotation(sensorGadgetOfficerMesh2->GetComponentRotation());
 
+	Sensor->CalculateMiddleMesh();
 	CanPlace = false;
 }
 
