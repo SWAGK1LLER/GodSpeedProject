@@ -15,6 +15,7 @@
 #include "SensorGadgetOfficerComponent.h"
 AOfficer::AOfficer()
 {
+	bReplicates = true;
 	flashLight = CreateDefaultSubobject<USpotLightComponent>(TEXT("FlashLight"));
 	flashLight->SetupAttachment((USceneComponent*)cameraComponent->camera);
 
@@ -194,4 +195,9 @@ void AOfficer::StopInteract()
 
 	IOfficerInteractibleActor::Execute_StopInteract(ItemUsing->_getUObject(), this);
 	ItemUsing = nullptr;
+}
+
+void AOfficer::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 }

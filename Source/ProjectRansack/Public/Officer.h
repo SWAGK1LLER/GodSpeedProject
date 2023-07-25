@@ -57,7 +57,7 @@ public:
 	UPROPERTY(editAnywhere, BlueprintReadWrite, Category = Light, meta = (AllowPrivateAccess = "true"))
 		class USpotLightComponent* flashLight;
 
-	UPROPERTY(editAnywhere, BlueprintReadWrite, Category = SensorGadget, meta = (AllowPrivateAccess = "true"))
+	UPROPERTY(editAnywhere, BlueprintReadWrite, Category = SensorGadget, meta = (AllowPrivateAccess = "true"), replicated)
 		class USensorGadgetOfficerComponent* sensorGadgetOfficer;
 
 	bool flashLightOn = false;
@@ -96,4 +96,6 @@ public:
 
 	virtual void Interact() override;
 	virtual void StopInteract() override;
+
+	void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const;
 };

@@ -15,6 +15,8 @@ ASensorGadget::ASensorGadget()
 
 	MiddleMesh = CreateDefaultSubobject<UStaticMeshComponent>(FName("MiddleMesh"));
 	MiddleMesh->SetupAttachment(RootComponent);
+	bReplicates = true;
+	
 }
 
 // Called when the game starts or when spawned
@@ -23,7 +25,7 @@ void ASensorGadget::BeginPlay()
 	Super::BeginPlay();
 }
 
-void ASensorGadget::CalculateMiddleMesh_Implementation()
+void ASensorGadget::CalculateMiddleMesh()
 {
 	FVector Location = (sensorGadgetMesh1->GetComponentLocation() + sensorGadgetMesh2->GetComponentLocation()) / 2;
 	FRotator Rotation = sensorGadgetMesh1->GetUpVector().Rotation();

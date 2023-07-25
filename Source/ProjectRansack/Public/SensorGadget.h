@@ -15,7 +15,7 @@ public:
 	// Sets default values for this actor's properties
 	ASensorGadget();
 
-	UFUNCTION(NetMulticast, Reliable)
+	
 	void CalculateMiddleMesh();
 
 	UPROPERTY(editAnywhere, BlueprintReadWrite, Category = SensorGadget, meta = (AllowPrivateAccess = "true"))

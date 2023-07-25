@@ -33,21 +33,30 @@ public:
 
 	void ToggleEnable(bool Enabled);
 
-	UFUNCTION(NetMultiCast, Reliable) //TODO Fix the multiplayer
 	void CalculateFirstPosition(AActor* IgnoredSelf, FVector CamLocation, FVector CamForward);
 
-	UFUNCTION(NetMultiCast, Reliable)
 	void CalculateSecondPosition(FVector FirstLocation, FVector ForwardVector, AActor* IgnoredSelf);
 
 	void ChangeMaterial(bool approved);
 
-	UFUNCTION(NetMultiCast, Reliable)
 	void TryPlace();
+
+	UFUNCTION(Server, Reliable)
+		void ServerSpawnSensor(FVector pfirstLocation, FRotator pfirstRotation, FVector psecondLocation, FRotator psecondRotation);
+
+	UFUNCTION(NetMulticast, Reliable)
+		void MultiSpawnSensor(FVector pfirstLocation, FRotator pfirstRotation, FVector psecondLocation, FRotator psecondRotation);
+
 
 	int Range = 1000;
 
 	bool CanPlace = false;
 
+	FVector firstLocation;
+	FRotator firstRotation;
+
+	FVector secondLocation;
+	FRotator secondRotation;
 protected:
 	// Called when the game starts
 	virtual void BeginPlay() override;

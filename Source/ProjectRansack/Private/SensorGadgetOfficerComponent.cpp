@@ -11,6 +11,7 @@ USensorGadgetOfficerComponent::USensorGadgetOfficerComponent()
 	// Set this component to be initialized when the game starts, and to be ticked every frame.  You can turn these features
 	// off to improve performance if you don't need them.
 	PrimaryComponentTick.bCanEverTick = true;
+	
 
 	sensorGadgetOfficerMesh1 = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("SensorGadgetMesh1"));
 
@@ -27,7 +28,7 @@ void USensorGadgetOfficerComponent::ToggleEnable(bool Enabled)
 	sensorGadgetOfficerMesh2->SetVisibility(Enabled);
 }
 
-void USensorGadgetOfficerComponent::CalculateFirstPosition_Implementation(AActor* IgnoredSelf, FVector CamLocation, FVector CamForward)
+void USensorGadgetOfficerComponent::CalculateFirstPosition(AActor* IgnoredSelf, FVector CamLocation, FVector CamForward)
 {
 	FHitResult Hit(ForceInit);
 	FVector Start = CamLocation;
@@ -59,6 +60,9 @@ void USensorGadgetOfficerComponent::CalculateFirstPosition_Implementation(AActor
 		sensorGadgetOfficerMesh1->SetWorldLocation(Point);
 		sensorGadgetOfficerMesh1->SetWorldRotation(Rotation);
 
+		firstLocation = Point;
+		firstRotation = Rotation;
+
 		CalculateSecondPosition(Point, Hit.ImpactNormal, IgnoredSelf);
 	}
 	else
@@ -68,7 +72,7 @@ void USensorGadgetOfficerComponent::CalculateFirstPosition_Implementation(AActor
 	}
 }
 
-void USensorGadgetOfficerComponent::CalculateSecondPosition_Implementation(FVector FirstLocation, FVector ForwardVector, AActor* IgnoredSelf)
+void USensorGadgetOfficerComponent::CalculateSecondPosition(FVector FirstLocation, FVector ForwardVector, AActor* IgnoredSelf)
 {
 	FHitResult Hit(ForceInit);
 	FVector Start = FirstLocation;
@@ -94,6 +98,10 @@ void USensorGadgetOfficerComponent::CalculateSecondPosition_Implementation(FVect
 			sensorGadgetOfficerMesh2->SetWorldLocation(Point);
 			sensorGadgetOfficerMesh2->SetWorldRotation(Rotation);
 			ChangeMaterial(true);
+
+			secondLocation = Point;
+			secondRotation = Rotation;
+
 			return;
 		}
 	}
@@ -118,7 +126,7 @@ void USensorGadgetOfficerComponent::ChangeMaterial(bool approved)
 	}
 }
 
-void USensorGadgetOfficerComponent::TryPlace_Implementation()
+void USensorGadgetOfficerComponent::TryPlace()
 {
 	if (!CanPlace)
 		return;
@@ -127,16 +135,28 @@ void USensorGadgetOfficerComponent::TryPlace_Implementation()
 	FRotator Rotation = sensorGadgetOfficerMesh1->GetComponentRotation();
 	FRotator Offset = FRotator(90, 0, 0);
 	Rotation += Offset;
-	FActorSpawnParameters SpawnInfo;
-	ASensorGadget* Sensor = Cast<ASensorGadget>(GetWorld()->SpawnActor<AActor>(ActorTospawn, Location, Rotation, SpawnInfo));
-	Sensor->sensorGadgetMesh1->SetWorldLocation(sensorGadgetOfficerMesh1->GetComponentLocation());
-	Sensor->sensorGadgetMesh1->SetWorldRotation(sensorGadgetOfficerMesh1->GetComponentRotation());
 
-	Sensor->sensorGadgetMesh2->SetWorldLocation(sensorGadgetOfficerMesh2->GetComponentLocation());
-	Sensor->sensorGadgetMesh2->SetWorldRotation(sensorGadgetOfficerMesh2->GetComponentRotation());
+	ServerSpawnSensor(firstLocation, firstRotation, secondLocation, secondRotation);
+	
+	CanPlace = false;
+}
+
+void USensorGadgetOfficerComponent::ServerSpawnSensor_Implementation(FVector pfirstLocation, FRotator pfirstRotation, FVector psecondLocation, FRotator psecondRotation)
+{
+	MultiSpawnSensor(pfirstLocation, pfirstRotation, psecondLocation, psecondRotation);
+}
+
+void USensorGadgetOfficerComponent::MultiSpawnSensor_Implementation(FVector pfirstLocation, FRotator pfirstRotation, FVector psecondLocation, FRotator psecondRotation)
+{
+	FActorSpawnParameters SpawnInfo;
+	ASensorGadget* Sensor = Cast<ASensorGadget>(GetWorld()->SpawnActor<AActor>(ActorTospawn, pfirstLocation, pfirstRotation, SpawnInfo));
+	Sensor->sensorGadgetMesh1->SetWorldLocation(pfirstLocation);
+	Sensor->sensorGadgetMesh1->SetWorldRotation(pfirstRotation);
+
+	Sensor->sensorGadgetMesh2->SetWorldLocation(psecondLocation);
+	Sensor->sensorGadgetMesh2->SetWorldRotation(psecondRotation);
 
 	Sensor->CalculateMiddleMesh();
-	CanPlace = false;
 }
 
 // Called when the game starts

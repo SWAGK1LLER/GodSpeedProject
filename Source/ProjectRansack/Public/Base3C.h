@@ -108,7 +108,7 @@ public:
 	UFUNCTION(Server, Reliable, BlueprintCallable)
 		void SetClientNickname(const FString& pNickName);
 	void SetClientNickname_Implementation(const FString& pNickName);
-
+	
 	UFUNCTION(NetMulticast, Reliable, BlueprintCallable)
 		void MulticastSetClientNickname(const FString& pNickName);
 	void MulticastSetClientNickname_Implementation(const FString& pNickName);
