@@ -11,6 +11,7 @@
 #include "StunWeapon.h"
 #include <Kismet/GameplayStatics.h>
 #include "GameFramework/CharacterMovementComponent.h"
+#include <EOSGameInstance.h>
 
 
 
@@ -104,6 +105,20 @@ void ABase3C::Tick(float DeltaTime)
 		if (TimeFreezed >= FreezeDuration)
 			bFreezeInput = false;
 	}		
+}
+
+void ABase3C::EndPlay(const EEndPlayReason::Type EndPlayReason)
+{
+	APlayerController* playerController = Cast<APlayerController>(GetController());
+	if (playerController == nullptr)
+		return;
+
+	UEOSGameInstance* gameInstance = Cast<UEOSGameInstance>(GetGameInstance());
+	if (gameInstance == nullptr)
+		return;
+
+	gameInstance->CloseGame();
+	gameInstance->unregisterPlayerToGameSession(playerController);
 }
 
 // Called to bind functionality to input

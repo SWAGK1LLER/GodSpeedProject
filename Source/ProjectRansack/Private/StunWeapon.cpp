@@ -60,9 +60,9 @@ void UStunWeapon::Fire()
 
     APawn* owner = Cast<APawn>(GetOwner());
     AGamePlayerController* playerController = Cast<AGamePlayerController>(owner->GetController());
-
-    if (!playerController)
+    if (playerController == nullptr)
         return;
+
 
     playerController->SRSpawnParticle(particleEffect, position, (hitableEnemy ? StunDuration : -1) );
 

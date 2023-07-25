@@ -58,6 +58,16 @@ void AGameGameMode::PostLogin(APlayerController* NewPlayer)
 		startRound();
 }
 
+void AGameGameMode::Logout(AController* ExitPlayer)
+{
+	APlayerController* playerController = Cast<APlayerController>(ExitPlayer);
+
+	PC.Remove(playerController);
+
+	UEOSGameInstance* instance = Cast<UEOSGameInstance>(GetGameInstance());
+	instance->unregisterPlayerToGameSession(playerController);
+}
+
 void AGameGameMode::SpawnPlayer(const ETeam& team, APlayerController* NewPlayer)
 {
 	APawn* pawn = NewPlayer->GetPawn();

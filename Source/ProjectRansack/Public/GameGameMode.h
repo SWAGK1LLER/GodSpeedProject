@@ -52,6 +52,8 @@ public:
 
 	virtual void PostLogin(class APlayerController* NewPlayer) override;
 
+	virtual void Logout(class AController* ExitPlayer) override;
+
 	void SpawnPlayer(const ETeam& team, class APlayerController* NewPlayer);
 
 	void FindSpawn(const ETeam& team, FTransform& Location, TSubclassOf<AActor>& ActorClass);

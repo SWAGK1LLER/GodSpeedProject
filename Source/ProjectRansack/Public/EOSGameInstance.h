@@ -101,6 +101,11 @@ public:
 	void setTeam(FOnlineSessionSearchResult search);
 	UFUNCTION(BlueprintCallable)
 	void registerPlayerToGameSession(class APlayerController* InPlayerController);
+	UFUNCTION(BlueprintCallable)
+	void unregisterPlayerToGameSession(class APlayerController* InPlayerController);
+	UFUNCTION(BlueprintCallable)
+	void CloseGame();
+	void OnGameCloseComplete(FName SessionName, bool bWasSuccess);
 	//------------
 	//start Game
 	UFUNCTION(BlueprintCallable)
