@@ -84,6 +84,8 @@ public:
 
 	virtual void Tick(float DeltaTime) override;
 
+	virtual void MulReset_Implementation() override;
+
 	bool CheckTableInstance();
 
 	void HandleMotionVision();

@@ -67,6 +67,11 @@ void AOfficer::Tick(float DeltaTime)
 			cameraComponent->camera->GetForwardVector());
 }
 
+void AOfficer::MulReset_Implementation()
+{
+	Super::MulReset_Implementation();
+}
+
 void AOfficer::TimelineProgress(float value)
 {
 	UKismetMaterialLibrary::SetScalarParameterValue(GetWorld(), officerTableInstance->MotionVisionMPC, "Scalar", value);

@@ -136,8 +136,10 @@ void AItem::dropItem(FVector dropLocation)
 
     SetActorTransform(FTransform(dropLocation));
 
+    if (Handle.IsValid())
+        Handle.Invalidate();
+
     //Add 30 timer to pickup before respawn
-    FTimerHandle Handle;
     GetWorld()->GetTimerManager().SetTimer(Handle, FTimerDelegate::CreateLambda([&] {
         
         if (lootedItem)
@@ -154,6 +156,7 @@ void AItem::reset()
     currentlyInteracting = false;
     lootedItem = false;
     locked = false;
+    Handle.Invalidate();
 
     SetActorTransform(SpawningTransform);
 }

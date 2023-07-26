@@ -100,6 +100,8 @@ public:
 	float FreezeDuration = 0;
 	float TimeFreezed = 0;
 
+	FTransform SpawnTransform;
+
 	ABase3C();
 
 	bool CheckTableInstance();
@@ -128,6 +130,14 @@ public:
 	virtual void Tick(float DeltaTime) override;
 
 	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
+
+	UFUNCTION(Server, Unreliable)
+	void SRReset();
+	void SRReset_Implementation();
+
+	UFUNCTION(NetMulticast, Unreliable)
+	virtual void MulReset();
+	virtual void MulReset_Implementation();
 
 
 	// Called to bind functionality to input
@@ -158,5 +168,5 @@ public:
 	void TestDamage(AActor* DamageActor);
 
 	UFUNCTION(BlueprintCallable)
-		UCameraComp* GetCameraComponent();
+	UCameraComp* GetCameraComponent();
 };

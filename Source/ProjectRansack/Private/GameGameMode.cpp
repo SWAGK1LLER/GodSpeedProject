@@ -218,12 +218,14 @@ void AGameGameMode::ArrestThief(ABase3C* other)
 	if (playerController == nullptr)
 		return;
 
-	AThief* thief = Cast<AThief>(other);
+	playerController->ClientBeingArrest();
+
+	/*AThief* thief = Cast<AThief>(other);
 	if (thief == nullptr)
 		return;
 
-	TeamA.Remove(other);
+	TeamA.Remove(other);*/
 	
-	thief->SRDropInventory();
-	playerController->ClientBeingArrest();
+	/*thief->SRDropInventory();
+	playerController->ClientBeingArrest();*/
 }

@@ -258,8 +258,18 @@ void AGamePlayerController::ClientSpawnParticle_Implementation(UParticleSystem* 
 
 void AGamePlayerController::ClientBeingArrest_Implementation()
 {
-	UEOSGameInstance* instance = Cast<UEOSGameInstance>(UGameplayStatics::GetGameInstance(GetWorld()));
-	if (instance == nullptr)
+	AThief* thief = Cast<AThief>(GetPawn());
+	if (thief == nullptr)
+		return;
+
+	thief->SRDropInventory(thief->GetActorLocation());
+	thief->SRReset();
+}
+
+void AGamePlayerController::ClientFinishArrest_Implementation()
+{
+	AThief* thief = Cast<AThief>(GetPawn());
+	if (thief == nullptr)
 		return;
 
 	for (auto& it : interactibleUI)
@@ -267,11 +277,6 @@ void AGamePlayerController::ClientBeingArrest_Implementation()
 		it.Value->RemoveFromParent();
 	}
 
-	AThief* thief = Cast<AThief>(GetPawn());
-	if (thief == nullptr)
-		return;
-
-	thief->WidgetUI->RemoveFromParent();
-
-	SRSpawnPlayer(instance->team);
+	UpdateDuffleBagUI(thief->inventory->items);
+	UpdateTeamDuffleBagUI();
 }

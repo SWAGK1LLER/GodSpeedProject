@@ -78,6 +78,9 @@ void ABase3C::ClientFreezeInput_Implementation(float duration)
 void ABase3C::BeginPlay()
 {
 	Super::BeginPlay();
+
+	SpawnTransform = GetActorTransform();
+
 	if(!CheckTableInstance())
 		return;
 
@@ -117,6 +120,16 @@ void ABase3C::EndPlay(const EEndPlayReason::Type EndPlayReason)
 
 	gameInstance->CloseGame();
 	gameInstance->unregisterPlayerToGameSession(playerController);
+}
+
+void ABase3C::SRReset_Implementation()
+{
+	MulReset();
+}
+
+void ABase3C::MulReset_Implementation()
+{
+	SetActorTransform(SpawnTransform);
 }
 
 // Called to bind functionality to input

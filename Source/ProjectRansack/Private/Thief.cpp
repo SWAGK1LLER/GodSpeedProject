@@ -27,6 +27,17 @@ void AThief::Tick(float DeltaTime)
 	ChangeStencilOnMovement();
 }
 
+void AThief::MulReset_Implementation()
+{
+	Super::MulReset_Implementation();
+
+	AGamePlayerController* pc = Cast<AGamePlayerController>(GetController());
+	if (pc == nullptr)
+		return;
+
+	pc->ClientFinishArrest();
+}
+
 bool AThief::ValidateSpaceItem(AItem& pItem)
 {
 	return inventory->ValidateSpace(pItem);
@@ -94,7 +105,7 @@ void AThief::MUlClearItems_Implementation()
 	}
 }
 
-void AThief::SRDropInventory_Implementation()
+void AThief::SRDropInventory_Implementation(FVector location)
 {
 	AGameGameMode* gameMode = Cast<AGameGameMode>(UGameplayStatics::GetGameMode(GetWorld()));
 
@@ -108,13 +119,11 @@ void AThief::SRDropInventory_Implementation()
 		break;
 	}
 
-	MUlDropInventory();
+	MUlDropInventory(location);
 }
 
-void AThief::MUlDropInventory_Implementation()
+void AThief::MUlDropInventory_Implementation(FVector location)
 {
-	FVector location = GetActorLocation();
-
 	if (inventory == nullptr)
 		return;
 
@@ -122,6 +131,8 @@ void AThief::MUlDropInventory_Implementation()
 	{
 		inventory->items[i].item->dropItem(location);
 	}
+
+	inventory->ClearInventory();
 }
 
 void AThief::Interact()

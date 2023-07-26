@@ -30,6 +30,7 @@ public:
 	AThief();
 	virtual void BeginPlay() override;
 	virtual void Tick(float DeltaTime) override;
+	virtual void MulReset_Implementation() override;
 	
 	UFUNCTION(Server, Reliable, BlueprintCallable)
 	void SRAddItem(class AItem* pItem);
@@ -49,12 +50,12 @@ public:
 
 
 	UFUNCTION(Server, Reliable, BlueprintCallable)
-	void SRDropInventory();
-	void SRDropInventory_Implementation();
+	void SRDropInventory(FVector location);
+	void SRDropInventory_Implementation(FVector location);
 
 	UFUNCTION(NetMulticast, Reliable, BlueprintCallable)
-	void MUlDropInventory();
-	void MUlDropInventory_Implementation();
+	void MUlDropInventory(FVector location);
+	void MUlDropInventory_Implementation(FVector location);
 
 
 	bool ValidateSpaceItem(class AItem& pItem);

@@ -40,6 +40,7 @@ public:
 	bool locked = false;
 
 	FTransform SpawningTransform;
+	FTimerHandle Handle;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	int score = 0;
