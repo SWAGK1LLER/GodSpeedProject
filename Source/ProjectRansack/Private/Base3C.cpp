@@ -87,11 +87,6 @@ void ABase3C::BeginPlay()
 	BindInputHandler();
 	SendDataToComponents();
 
-	if (WidgetUI != nullptr)
-		return;
-
-	WidgetUI = CreateWidget<UPlayerUI>(GetWorld(), WidgetClass);
-	WidgetUI->AddToViewport();
 }
 
 // Called every frame
@@ -109,6 +104,9 @@ void ABase3C::Tick(float DeltaTime)
 
 void ABase3C::EndPlay(const EEndPlayReason::Type EndPlayReason)
 {
+	if (EndPlayReason != EEndPlayReason::Type::Quit)
+		return;
+
 	APlayerController* playerController = Cast<APlayerController>(GetController());
 	if (playerController == nullptr)
 		return;
@@ -247,4 +245,14 @@ void ABase3C::BindInputHandler()
 UCameraComp* ABase3C::GetCameraComponent()
 {
 	return cameraComponent;
+}
+
+
+void ABase3C::SetClientUI_Implementation()
+{
+	if (WidgetUI != nullptr)
+		return;
+
+	WidgetUI = CreateWidget<UPlayerUI>(GetWorld(), WidgetClass);
+	WidgetUI->AddToViewport();
 }

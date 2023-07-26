@@ -98,4 +98,8 @@ public:
 	virtual void StopInteract() override;
 
 	void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const;
+
+	UFUNCTION(Server, Reliable, BlueprintCallable)
+	void ArrestThief(ABase3C* other);
+	void ArrestThief_Implementation(ABase3C* other);
 };

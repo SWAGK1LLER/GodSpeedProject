@@ -77,7 +77,7 @@ void AGameGameMode::SpawnPlayer(const ETeam& team, APlayerController* NewPlayer)
 	FTransform spawnTransform;
 	TSubclassOf<AActor> classToSpawn;
 
-	FindSpawn(team, spawnTransform, classToSpawn);
+	FindSpawn(NewPlayer, team, spawnTransform, classToSpawn);
 
 	ABase3C* actor = Cast<ABase3C>(GetWorld()->SpawnActor(classToSpawn, &spawnTransform));
 
@@ -94,7 +94,7 @@ void AGameGameMode::SpawnPlayer(const ETeam& team, APlayerController* NewPlayer)
 	NewPlayer->Possess(actor);
 }
 
-void AGameGameMode::FindSpawn(const ETeam& team, FTransform& Location, TSubclassOf<AActor>& ActorClass)
+void AGameGameMode::FindSpawn(APlayerController* NewPlayer, const ETeam& team, FTransform& Location, TSubclassOf<AActor>& ActorClass)
 {
 	TArray<AActor*> spawnPoint;
 	if (team == ETeam::A)
@@ -108,6 +108,12 @@ void AGameGameMode::FindSpawn(const ETeam& team, FTransform& Location, TSubclass
 		ActorClass = OfficerClass;
 	}
 
+	if (PlayerSpawn.Contains(NewPlayer))
+	{
+		Location = PlayerSpawn[NewPlayer]->GetActorTransform();
+		return;
+	}
+
 	for (AActor* Actor : spawnPoint)
 	{
 		AGamePlayerStart* spawn = Cast<AGamePlayerStart>(Actor);
@@ -116,6 +122,8 @@ void AGameGameMode::FindSpawn(const ETeam& team, FTransform& Location, TSubclass
 
 		Location = spawn->GetActorTransform();
 		spawn->used = true;
+
+		PlayerSpawn.Add(NewPlayer, spawn);
 		break;
 	}
 }
@@ -182,6 +190,18 @@ FString AGameGameMode::convertTimeToText()
 void AGameGameMode::AddToScore(int pValue, int& pScore)
 {
 	pScore += pValue;
+	if (pScore < 0)
+		pScore = 0;
+
+	for (APlayerController* aPC : PC)
+		(Cast<AGamePlayerController>(aPC))->ClientUpdateScore(ScoreTeamA, ScoreTeamB);
+}
+
+void AGameGameMode::RemoveToScore(int pValue, int& pScore)
+{
+	pScore -= pValue;
+	if (pScore < 0)
+		pScore = 0;
 
 	for (APlayerController* aPC : PC)
 		(Cast<AGamePlayerController>(aPC))->ClientUpdateScore(ScoreTeamA, ScoreTeamB);
@@ -190,4 +210,20 @@ void AGameGameMode::AddToScore(int pValue, int& pScore)
 void AGameGameMode::FreezeInput(float duration, ABase3C* actor)
 {
 	actor->ClientFreezeInput(duration);
+}
+
+void AGameGameMode::ArrestThief(ABase3C* other)
+{
+	AGamePlayerController* playerController = Cast<AGamePlayerController>(other->GetController());
+	if (playerController == nullptr)
+		return;
+
+	AThief* thief = Cast<AThief>(other);
+	if (thief == nullptr)
+		return;
+
+	TeamA.Remove(other);
+	
+	thief->SRDropInventory();
+	playerController->ClientBeingArrest();
 }

@@ -15,8 +15,15 @@ AThief::AThief()
 	inventory = NewObject<UInventory>();
 }
 
+void AThief::BeginPlay()
+{
+	Super::BeginPlay();
+}
+
 void AThief::Tick(float DeltaTime)
 {
+	Super::Tick(DeltaTime);
+
 	ChangeStencilOnMovement();
 }
 
@@ -84,6 +91,36 @@ void AThief::MUlClearItems_Implementation()
 	{
 		PC->UpdateDuffleBagUI(inventory->items);
 		PC->UpdateTeamDuffleBagUI();
+	}
+}
+
+void AThief::SRDropInventory_Implementation()
+{
+	AGameGameMode* gameMode = Cast<AGameGameMode>(UGameplayStatics::GetGameMode(GetWorld()));
+
+	ETeam team = Cast<UEOSGameInstance>(GetGameInstance())->team;
+
+	switch (team)
+	{
+	case ETeam::A: gameMode->RemoveToScore(costOnArrest, gameMode->ScoreTeamA);
+		break;
+	case ETeam::B: gameMode->RemoveToScore(costOnArrest, gameMode->ScoreTeamB);
+		break;
+	}
+
+	MUlDropInventory();
+}
+
+void AThief::MUlDropInventory_Implementation()
+{
+	FVector location = GetActorLocation();
+
+	if (inventory == nullptr)
+		return;
+
+	for (int i = 0; i < inventory->items.Num(); i++)
+	{
+		inventory->items[i].item->dropItem(location);
 	}
 }
 

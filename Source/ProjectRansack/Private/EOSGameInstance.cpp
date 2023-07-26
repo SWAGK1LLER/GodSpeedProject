@@ -563,7 +563,8 @@ void UEOSGameInstance::registerPlayerToGameSession(APlayerController* InPlayerCo
 	}
 
 	TSharedPtr<const FUniqueNetId> UniqueNetId = UniqueNetIdRepl.GetUniqueNetId();
-	check(UniqueNetId != nullptr);
+	if (UniqueNetId == nullptr)
+		return;
 
 	IOnlineSessionPtr SessionPtr = OnlineSubsystem->GetSessionInterface();
 	if (!SessionPtr)
@@ -596,7 +597,8 @@ void UEOSGameInstance::unregisterPlayerToGameSession(APlayerController* InPlayer
 	else
 	{
 		UNetConnection* RemoteNetConnection = Cast<UNetConnection>(InPlayerController->Player);
-		check(IsValid(RemoteNetConnection));
+		if (RemoteNetConnection == nullptr)
+			return;
 		UniqueNetIdRepl = RemoteNetConnection->PlayerId;
 	}
 

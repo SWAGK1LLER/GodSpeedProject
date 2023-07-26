@@ -46,6 +46,10 @@ public:
 
 	virtual void SetPawn(APawn* InPawn) override;
 
+	UFUNCTION(Client, Reliable, BlueprintCallable)
+	void SetUpUI(APawn* InPawn);
+	void SetUpUI_Implementation(APawn* InPawn);
+
 	UFUNCTION(Server, Reliable, BlueprintCallable)
 	void SRSpawnPlayer(const ETeam& pTeam);
 	void SRSpawnPlayer_Implementation(const ETeam& pTeam);
@@ -104,4 +108,8 @@ public:
 	UFUNCTION(Client, Reliable, BlueprintCallable)
 	void ClientSpawnParticle(class UParticleSystem* particleEffect, const FTransform& position, const float& duration);
 	void ClientSpawnParticle_Implementation(class UParticleSystem* particleEffect, const FTransform& position, const float& duration);
+
+	UFUNCTION(Client, Reliable, BlueprintCallable)
+	void ClientBeingArrest();
+	void ClientBeingArrest_Implementation();
 };

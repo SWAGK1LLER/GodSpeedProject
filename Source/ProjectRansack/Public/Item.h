@@ -5,6 +5,7 @@
 #include "Blueprint/UserWidget.h"
 #include "ThiefInteractibleActor.h"
 #include "ItemWidgetUI.h"
+#include "VectorTypes.h"
 #include "Item.generated.h"
 
 USTRUCT(BlueprintType)
@@ -30,10 +31,15 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	float TimeToPickUp = 0;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	float TimeBeforeRespawn = 30;
+
 	float currentTime = 0;
 	bool currentlyInteracting = false;
 	bool lootedItem = false;
 	bool locked = false;
+
+	FTransform SpawningTransform;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	int score = 0;
@@ -62,8 +68,11 @@ public:
 	virtual void Interact_Implementation(class AActor* pActor) override;
 	virtual void StopInteract_Implementation(class AActor* pActor) override;
 
-
 	UFUNCTION(NetMulticast, Reliable, BlueprintCallable)
 	void MulPlayerLootIt();
 	void MulPlayerLootIt_Implementation();
+
+	void dropItem(FVector dropLocation);
+
+	void reset();
 };

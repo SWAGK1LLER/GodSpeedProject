@@ -26,6 +26,12 @@ void AGamePlayerController::BeginPlay()
 	if (instance == nullptr)
 		return;
 
+	if (RoundUIWidget == nullptr)
+	{
+		RoundUIWidget = CreateWidget<URoundUI>(GetWorld(), RoundUIClass);
+		RoundUIWidget->AddToViewport();
+	}
+
 	instance->LoadSaveGame();
 	instance->LoadSaveSettings();
 	SRSpawnPlayer(instance->team);
@@ -41,25 +47,42 @@ void AGamePlayerController::PawnIsPossess(APawn* InPawn)
 	if (!IsLocalPlayerController())
 		return;
 
-
-	if (RoundUIWidget == nullptr)
-	{
-		RoundUIWidget = CreateWidget<URoundUI>(GetWorld(), RoundUIClass);
-		RoundUIWidget->AddToViewport();
-	}
-
 	AThief* thief = Cast<AThief>(InPawn);
 	if (thief == nullptr)
 		return;
 
-	DuffleBagUIWidget = CreateWidget<UDuffleBagUI>(GetWorld(), DuffleBagUIClass);
-	DuffleBagUIWidget->AddToViewport();
-
-	TeamDuffleBagUIWidget = CreateWidget<UTeamDuffleBagUI>(GetWorld(), TeamDuffleBagUIClass);
-	TeamDuffleBagUIWidget->AddToViewport();
-
+	
+	SetUpUI(thief);
 	SRGetTeamData();
 	SRUpdatePlayerName();
+}
+
+void AGamePlayerController::SetUpUI_Implementation(APawn* InPawn)
+{
+	AThief* thief = Cast<AThief>(InPawn);
+	if (thief == nullptr)
+		return;
+
+	if (DuffleBagUIWidget == nullptr)
+	{
+		DuffleBagUIWidget = CreateWidget<UDuffleBagUI>(GetWorld(), DuffleBagUIClass);
+		DuffleBagUIWidget->AddToViewport();
+	}
+	else
+	{
+		if (thief->inventory == nullptr)
+			thief->inventory = NewObject<UInventory>();
+
+		DuffleBagUIWidget->UpdateUI(thief->inventory->items);
+	}
+
+	if (TeamDuffleBagUIWidget == nullptr)
+	{
+		TeamDuffleBagUIWidget = CreateWidget<UTeamDuffleBagUI>(GetWorld(), TeamDuffleBagUIClass);
+		TeamDuffleBagUIWidget->AddToViewport();
+	}
+
+	thief->SetClientUI();
 }
 
 void AGamePlayerController::SetPawn(APawn* InPawn)
@@ -137,6 +160,8 @@ void AGamePlayerController::ClientUpdateTeamDuffleBagUI_Implementation()
 	if (TeamA.Num() > 0)
 	{
 		AThief* thief = Cast<AThief>(TeamA[0]);
+		if (thief == nullptr)
+			return;
 
 		if (thief->inventory != nullptr)
 			TeamDuffleBagUIWidget->UpdateUIBag1(thief->nickName, thief->inventory->items);
@@ -147,6 +172,9 @@ void AGamePlayerController::ClientUpdateTeamDuffleBagUI_Implementation()
 	if (TeamA.Num() > 1)
 	{
 		AThief* thief = Cast<AThief>(TeamA[1]);
+		if (thief == nullptr)
+			return;
+
 		if (thief->inventory != nullptr)
 			TeamDuffleBagUIWidget->UpdateUIBag2(thief->nickName, thief->inventory->items);
 		else
@@ -226,4 +254,24 @@ void AGamePlayerController::ClientSpawnParticle_Implementation(UParticleSystem* 
 																														);
 	if (duration != -1)
 		particle->setLifeSpan(duration);
+}
+
+void AGamePlayerController::ClientBeingArrest_Implementation()
+{
+	UEOSGameInstance* instance = Cast<UEOSGameInstance>(UGameplayStatics::GetGameInstance(GetWorld()));
+	if (instance == nullptr)
+		return;
+
+	for (auto& it : interactibleUI)
+	{
+		it.Value->RemoveFromParent();
+	}
+
+	AThief* thief = Cast<AThief>(GetPawn());
+	if (thief == nullptr)
+		return;
+
+	thief->WidgetUI->RemoveFromParent();
+
+	SRSpawnPlayer(instance->team);
 }

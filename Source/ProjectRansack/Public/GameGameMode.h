@@ -11,6 +11,7 @@
 #define SECOND 60
 #define MAX_PLAYER 6
 
+
 /**
  * 
  */
@@ -45,6 +46,9 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	TArray<class ABase3C*> TeamB;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	TMap<class APlayerController*, AActor*> PlayerSpawn;
 	
 	virtual void BeginPlay() override;
 
@@ -56,7 +60,7 @@ public:
 
 	void SpawnPlayer(const ETeam& team, class APlayerController* NewPlayer);
 
-	void FindSpawn(const ETeam& team, FTransform& Location, TSubclassOf<AActor>& ActorClass);
+	void FindSpawn(class APlayerController* NewPlayer, const ETeam& team, FTransform& Location, TSubclassOf<AActor>& ActorClass);
 
 	void SendPlayerName();
 
@@ -74,6 +78,10 @@ public:
 	FString convertTimeToText();
 
 	void AddToScore(int pValue, int& pScore);
+	void RemoveToScore(int pValue, int& pScore);
 
 	void FreezeInput(float duration, ABase3C* actor);
+
+	UFUNCTION(BlueprintCallable)
+	void ArrestThief(ABase3C* other);
 };

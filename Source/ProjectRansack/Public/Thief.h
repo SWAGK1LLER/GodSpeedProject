@@ -18,6 +18,9 @@ class PROJECTRANSACK_API AThief : public ABase3C
 	GENERATED_BODY()
 
 public:
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	int costOnArrest = 400;
+
 	TArray<IThiefInteractibleActor*> closeItems;
 	IThiefInteractibleActor* ItemUsing = nullptr;
 
@@ -25,6 +28,7 @@ public:
 	UInventory* inventory = nullptr;
 
 	AThief();
+	virtual void BeginPlay() override;
 	virtual void Tick(float DeltaTime) override;
 	
 	UFUNCTION(Server, Reliable, BlueprintCallable)
@@ -42,6 +46,16 @@ public:
 	UFUNCTION(NetMulticast, Reliable, BlueprintCallable)
 	void MUlClearItems();
 	void MUlClearItems_Implementation();
+
+
+	UFUNCTION(Server, Reliable, BlueprintCallable)
+	void SRDropInventory();
+	void SRDropInventory_Implementation();
+
+	UFUNCTION(NetMulticast, Reliable, BlueprintCallable)
+	void MUlDropInventory();
+	void MUlDropInventory_Implementation();
+
 
 	bool ValidateSpaceItem(class AItem& pItem);
 

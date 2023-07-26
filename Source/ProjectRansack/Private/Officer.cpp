@@ -13,6 +13,9 @@
 #include "Engine/World.h"
 #include "Camera/CameraComponent.h"
 #include "SensorGadgetOfficerComponent.h"
+#include <GameGameMode.h>
+#include <Kismet/GameplayStatics.h>
+
 AOfficer::AOfficer()
 {
 	bReplicates = true;
@@ -200,4 +203,12 @@ void AOfficer::StopInteract()
 void AOfficer::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+}
+
+void AOfficer::ArrestThief_Implementation(ABase3C* other)
+{
+	AGameGameMode* gameMode = Cast<AGameGameMode>(UGameplayStatics::GetGameMode(GetWorld()));
+
+	if (gameMode != nullptr)
+		gameMode->ArrestThief(other);
 }
