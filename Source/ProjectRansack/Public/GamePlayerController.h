@@ -116,4 +116,8 @@ public:
 	UFUNCTION(Client, Reliable, BlueprintCallable)
 	void ClientFinishArrest();
 	void ClientFinishArrest_Implementation();
+
+	UFUNCTION(Client, Reliable, BlueprintCallable)
+	void RestartRound();
+	void RestartRound_Implementation();
 };

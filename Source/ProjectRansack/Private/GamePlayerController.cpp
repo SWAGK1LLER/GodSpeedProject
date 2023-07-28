@@ -14,6 +14,7 @@
 #include "TeamDuffleBagUI.h"
 #include "Particles/ParticleSystemComponent.h"
 #include "GenericParticleSystemComponent.h"
+#include <Officer.h>
 
 void AGamePlayerController::BeginPlay()
 {
@@ -49,9 +50,14 @@ void AGamePlayerController::PawnIsPossess(APawn* InPawn)
 
 	AThief* thief = Cast<AThief>(InPawn);
 	if (thief == nullptr)
+	{
+		AOfficer* officer = Cast<AOfficer>(InPawn);
+		if (officer != nullptr)
+			officer->SetClientUI();
 		return;
+	}
+		
 
-	
 	SetUpUI(thief);
 	SRGetTeamData();
 	SRUpdatePlayerName();
@@ -279,4 +285,42 @@ void AGamePlayerController::ClientFinishArrest_Implementation()
 
 	UpdateDuffleBagUI(thief->inventory->items);
 	UpdateTeamDuffleBagUI();
+}
+
+void AGamePlayerController::RestartRound_Implementation()
+{
+	UEOSGameInstance* instance = Cast<UEOSGameInstance>(UGameplayStatics::GetGameInstance(GetWorld()));
+	if (instance == nullptr)
+		return;
+
+	TArray<AActor*> FoundActors;
+	UGameplayStatics::GetAllActorsOfClass(GetWorld(), AItem::StaticClass(), FoundActors);
+
+	for (int i = 0; i < FoundActors.Num(); i++)
+		Cast<AItem>(FoundActors[i])->reset();
+
+	instance->team = instance->team == ETeam::A ? ETeam::B : ETeam::A;
+
+	ABase3C* base3c = Cast<ABase3C>(GetPawn());
+	if (base3c->WidgetUI != nullptr)
+	{
+		base3c->WidgetUI->RemoveFromParent();
+		base3c->WidgetUI = nullptr;
+	}
+	
+
+	if (DuffleBagUIWidget != nullptr)
+	{
+		DuffleBagUIWidget->RemoveFromParent();
+		DuffleBagUIWidget = nullptr;
+	}
+
+	if (TeamDuffleBagUIWidget != nullptr)
+	{
+		TeamDuffleBagUIWidget->RemoveFromParent();
+		TeamDuffleBagUIWidget = nullptr;
+	}
+
+
+	SRSpawnPlayer(instance->team);
 }

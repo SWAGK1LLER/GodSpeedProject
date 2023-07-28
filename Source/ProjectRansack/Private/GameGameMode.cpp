@@ -17,15 +17,14 @@ void AGameGameMode::BeginPlay()
 {
 	Super::BeginPlay();
 
-	CurrentTime = Timer * MINUTE;
-
 	UEOSGameInstance* instance = Cast<UEOSGameInstance>(UGameplayStatics::GetGameInstance(GetWorld()));
 	if (instance != nullptr)
 	{
 		//instance->StartGame();
 	}
 
-	startRound();
+	//For testing
+	StartRound();
 }
 
 void AGameGameMode::Tick(float DeltaTime)
@@ -34,6 +33,9 @@ void AGameGameMode::Tick(float DeltaTime)
 	
 	if (RoundStarted)
 		CurrentTime -= DeltaTime;
+
+	if (CurrentTime <= 0)
+		EndRound();
 
 	FString timeRemaining = getRemainingTimeText();
 	for (APlayerController* aPC : PC)
@@ -55,7 +57,7 @@ void AGameGameMode::PostLogin(APlayerController* NewPlayer)
 	PC.Add(NewPlayer);
 
 	if (PC.Num() == MAX_PLAYER)
-		startRound();
+		StartRound();
 }
 
 void AGameGameMode::Logout(AController* ExitPlayer)
@@ -108,12 +110,6 @@ void AGameGameMode::FindSpawn(APlayerController* NewPlayer, const ETeam& team, F
 		ActorClass = OfficerClass;
 	}
 
-	if (PlayerSpawn.Contains(NewPlayer))
-	{
-		Location = PlayerSpawn[NewPlayer]->GetActorTransform();
-		return;
-	}
-
 	for (AActor* Actor : spawnPoint)
 	{
 		AGamePlayerStart* spawn = Cast<AGamePlayerStart>(Actor);
@@ -123,7 +119,7 @@ void AGameGameMode::FindSpawn(APlayerController* NewPlayer, const ETeam& team, F
 		Location = spawn->GetActorTransform();
 		spawn->used = true;
 
-		PlayerSpawn.Add(NewPlayer, spawn);
+		PlayerSpawn.Add(spawn);
 		break;
 	}
 }
@@ -165,11 +161,6 @@ void AGameGameMode::SpawnParticle(UParticleSystem* particleEffect, const FTransf
 {
 	for (APlayerController* aPC : PC)
 		(Cast<AGamePlayerController>(aPC))->ClientSpawnParticle(particleEffect, position, duration);
-}
-
-void AGameGameMode::startRound()
-{
-	RoundStarted = true;
 }
 
 FString AGameGameMode::getRemainingTimeText()
@@ -219,13 +210,49 @@ void AGameGameMode::ArrestThief(ABase3C* other)
 		return;
 
 	playerController->ClientBeingArrest();
+}
 
-	/*AThief* thief = Cast<AThief>(other);
-	if (thief == nullptr)
+void AGameGameMode::StartRound()
+{
+	//TO DO: add cooldown before starting round
+
+	CurrentTime = Timer * MINUTE;
+	RoundStarted = true;
+	TotalRound++;
+}
+
+void AGameGameMode::EndRound()
+{
+	RoundStarted = false;
+
+#if !WITH_EDITOR
+	/*if (TotalRound == MAX_ROUND)
+	{
+		EndGame();
 		return;
+	}*/
+#endif
 
-	TeamA.Remove(other);*/
-	
-	/*thief->SRDropInventory();
-	playerController->ClientBeingArrest();*/
+	//TO DO: Add cooldown before restarting round
+	for (int i = 0; i < PlayerSpawn.Num(); i++)
+		PlayerSpawn[i]->used = false;
+
+	TeamA.Empty();
+	TeamB.Empty();
+
+	std::swap(ScoreTeamA, ScoreTeamB);
+
+	for (int i = 0; i < PC.Num(); i++)
+	{
+		Cast<AGamePlayerController>(PC[i])->RestartRound();
+		(Cast<AGamePlayerController>(PC[i]))->ClientUpdateScore(ScoreTeamA, ScoreTeamB);
+	}
+
+	//TO DO call back when finish restarting
+	StartRound();
+}
+
+void AGameGameMode::EndGame()
+{
+	//TO DO: Show score tab
 }

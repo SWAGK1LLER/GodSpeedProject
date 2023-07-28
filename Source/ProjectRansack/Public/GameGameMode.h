@@ -10,6 +10,7 @@
 #define MINUTE 60
 #define SECOND 60
 #define MAX_PLAYER 6
+#define MAX_ROUND 2
 
 
 /**
@@ -25,6 +26,7 @@ public:
 	int Timer = 10;
 	float CurrentTime = 0;
 	bool RoundStarted = false;
+	int TotalRound = 0;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	int ScoreTeamA = 0;
@@ -48,7 +50,7 @@ public:
 	TArray<class ABase3C*> TeamB;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	TMap<class APlayerController*, AActor*> PlayerSpawn;
+	TArray<class AGamePlayerStart*> PlayerSpawn;
 	
 	virtual void BeginPlay() override;
 
@@ -70,8 +72,12 @@ public:
 
 	void SpawnParticle(class UParticleSystem* particleEffect, const FTransform& position, const float& duration);
 
+	void StartRound();
+
 	UFUNCTION(BlueprintCallable)
-	void startRound();
+	void EndRound();
+
+	void EndGame();
 
 	UFUNCTION(BlueprintCallable)
 	FString getRemainingTimeText();
@@ -84,4 +90,6 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 	void ArrestThief(ABase3C* other);
+
+
 };

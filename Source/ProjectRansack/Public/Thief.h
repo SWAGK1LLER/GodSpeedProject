@@ -48,7 +48,6 @@ public:
 	void MUlClearItems();
 	void MUlClearItems_Implementation();
 
-
 	UFUNCTION(Server, Reliable, BlueprintCallable)
 	void SRDropInventory(FVector location);
 	void SRDropInventory_Implementation(FVector location);
@@ -56,7 +55,6 @@ public:
 	UFUNCTION(NetMulticast, Reliable, BlueprintCallable)
 	void MUlDropInventory(FVector location);
 	void MUlDropInventory_Implementation(FVector location);
-
 
 	bool ValidateSpaceItem(class AItem& pItem);
 

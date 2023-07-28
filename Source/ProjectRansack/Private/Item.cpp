@@ -152,11 +152,15 @@ void AItem::dropItem(FVector dropLocation)
 
 void AItem::reset()
 {
+    HelperClass::activateActor(this);
+
     currentTime = 0;
     currentlyInteracting = false;
     lootedItem = false;
     locked = false;
-    Handle.Invalidate();
+
+    if (Handle.IsValid())
+        Handle.Invalidate();
 
     SetActorTransform(SpawningTransform);
 }
