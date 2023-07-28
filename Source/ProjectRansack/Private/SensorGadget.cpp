@@ -4,6 +4,7 @@
 #include "SensorGadget.h"
 #include "Components/StaticMeshComponent.h"
 #include "Base3C.h"
+#include <Net/UnrealNetwork.h>
 // Sets default values
 ASensorGadget::ASensorGadget()
 {
@@ -19,22 +20,40 @@ ASensorGadget::ASensorGadget()
 	MiddleMesh = CreateDefaultSubobject<UStaticMeshComponent>(FName("MiddleMesh"));
 	MiddleMesh->SetupAttachment(RootComponent);
 	MiddleMesh->SetIsReplicated(true);
+
 	bReplicates = true;
 	MiddleMesh->SetCollisionResponseToChannel(ECollisionChannel::ECC_Pawn, ECollisionResponse::ECR_Overlap);
 }
 
-void ASensorGadget::OverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
+void ASensorGadget::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
 {
-	GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("Some debug message!"));
-	if (OtherActor->IsA(ABase3C::StaticClass()))
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+	DOREPLIFETIME(ASensorGadget, placedActor);
+}
+
+void ASensorGadget::OverlapBegin_Implementation(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
+{
+	if (OtherActor->IsA(ABase3C::StaticClass()) && placedActor != OtherActor && !pinged)
 	{
-		if (Cast<ABase3C>(OtherActor)->GetMesh())
-		{
-			Cast<ABase3C>(OtherActor)->GetMesh()->SetCustomDepthStencilValue(2);
-			Cast<ABase3C>(OtherActor)->shouldPingMovement = true;
-		}
-		if(officerOwner)
-			officerOwner->TimelineProgress(1);
+		Ser_PingPlayer(OtherActor);
+		Cast<AOfficer>(placedActor)->SetOfficerSensorScalor(1);
+		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, FString::Printf(TEXT("ACTOR HIT NAME %s"), *OtherActor->GetName()));
+		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, FString::Printf(TEXT("OWNER ACTOR NAME %s"), *placedActor->GetName()));
+	//	Cast<AOfficer>(placedActor)->TimelineProgress(1);
+	}
+}
+
+void ASensorGadget::Ser_PingPlayer_Implementation(AActor* pPlayerToPing)
+{
+	if (Cast<ABase3C>(pPlayerToPing)->GetMesh())
+	{
+		
+		//Cast<ABase3C>(pPlayerToPing)->Revealed = true;
+		Cast<AOfficer>(pPlayerToPing)->ChangeStencilFromServer(2);
+		
+		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, FString::Printf(TEXT("ACTOR PINGED NAME %s"), *pPlayerToPing->GetName()));
+		//pinged = true;
+
 	}
 }
 
@@ -55,6 +74,22 @@ void ASensorGadget::CalculateMiddleMesh()
 	MiddleMesh->SetWorldTransform(newTrans);
 
 }
+void ASensorGadget::SetOfficerOwner(AActor* pOwner)
+{
+	if (!placedActor)
+	{
+		Ser_SetOfficer(pOwner);
+	}
+
+}
+
+void ASensorGadget::Ser_SetOfficer_Implementation(AActor* pOwner)
+{
+	GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, FString::Printf(TEXT("ACTOR NAME %s"), *pOwner->GetName()));
+	placedActor = pOwner;
+	//Mul_SetOfficer(pOwner);
+}
+
 
 // Called every frame
 void ASensorGadget::Tick(float DeltaTime)

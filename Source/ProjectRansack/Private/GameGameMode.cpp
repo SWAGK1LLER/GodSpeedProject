@@ -153,7 +153,8 @@ void AGameGameMode::UpdateTeamDuffleBag()
 	for (ABase3C* player : TeamA)
 	{
 		AGamePlayerController* aPC = Cast<AGamePlayerController>(player->GetController());
-		aPC->ClientUpdateTeamDuffleBagUI();
+		if(aPC)
+			aPC->ClientUpdateTeamDuffleBagUI();
 	}
 }
 

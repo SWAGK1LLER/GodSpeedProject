@@ -44,6 +44,8 @@ void AOfficer::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 
 
 
+
+
 void AOfficer::BeginPlay()
 {
 	Super::BeginPlay();
@@ -84,6 +86,13 @@ void AOfficer::TimelineFinished()
 
 void AOfficer::ChangeStencilOnMovement()
 {
+	if (Revealed)
+	{
+		
+		return;
+	}
+		
+
 	if (GetVelocity().Length() > 0)
 	{
 		if (GetMesh())
@@ -94,6 +103,21 @@ void AOfficer::ChangeStencilOnMovement()
 		if (GetMesh())
 			GetMesh()->SetCustomDepthStencilValue(0);
 	}
+}
+
+void AOfficer::SetOfficerSensorScalor_Implementation(int newValue)
+{
+	UKismetMaterialLibrary::SetScalarParameterValue(GetWorld(), officerTableInstance->MotionVisionMPC, "OfficerSensor", newValue);
+}
+
+void AOfficer::ChangeStencilFromServer_Implementation(int pNewStencilValue) // this is multicast to tell everyone we are visible
+{
+	if (pNewStencilValue != 0)
+		Revealed = true;
+
+	GetMesh()->SetCustomDepthStencilValue(pNewStencilValue);
+
+	
 }
 
 void AOfficer::CreateTimeline()

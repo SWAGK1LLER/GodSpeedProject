@@ -41,12 +41,10 @@ public:
 
 	void TryPlace();
 
-	UFUNCTION(Server, Reliable)
-		void ServerSpawnSensor(FVector pfirstLocation, FRotator pfirstRotation, FVector psecondLocation, FRotator psecondRotation, AOfficer* pOwner);
+	UFUNCTION(Server, Reliable)//ok so apparently if only the server spawns actors they will automatically replicate
+		void ServerSpawnSensor(FVector pfirstLocation, FRotator pfirstRotation, FVector psecondLocation, FRotator psecondRotation, AActor* pOwner);
 
-	UFUNCTION(NetMulticast, Reliable)
-		void MultiSpawnSensor(FVector pfirstLocation, FRotator pfirstRotation, FVector psecondLocation, FRotator psecondRotation, AOfficer* pOwner);
-
+	class ASensorGadget* SpawnedSensor;
 
 	int Range = 1000;
 

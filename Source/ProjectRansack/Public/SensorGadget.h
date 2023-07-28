@@ -17,8 +17,8 @@ public:
 	// Sets default values for this actor's properties
 	ASensorGadget();
 
+	void GetLifetimeReplicatedProps(TArray< FLifetimeProperty >& OutLifetimeProps) const;
 	
-	void CalculateMiddleMesh();
 
 	UPROPERTY(editAnywhere, BlueprintReadWrite, Category = SensorGadget, meta = (AllowPrivateAccess = "true"))
 		class UStaticMeshComponent* sensorGadgetMesh1 = nullptr;
@@ -29,11 +29,26 @@ public:
 	UPROPERTY(editAnywhere, BlueprintReadWrite, Category = SensorGadget, meta = (AllowPrivateAccess = "true"))
 		class UStaticMeshComponent* MiddleMesh = nullptr;
 
-	UFUNCTION()
+	UFUNCTION(Server, Reliable)
 		void OverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
 
+	void CalculateMiddleMesh();
 
-	AOfficer* officerOwner;
+	void SetOfficerOwner(AActor* pOwner);
+
+	UFUNCTION(Server, Reliable)
+		void Ser_SetOfficer(AActor* pOwner);
+
+	UFUNCTION(Server, Reliable)
+		void Ser_PingPlayer(AActor* pPlayerToPing);
+
+
+
+
+	UPROPERTY(Replicated, VisibleAnywhere, blueprintReadWrite)
+		AActor* placedActor = nullptr;
+
+	bool pinged = false;
 
 protected:
 	// Called when the game starts or when spawned

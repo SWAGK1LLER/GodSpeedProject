@@ -102,7 +102,7 @@ public:
 
 	FTransform SpawnTransform;
 
-	bool shouldPingMovement = false;
+	bool Revealed = false;
 
 	ABase3C();
 

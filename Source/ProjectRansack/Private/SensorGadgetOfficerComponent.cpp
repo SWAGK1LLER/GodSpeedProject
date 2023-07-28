@@ -136,17 +136,12 @@ void USensorGadgetOfficerComponent::TryPlace()
 	FRotator Offset = FRotator(90, 0, 0);
 	Rotation += Offset;
 
-	ServerSpawnSensor(firstLocation, firstRotation, secondLocation, secondRotation, Cast<AOfficer>(GetOwner()));
-	
+	ServerSpawnSensor(firstLocation, firstRotation, secondLocation, secondRotation, GetOwner());
+
 	CanPlace = false;
 }
 
-void USensorGadgetOfficerComponent::ServerSpawnSensor_Implementation(FVector pfirstLocation, FRotator pfirstRotation, FVector psecondLocation, FRotator psecondRotation, AOfficer* pOwner)
-{
-	MultiSpawnSensor(pfirstLocation, pfirstRotation, psecondLocation, psecondRotation, pOwner);
-}
-
-void USensorGadgetOfficerComponent::MultiSpawnSensor_Implementation(FVector pfirstLocation, FRotator pfirstRotation, FVector psecondLocation, FRotator psecondRotation, AOfficer* pOwner)
+void USensorGadgetOfficerComponent::ServerSpawnSensor_Implementation(FVector pfirstLocation, FRotator pfirstRotation, FVector psecondLocation, FRotator psecondRotation, AActor* pOwner)
 {
 	FActorSpawnParameters SpawnInfo;
 	ASensorGadget* Sensor = Cast<ASensorGadget>(GetWorld()->SpawnActor<AActor>(ActorTospawn, pfirstLocation, pfirstRotation, SpawnInfo));
@@ -157,8 +152,7 @@ void USensorGadgetOfficerComponent::MultiSpawnSensor_Implementation(FVector pfir
 	Sensor->sensorGadgetMesh2->SetWorldRotation(psecondRotation);
 
 	Sensor->CalculateMiddleMesh();
-
-	Sensor->officerOwner = pOwner;
+	Sensor->SetOfficerOwner(pOwner);
 }
 
 // Called when the game starts

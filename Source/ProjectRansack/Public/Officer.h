@@ -79,6 +79,12 @@ public:
 
 	void ChangeStencilOnMovement();
 
+	UFUNCTION(NetMulticast, Reliable)
+		void ChangeStencilFromServer(int pNewStencilValue);
+
+	UFUNCTION(Client, Reliable)
+	void SetOfficerSensorScalor(int newValue);
+
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
