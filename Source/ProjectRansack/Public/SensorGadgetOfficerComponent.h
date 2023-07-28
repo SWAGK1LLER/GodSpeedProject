@@ -42,10 +42,10 @@ public:
 	void TryPlace();
 
 	UFUNCTION(Server, Reliable)
-		void ServerSpawnSensor(FVector pfirstLocation, FRotator pfirstRotation, FVector psecondLocation, FRotator psecondRotation);
+		void ServerSpawnSensor(FVector pfirstLocation, FRotator pfirstRotation, FVector psecondLocation, FRotator psecondRotation, AOfficer* pOwner);
 
 	UFUNCTION(NetMulticast, Reliable)
-		void MultiSpawnSensor(FVector pfirstLocation, FRotator pfirstRotation, FVector psecondLocation, FRotator psecondRotation);
+		void MultiSpawnSensor(FVector pfirstLocation, FRotator pfirstRotation, FVector psecondLocation, FRotator psecondRotation, AOfficer* pOwner);
 
 
 	int Range = 1000;

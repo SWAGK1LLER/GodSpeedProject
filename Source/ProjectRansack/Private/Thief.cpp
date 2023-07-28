@@ -45,12 +45,12 @@ bool AThief::ValidateSpaceItem(AItem& pItem)
 
 void AThief::ChangeStencilOnMovement()
 {
-	if (GetVelocity().Length() > 0)
+	if (GetVelocity().Length() > 0 || shouldPingMovement)
 	{
 		if (GetMesh())
 			GetMesh()->SetCustomDepthStencilValue(2); //TODO Implement datatable for thief and add a value for stencil buffer
 	}
-	else
+	else if (shouldPingMovement == false)
 	{
 		if (GetMesh())
 			GetMesh()->SetCustomDepthStencilValue(0);

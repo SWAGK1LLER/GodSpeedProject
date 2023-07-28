@@ -4,7 +4,9 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
+#include "Officer.h"
 #include "SensorGadget.generated.h"
+
 
 UCLASS()
 class PROJECTRANSACK_API ASensorGadget : public AActor
@@ -26,6 +28,12 @@ public:
 
 	UPROPERTY(editAnywhere, BlueprintReadWrite, Category = SensorGadget, meta = (AllowPrivateAccess = "true"))
 		class UStaticMeshComponent* MiddleMesh = nullptr;
+
+	UFUNCTION()
+		void OverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
+
+
+	AOfficer* officerOwner;
 
 protected:
 	// Called when the game starts or when spawned

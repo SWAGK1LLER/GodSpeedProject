@@ -47,7 +47,9 @@ void UStunWeapon::Fire()
 	ammo--;
 
     ABase3C* player = Cast<ABase3C>(GetOwner());
-    player->WidgetUI->UpdateRemainingAmmo(ammo);
+
+    if(player->WidgetUI)
+        player->WidgetUI->UpdateRemainingAmmo(ammo);
 
     FVector hitLocation;
     AActor* actor = HitScan(hitLocation);

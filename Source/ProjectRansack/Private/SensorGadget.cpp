@@ -3,6 +3,7 @@
 
 #include "SensorGadget.h"
 #include "Components/StaticMeshComponent.h"
+#include "Base3C.h"
 // Sets default values
 ASensorGadget::ASensorGadget()
 {
@@ -10,18 +11,37 @@ ASensorGadget::ASensorGadget()
 	PrimaryActorTick.bCanEverTick = true;
 	sensorGadgetMesh1 = CreateDefaultSubobject<UStaticMeshComponent>(FName("Mesh1"));
 	sensorGadgetMesh1->SetupAttachment(RootComponent);
+	sensorGadgetMesh1->SetIsReplicated(true);
 	sensorGadgetMesh2 = CreateDefaultSubobject<UStaticMeshComponent>(FName("Mesh2"));
+	sensorGadgetMesh2->SetIsReplicated(true);
 	sensorGadgetMesh2->SetupAttachment(RootComponent);
 
 	MiddleMesh = CreateDefaultSubobject<UStaticMeshComponent>(FName("MiddleMesh"));
 	MiddleMesh->SetupAttachment(RootComponent);
+	MiddleMesh->SetIsReplicated(true);
 	bReplicates = true;
-	
+	MiddleMesh->SetCollisionResponseToChannel(ECollisionChannel::ECC_Pawn, ECollisionResponse::ECR_Overlap);
+}
+
+void ASensorGadget::OverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
+{
+	GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("Some debug message!"));
+	if (OtherActor->IsA(ABase3C::StaticClass()))
+	{
+		if (Cast<ABase3C>(OtherActor)->GetMesh())
+		{
+			Cast<ABase3C>(OtherActor)->GetMesh()->SetCustomDepthStencilValue(2);
+			Cast<ABase3C>(OtherActor)->shouldPingMovement = true;
+		}
+		if(officerOwner)
+			officerOwner->TimelineProgress(1);
+	}
 }
 
 // Called when the game starts or when spawned
 void ASensorGadget::BeginPlay()
 {
+	MiddleMesh->OnComponentBeginOverlap.AddDynamic(this, &ASensorGadget::OverlapBegin);
 	Super::BeginPlay();
 }
 

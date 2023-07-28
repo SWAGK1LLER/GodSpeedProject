@@ -102,6 +102,8 @@ public:
 
 	FTransform SpawnTransform;
 
+	bool shouldPingMovement = false;
+
 	ABase3C();
 
 	bool CheckTableInstance();
