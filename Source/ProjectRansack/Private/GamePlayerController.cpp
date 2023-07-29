@@ -34,7 +34,7 @@ void AGamePlayerController::BeginPlay()
 	}
 
 	instance->LoadSaveGame();
-	instance->LoadSaveSettings();
+	//instance->LoadSaveSettings();
 	SRSpawnPlayer(instance->team);
 }
 
@@ -321,6 +321,29 @@ void AGamePlayerController::RestartRound_Implementation()
 		TeamDuffleBagUIWidget = nullptr;
 	}
 
+	int playTimeDiff = UGameplayStatics::GetRealTimeSeconds((GetWorld())) - base3c->playTime;
+	if (base3c->IsA(AThief::StaticClass()))
+		instance->GetPlayerSaveGame()->timePlayThief += playTimeDiff;
+	else
+		instance->GetPlayerSaveGame()->timePlaySecurity += playTimeDiff;
+
 
 	SRSpawnPlayer(instance->team);
+}
+
+void AGamePlayerController::EndGame_Implementation(bool isWin, bool isTie)
+{
+	UEOSGameInstance* instance = Cast<UEOSGameInstance>(UGameplayStatics::GetGameInstance(GetWorld()));
+	if (instance == nullptr)
+		return;
+
+	if (isTie)
+		return;
+
+	if (isWin)
+		instance->GetPlayerSaveGame()->totalWin++;
+	else
+		instance->GetPlayerSaveGame()->totalLoose++;
+
+	instance->SaveGame();
 }

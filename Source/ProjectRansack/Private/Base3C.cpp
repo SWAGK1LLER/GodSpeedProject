@@ -31,6 +31,55 @@ ABase3C::ABase3C()
 	StunWeapon = CreateDefaultSubobject<UStunWeapon>(TEXT("StunWeapon"));
 }
 
+// Called when the game starts or when spawned
+void ABase3C::BeginPlay()
+{
+	Super::BeginPlay();
+
+	SpawnTransform = GetActorTransform();
+	playTime = UGameplayStatics::GetRealTimeSeconds((GetWorld()));
+
+	if(!CheckTableInstance())
+		return;
+
+	normalWalkSpeed = GetCharacterMovement()->MaxWalkSpeed;
+	GetCharacterMovement()->MaxWalkSpeed *= tableInstance->movementSpeed;
+
+	BindInputHandler();
+	SendDataToComponents();
+
+}
+
+// Called every frame
+void ABase3C::Tick(float DeltaTime)
+{
+	Super::Tick(DeltaTime);
+
+	if (bFreezeInput && FreezeDuration != -1)
+	{
+		TimeFreezed += DeltaTime;
+		if (TimeFreezed >= FreezeDuration)
+			UnFreezeInput();
+	}		
+}
+
+void ABase3C::EndPlay(const EEndPlayReason::Type EndPlayReason)
+{
+	if (EndPlayReason != EEndPlayReason::Type::Quit)
+		return;
+
+	APlayerController* playerController = Cast<APlayerController>(GetController());
+	if (playerController == nullptr)
+		return;
+
+	UEOSGameInstance* gameInstance = Cast<UEOSGameInstance>(GetGameInstance());
+	if (gameInstance == nullptr)
+		return;
+
+	gameInstance->CloseGame();
+	gameInstance->unregisterPlayerToGameSession(playerController);
+}
+
 bool ABase3C::CheckTableInstance()
 {
 	if (tableInstance)
@@ -46,7 +95,7 @@ bool ABase3C::CheckTableInstance()
 
 void ABase3C::SendDataToComponents()
 {
-	if(!CheckTableInstance())
+	if (!CheckTableInstance())
 		return;
 
 	cameraComponent->fetchData(tableInstance->maxPitchBottom, tableInstance->maxPitchTop);
@@ -74,52 +123,9 @@ void ABase3C::ClientFreezeInput_Implementation(float duration)
 	TimeFreezed = 0;
 }
 
-// Called when the game starts or when spawned
-void ABase3C::BeginPlay()
+void ABase3C::UnFreezeInput()
 {
-	Super::BeginPlay();
-
-	SpawnTransform = GetActorTransform();
-
-	if(!CheckTableInstance())
-		return;
-
-	normalWalkSpeed = GetCharacterMovement()->MaxWalkSpeed;
-	GetCharacterMovement()->MaxWalkSpeed *= tableInstance->movementSpeed;
-
-	BindInputHandler();
-	SendDataToComponents();
-
-}
-
-// Called every frame
-void ABase3C::Tick(float DeltaTime)
-{
-	Super::Tick(DeltaTime);
-
-	if (bFreezeInput && FreezeDuration != -1)
-	{
-		TimeFreezed += DeltaTime;
-		if (TimeFreezed >= FreezeDuration)
-			bFreezeInput = false;
-	}		
-}
-
-void ABase3C::EndPlay(const EEndPlayReason::Type EndPlayReason)
-{
-	if (EndPlayReason != EEndPlayReason::Type::Quit)
-		return;
-
-	APlayerController* playerController = Cast<APlayerController>(GetController());
-	if (playerController == nullptr)
-		return;
-
-	UEOSGameInstance* gameInstance = Cast<UEOSGameInstance>(GetGameInstance());
-	if (gameInstance == nullptr)
-		return;
-
-	gameInstance->CloseGame();
-	gameInstance->unregisterPlayerToGameSession(playerController);
+	bFreezeInput = false;
 }
 
 void ABase3C::SRReset_Implementation()
@@ -221,6 +227,9 @@ void ABase3C::Fire()
 		return;
 
 	StunWeapon->Fire();
+
+	//Ugly hack to trigger overlap event if actor is already in trigger volume
+	TryGeneratingOverlapEvent();
 }
 
 void ABase3C::Sprint()
@@ -268,4 +277,16 @@ void ABase3C::SetClientUI_Implementation()
 
 	WidgetUI = CreateWidget<UPlayerUI>(GetWorld(), WidgetClass);
 	WidgetUI->AddToViewport();
+}
+
+void ABase3C::TryGeneratingOverlapEvent()
+{
+	FVector location;
+	location = GetActorLocation();
+
+	location.X++;
+	SetActorLocation(location);
+
+	location.X--;
+	SetActorLocation(location);
 }

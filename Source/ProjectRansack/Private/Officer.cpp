@@ -14,7 +14,10 @@
 #include "Camera/CameraComponent.h"
 #include "SensorGadgetOfficerComponent.h"
 #include <GameGameMode.h>
+#include "ArrestUI.h"
 #include <Kismet/GameplayStatics.h>
+#include <GamePlayerController.h>
+#include <HelperClass.h>
 
 AOfficer::AOfficer()
 {
@@ -63,6 +66,35 @@ void AOfficer::Tick(float DeltaTime)
 
 	MotionVisionTimeline.TickTimeline(DeltaTime);
 	ChangeStencilOnMovement();
+
+	if (startArrest)
+	{
+		arrestTime += DeltaTime;
+
+		AGamePlayerController* playerController = Cast<AGamePlayerController>(GetController());
+		if (playerController == nullptr)
+			return;
+
+		if (ArrestingThief == nullptr)
+		{
+			startArrest = false;
+			return;
+		}
+
+		if (arrestTime >= TimeToArrestThief)
+		{
+			ArrestThief(ArrestingThief);
+			startArrest = false;
+			ArrestingThief = nullptr;
+		}
+		else
+		{
+			UArrestUI* ui = Cast<UArrestUI>(playerController->GetWidget(ArrestingThief));
+			ui->ShowProgress();
+			ui->SetProgress(HelperClass::mapValue(arrestTime, 0, TimeToArrestThief, 0, 1));
+		}
+	}
+
 
 	if (usingSensorGadget)
 		sensorGadgetOfficer->CalculateFirstPosition(this, cameraComponent->camera->GetComponentLocation(),
@@ -212,6 +244,14 @@ void AOfficer::StartFire()
 
 void AOfficer::Interact()
 {
+	if (closeThief.Num() != 0)
+	{
+		startArrest = true;
+		arrestTime = 0;
+		ArrestingThief = closeThief[0];
+		return;
+	}
+
 	if (closeItems.Num() == 0)
 		return;
 
@@ -222,6 +262,21 @@ void AOfficer::Interact()
 
 void AOfficer::StopInteract()
 {
+	if (ArrestingThief != nullptr)
+	{
+		AGamePlayerController* playerController = Cast<AGamePlayerController>(GetController());
+		if (playerController == nullptr)
+			return;
+
+		UArrestUI* ui = Cast<UArrestUI>(playerController->GetWidget(ArrestingThief));
+		ui->Reset();
+
+		startArrest = false;
+		ArrestingThief = nullptr;
+	}
+
+	
+
 	if (ItemUsing == nullptr)
 		return;
 

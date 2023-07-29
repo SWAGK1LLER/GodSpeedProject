@@ -6,6 +6,9 @@
 #include <GamePlayerController.h>
 #include <Kismet/GameplayStatics.h>
 #include <GameGameMode.h>
+#include <Components/BoxComponent.h>
+#include <Officer.h>
+#include "HelperClass.h"
 
 AThief::AThief()
 {
@@ -13,11 +16,19 @@ AThief::AThief()
 	bReplicates = true;
 
 	inventory = NewObject<UInventory>();
+
+	ArrestArea = CreateDefaultSubobject<UBoxComponent>(FName("ArrestArea"));
+	ArrestArea->SetGenerateOverlapEvents(true);
+	ArrestArea->SetupAttachment(RootComponent);
 }
 
 void AThief::BeginPlay()
 {
 	Super::BeginPlay();
+
+	ArrestArea->OnComponentBeginOverlap.AddDynamic(this, &AThief::OnArrestTriggerOverlapBegin);
+	ArrestArea->OnComponentEndOverlap.AddDynamic(this, &AThief::OnArrestTriggerOverlapEnd);
+	HelperClass::deactivateTrigger(ArrestArea);
 }
 
 void AThief::Tick(float DeltaTime)
@@ -30,12 +41,13 @@ void AThief::Tick(float DeltaTime)
 void AThief::MulReset_Implementation()
 {
 	Super::MulReset_Implementation();
-
+	HelperClass::deactivateTrigger(ArrestArea);
 	AGamePlayerController* pc = Cast<AGamePlayerController>(GetController());
 	if (pc == nullptr)
 		return;
 
 	pc->ClientFinishArrest();
+	
 }
 
 bool AThief::ValidateSpaceItem(AItem& pItem)
@@ -75,6 +87,15 @@ void AThief::MUlAddItem_Implementation(AItem* pItem)
 	{
 		PC->UpdateDuffleBagUI(inventory->items);
 		PC->UpdateTeamDuffleBagUI();
+
+		//if (pItem->IsA(A))
+		{
+			UEOSGameInstance* instance = Cast<UEOSGameInstance>(UGameplayStatics::GetGameInstance(GetWorld()));
+			if (instance == nullptr)
+				return;
+
+			instance->GetPlayerSaveGame()->totalHightLoot++;
+		}
 	}
 }
 
@@ -90,10 +111,10 @@ void AThief::SRClearItems_Implementation(int score, ETeam pTeam)
 			break;
 	}
 
-	MUlClearItems();
+	MUlClearItems(score);
 }
 
-void AThief::MUlClearItems_Implementation()
+void AThief::MUlClearItems_Implementation(int score)
 {
 	inventory->ClearInventory();
 
@@ -102,6 +123,13 @@ void AThief::MUlClearItems_Implementation()
 	{
 		PC->UpdateDuffleBagUI(inventory->items);
 		PC->UpdateTeamDuffleBagUI();
+
+		UEOSGameInstance* instance = Cast<UEOSGameInstance>(UGameplayStatics::GetGameInstance(GetWorld()));
+		if (instance == nullptr)
+			return;
+
+		instance->GetPlayerSaveGame()->totalCash += score;
+		instance->GetPlayerSaveGame()->totalExtraction++;
 	}
 }
 
@@ -152,4 +180,60 @@ void AThief::StopInteract()
 
 	IThiefInteractibleActor::Execute_StopInteract(ItemUsing->_getUObject(), this);
 	ItemUsing = nullptr;
+}
+
+void AThief::ClientFreezeInput_Implementation(float duration)
+{
+	Super::ClientFreezeInput_Implementation(duration);
+	SRActivateArrestTrigger();
+}
+
+void AThief::SRActivateArrestTrigger_Implementation()
+{
+	MulActivateArrestTrigger();
+}
+
+void AThief::MulActivateArrestTrigger_Implementation()
+{
+	HelperClass::activateTrigger(ArrestArea);
+}
+
+void AThief::UnFreezeInput()
+{
+	Super::UnFreezeInput();
+	HelperClass::deactivateTrigger(ArrestArea);
+}
+
+void AThief::OnArrestTriggerOverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
+{
+	AOfficer* player = Cast<AOfficer>(OtherActor);
+	if (player == nullptr)
+		return;
+
+	player->closeThief.Add(this);
+
+	AController* PC = player->GetController();
+	if (PC != nullptr && PC->IsLocalPlayerController())
+	{
+		AGamePlayerController* playerController = Cast<AGamePlayerController>(PC);
+		playerController->AddInteractibleWidgetUI(this, ArrestWidgetClass);
+	}
+}
+
+void AThief::OnArrestTriggerOverlapEnd(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
+{
+	AOfficer* player = Cast<AOfficer>(OtherActor);
+	if (player == nullptr)
+		return;
+
+	player->closeThief.Remove(this);
+	if (player->ArrestingThief == this)
+		player->ArrestingThief = nullptr;
+
+	AController* PC = player->GetController();
+	if (PC != nullptr && PC->IsLocalPlayerController())
+	{
+		AGamePlayerController* playerController = Cast<AGamePlayerController>(PC);
+		playerController->RemoveInteractibleWidgetUI(this);
+	}
 }

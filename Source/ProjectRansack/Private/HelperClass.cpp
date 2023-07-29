@@ -31,6 +31,20 @@ void HelperClass::activateActor(AActor* actor)
 		activateActor(child);
 }
 
+void HelperClass::deactivateTrigger(UShapeComponent* actor)
+{
+	actor->SetVisibility(false);
+	actor->SetGenerateOverlapEvents(false);
+	actor->SetComponentTickEnabled(false);
+}
+
+void HelperClass::activateTrigger(UShapeComponent* actor)
+{
+	actor->SetVisibility(true);
+	actor->SetGenerateOverlapEvents(true);
+	actor->SetComponentTickEnabled(true);
+}
+
 float HelperClass::mapValue(float x, float in_min, float in_max, float out_min, float out_max)
 {
 	return (x - in_min) * (out_max - out_min) / (in_max - in_min) + out_min;

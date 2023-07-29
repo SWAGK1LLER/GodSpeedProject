@@ -50,6 +50,9 @@ public:
 	TArray<class ABase3C*> TeamB;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	TMap<class APlayerController*, ETeam> PlayerTeams;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	TArray<class AGamePlayerStart*> PlayerSpawn;
 	
 	virtual void BeginPlay() override;

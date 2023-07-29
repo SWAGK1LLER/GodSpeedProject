@@ -69,26 +69,29 @@ class PROJECTRANSACK_API ABase3C : public ACharacter
 
 public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-		TSubclassOf<UPlayerUI> WidgetClass;
+	TSubclassOf<UPlayerUI> WidgetClass;
 	UPlayerUI* WidgetUI = nullptr;
 
 	//UPROPERTY(editAnywhere, blueprintReadWrite)
 	//class USkeletalMeshComponent* skeletalMesh = nullptr;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
-		class UCameraComp* cameraComponent = nullptr;
+	class UCameraComp* cameraComponent = nullptr;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
-		class UStunWeapon* StunWeapon = nullptr;
+	class UStunWeapon* StunWeapon = nullptr;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Health, meta = (AllowPrivateAccess = "true"))
-		class UHealthComponent* healthComp = nullptr;
+	class UHealthComponent* healthComp = nullptr;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-		FString nickName = "";
+	FString nickName = "";
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	int playTime = 0;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Data, meta = (AllowPrivateAccess = "true"))
-		class UDataTable* dataTable = nullptr;
+	class UDataTable* dataTable = nullptr;
 
 	FBase3CTable* tableInstance = nullptr;
 
@@ -106,25 +109,6 @@ public:
 
 	ABase3C();
 
-	bool CheckTableInstance();
-	void SendDataToComponents();
-	
-	UFUNCTION(Client, Reliable, BlueprintCallable)
-	void SetClientUI();
-	void SetClientUI_Implementation();
-	
-	UFUNCTION(Server, Reliable, BlueprintCallable)
-	void SetClientNickname(const FString& pNickName);
-	void SetClientNickname_Implementation(const FString& pNickName);
-	
-	UFUNCTION(NetMulticast, Reliable, BlueprintCallable)
-	void MulticastSetClientNickname(const FString& pNickName);
-	void MulticastSetClientNickname_Implementation(const FString& pNickName);
-
-	UFUNCTION(Client, Reliable, BlueprintCallable)
-	void ClientFreezeInput(float duration);
-	void ClientFreezeInput_Implementation(float duration);
-
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
@@ -132,6 +116,27 @@ public:
 	virtual void Tick(float DeltaTime) override;
 
 	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
+
+	bool CheckTableInstance();
+	void SendDataToComponents();
+
+	UFUNCTION(Client, Reliable, BlueprintCallable)
+	void SetClientUI();
+	void SetClientUI_Implementation();
+
+	UFUNCTION(Server, Reliable, BlueprintCallable)
+	void SetClientNickname(const FString& pNickName);
+	void SetClientNickname_Implementation(const FString& pNickName);
+
+	UFUNCTION(NetMulticast, Reliable, BlueprintCallable)
+	void MulticastSetClientNickname(const FString& pNickName);
+	void MulticastSetClientNickname_Implementation(const FString& pNickName);
+
+	UFUNCTION(Client, Reliable, BlueprintCallable)
+	void ClientFreezeInput(float duration);
+	virtual void ClientFreezeInput_Implementation(float duration);
+
+	virtual void UnFreezeInput();
 
 	UFUNCTION(Server, Unreliable)
 	void SRReset();
@@ -171,4 +176,6 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 	UCameraComp* GetCameraComponent();
+
+	void TryGeneratingOverlapEvent();
 };

@@ -93,6 +93,12 @@ void AGameGameMode::SpawnPlayer(const ETeam& team, APlayerController* NewPlayer)
 		break;
 	}
 
+	if (PlayerTeams.Contains(NewPlayer))
+		PlayerTeams[NewPlayer] = team;
+	else
+		PlayerTeams.Add(NewPlayer, team);
+	
+
 	NewPlayer->Possess(actor);
 }
 
@@ -256,4 +262,16 @@ void AGameGameMode::EndRound()
 void AGameGameMode::EndGame()
 {
 	//TO DO: Show score tab
+
+	bool teamAWin = ScoreTeamA > ScoreTeamB;
+	bool teamBWin = !teamAWin;
+	bool tie = ScoreTeamA == ScoreTeamB;
+
+	for (int i = 0; i < PC.Num(); i++)
+	{
+		if (PlayerTeams[PC[i]] == ETeam::A)
+			Cast<AGamePlayerController>(PC[i])->EndGame(teamAWin, tie);
+		else
+			Cast<AGamePlayerController>(PC[i])->EndGame(teamBWin, tie);
+	}
 }

@@ -120,4 +120,8 @@ public:
 	UFUNCTION(Client, Reliable, BlueprintCallable)
 	void RestartRound();
 	void RestartRound_Implementation();
+
+	UFUNCTION(Client, Reliable, BlueprintCallable)
+	void EndGame(bool isWin, bool isTie);
+	void EndGame_Implementation(bool isWin, bool isTie);
 };

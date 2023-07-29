@@ -7,6 +7,7 @@
 #include "Inventory.h"
 #include "ThiefInteractibleActor.h"
 #include "EOSGameInstance.h"
+#include "ArrestUI.h"
 #include "Thief.generated.h"
 
 /**
@@ -19,6 +20,9 @@ class PROJECTRANSACK_API AThief : public ABase3C
 
 public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	class UShapeComponent* ArrestArea = nullptr;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	int costOnArrest = 400;
 
 	TArray<IThiefInteractibleActor*> closeItems;
@@ -26,6 +30,9 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	UInventory* inventory = nullptr;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	TSubclassOf<UArrestUI> ArrestWidgetClass;
 
 	AThief();
 	virtual void BeginPlay() override;
@@ -45,8 +52,8 @@ public:
 	void SRClearItems_Implementation(int score, ETeam pTeam);
 
 	UFUNCTION(NetMulticast, Reliable, BlueprintCallable)
-	void MUlClearItems();
-	void MUlClearItems_Implementation();
+	void MUlClearItems(int score);
+	void MUlClearItems_Implementation(int score);
 
 	UFUNCTION(Server, Reliable, BlueprintCallable)
 	void SRDropInventory(FVector location);
@@ -56,10 +63,28 @@ public:
 	void MUlDropInventory(FVector location);
 	void MUlDropInventory_Implementation(FVector location);
 
+	UFUNCTION(Server, Reliable, BlueprintCallable)
+	void SRActivateArrestTrigger();
+	void SRActivateArrestTrigger_Implementation();
+
+	UFUNCTION(NetMulticast, Reliable, BlueprintCallable)
+	void MulActivateArrestTrigger();
+	void MulActivateArrestTrigger_Implementation();
+
 	bool ValidateSpaceItem(class AItem& pItem);
 
 	void ChangeStencilOnMovement();
 
 	virtual void Interact() override;
 	virtual void StopInteract() override;
+
+	void ClientFreezeInput_Implementation(float duration) override;
+
+	virtual void UnFreezeInput() override;
+
+	UFUNCTION()
+	void OnArrestTriggerOverlapBegin(class UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, class UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
+
+	UFUNCTION()
+	void OnArrestTriggerOverlapEnd(class UPrimitiveComponent* OverlappedComp, AActor* OtherActor, class UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);
 };

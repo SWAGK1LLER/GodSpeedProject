@@ -19,19 +19,19 @@ struct FOfficerTable : public FTableRowBase
 GENERATED_BODY()
 public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = MotionVision, meta = (AllowPrivateAccess = "true"))
-		class UInputAction* MotionVisionAction = nullptr;
+	class UInputAction* MotionVisionAction = nullptr;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = MotionVision, meta = (AllowPrivateAccess = "true"))
-		UCurveFloat* MotionVisionFloatCurve = nullptr;
+	UCurveFloat* MotionVisionFloatCurve = nullptr;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = MotionVision, meta = (AllowPrivateAccess = "true"))
-		class UMaterialParameterCollection* MotionVisionMPC = nullptr;
+	class UMaterialParameterCollection* MotionVisionMPC = nullptr;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = MotionVision, meta = (AllowPrivateAccess = "true"))
-		int MotionSensorStencilBufNumber = 0;
+	int MotionSensorStencilBufNumber = 0;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = MotionVision, meta = (AllowPrivateAccess = "true"))
-		class UInputAction* FlashlightAction = nullptr;
+	class UInputAction* FlashlightAction = nullptr;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = MotionVision, meta = (AllowPrivateAccess = "true"))
-		class UInputAction* SensorGadgetAction = nullptr;
+	class UInputAction* SensorGadgetAction = nullptr;
 };
 
 UCLASS()
@@ -44,21 +44,28 @@ public:
 	IOfficerInteractibleActor* ItemUsing = nullptr;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Data, meta = (AllowPrivateAccess = "true"))
-		class UDataTable* officerDataTable = nullptr;
+	class UDataTable* officerDataTable = nullptr;
 
 	FOfficerTable* officerTableInstance = nullptr;
 
 	FTimeline MotionVisionTimeline;
 
 	bool MotionTimelineRunning = false;
-
 	bool motionSensorActive = false;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	int TimeToArrestThief = 6;
+
+	float arrestTime = 0;
+	bool startArrest = false;
+	ABase3C* ArrestingThief = nullptr;
+	TArray<ABase3C*> closeThief;
+
 	UPROPERTY(editAnywhere, BlueprintReadWrite, Category = Light, meta = (AllowPrivateAccess = "true"))
-		class USpotLightComponent* flashLight;
+	class USpotLightComponent* flashLight;
 
 	UPROPERTY(editAnywhere, BlueprintReadWrite, Category = SensorGadget, meta = (AllowPrivateAccess = "true"), replicated)
-		class USensorGadgetOfficerComponent* sensorGadgetOfficer;
+	class USensorGadgetOfficerComponent* sensorGadgetOfficer;
 
 	bool flashLightOn = false;
 
@@ -80,7 +87,7 @@ public:
 	void ChangeStencilOnMovement();
 
 	UFUNCTION(NetMulticast, Reliable)
-		void ChangeStencilFromServer(int pNewStencilValue);
+	void ChangeStencilFromServer(int pNewStencilValue);
 
 	UFUNCTION(Client, Reliable)
 	void SetOfficerSensorScalor(int newValue);
