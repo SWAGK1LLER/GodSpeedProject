@@ -31,7 +31,7 @@ public:
 	UPROPERTY(editAnywhere, BlueprintReadWrite, Category = SensorGadget, meta = (AllowPrivateAccess = "true"))
 		TSubclassOf<AActor> ActorTospawn;
 
-	void fetchData(float pRange, float pRevealTime, float pMaxAngle);
+	void fetchData(float pRange, float pRevealTime, float pMaxAngle, unsigned int pMaxSensors);
 
 	void ToggleEnable(bool Enabled);
 
@@ -61,4 +61,8 @@ public:
 
 	FVector secondLocation;
 	FRotator secondRotation;
+
+	int maxSensors = 0;
+
+	int sensorsUsed = 0;
 };

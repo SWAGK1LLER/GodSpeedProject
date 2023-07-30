@@ -24,11 +24,12 @@ USensorGadgetOfficerComponent::USensorGadgetOfficerComponent()
 	sensorGadgetOfficerMesh2->SetCollisionResponseToChannel(ECollisionChannel::ECC_WorldStatic, ECollisionResponse::ECR_Overlap);
 }
 
-void USensorGadgetOfficerComponent::fetchData(float pRange, float pRevealTime, float pMaxAngle)
+void USensorGadgetOfficerComponent::fetchData(float pRange, float pRevealTime, float pMaxAngle, unsigned int pMaxSensors)
 {
 	range = pRange;
 	revealTime = pRevealTime;
 	maxAngle = pMaxAngle;
+	maxSensors = pMaxSensors;
 }
 
 void USensorGadgetOfficerComponent::ToggleEnable(bool Enabled)
@@ -144,13 +145,16 @@ void USensorGadgetOfficerComponent::ChangeMaterial(bool approved)
 
 void USensorGadgetOfficerComponent::TryPlace()
 {
-	if (!CanPlace)
+	if (!CanPlace || sensorsUsed >= maxSensors)
 		return;
+
+	
 
 	FVector Location = (sensorGadgetOfficerMesh1->GetComponentLocation() + sensorGadgetOfficerMesh2->GetComponentLocation()) / 2;
 	FRotator Rotation = sensorGadgetOfficerMesh1->GetComponentRotation();
 	FRotator Offset = FRotator(90, 0, 0);
 	Rotation += Offset;
+	sensorsUsed++;
 
 	ServerSpawnSensor(firstLocation, firstRotation, secondLocation, secondRotation, GetOwner());
 
