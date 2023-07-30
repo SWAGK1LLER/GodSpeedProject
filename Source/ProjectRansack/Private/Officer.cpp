@@ -28,6 +28,18 @@ AOfficer::AOfficer()
 	sensorGadgetOfficer = CreateDefaultSubobject<USensorGadgetOfficerComponent>(TEXT("Sensor Gadget Component"));
 }
 
+void AOfficer::BeginPlay()
+{
+	Super::BeginPlay();
+	if (!CheckTableInstance())
+		return;
+
+	CreateTimeline();
+	flashLight->SetIntensity(0.f);
+	sensorGadgetOfficer->ToggleEnable(false);
+}
+
+
 void AOfficer::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
@@ -43,21 +55,6 @@ void AOfficer::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 		EnhancedInputComponent->BindAction(officerTableInstance->FlashlightAction, ETriggerEvent::Started, this, &AOfficer::ToggleFlashight);
 		EnhancedInputComponent->BindAction(officerTableInstance->SensorGadgetAction, ETriggerEvent::Started, this, &AOfficer::SensorGadgetAction);
 	}
-}
-
-
-
-
-
-void AOfficer::BeginPlay()
-{
-	Super::BeginPlay();
-	if (!CheckTableInstance())
-		return;
-
-	CreateTimeline();
-	flashLight->SetIntensity(0.f);
-	sensorGadgetOfficer->ToggleEnable(false);
 }
 
 void AOfficer::Tick(float DeltaTime)
@@ -116,11 +113,10 @@ void AOfficer::TimelineFinished()
 	MotionTimelineRunning = false;
 }
 
-void AOfficer::ChangeStencilOnMovement()
+void AOfficer::ChangeStencilOnMovement() //Reveals enemies when motion vision is active
 {
 	if (Revealed)
 	{
-		
 		return;
 	}
 		
@@ -137,22 +133,12 @@ void AOfficer::ChangeStencilOnMovement()
 	}
 }
 
-void AOfficer::SetOfficerSensorScalor_Implementation(int newValue)
+void AOfficer::SetOfficerSensorScalor_Implementation(int newValue) //TODO Destroy officerSensor variable
 {
 	UKismetMaterialLibrary::SetScalarParameterValue(GetWorld(), officerTableInstance->MotionVisionMPC, "OfficerSensor", newValue);
 }
 
-void AOfficer::ChangeStencilFromServer_Implementation(int pNewStencilValue) // this is multicast to tell everyone we are visible
-{
-	if (pNewStencilValue != 0)
-		Revealed = true;
-
-	GetMesh()->SetCustomDepthStencilValue(pNewStencilValue);
-
-	
-}
-
-void AOfficer::CreateTimeline()
+void AOfficer::CreateTimeline() //Timeline is used for the motion vision to change between states
 {
 
 	if (officerTableInstance->MotionVisionFloatCurve)
@@ -182,7 +168,7 @@ bool AOfficer::CheckTableInstance()
 	return officerTableInstance != nullptr;
 }
 
-void AOfficer::HandleMotionVision()
+void AOfficer::HandleMotionVision() //Reacts to the input of MotionVision
 {
 	if (MotionTimelineRunning)
 		return;
@@ -216,9 +202,8 @@ void AOfficer::ToggleFlashight()
 		
 }
 
-void AOfficer::SensorGadgetAction()
+void AOfficer::SensorGadgetAction() //Reacts to the input of SensorGadget
 {
-	GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("SensorGadget!"));
 	if (currentState == CharacterState::SensorGadget)
 	{
 		currentState = CharacterState::Gun;

@@ -86,9 +86,6 @@ public:
 
 	void ChangeStencilOnMovement();
 
-	UFUNCTION(NetMulticast, Reliable)
-	void ChangeStencilFromServer(int pNewStencilValue);
-
 	UFUNCTION(Client, Reliable)
 	void SetOfficerSensorScalor(int newValue);
 

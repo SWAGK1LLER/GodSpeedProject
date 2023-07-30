@@ -261,6 +261,14 @@ void ABase3C::BindInputHandler()
 			Subsystem->AddMappingContext(tableInstance->inputHandler, 0);
 }
 
+void ABase3C::ChangeStencilFromServer_Implementation(int pNewStencilValue) // this is multicast to tell everyone we are visible
+{
+	if (pNewStencilValue != 0)
+		Revealed = true;
+
+	GetMesh()->SetCustomDepthStencilValue(pNewStencilValue);
+}
+
 UCameraComp* ABase3C::GetCameraComponent()
 {
 	return cameraComponent;

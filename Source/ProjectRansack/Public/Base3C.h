@@ -171,6 +171,9 @@ public:
 	UFUNCTION(Server, Unreliable)
 	void TestDamage(AActor* DamageActor);
 
+	UFUNCTION(NetMulticast, Reliable)
+		void ChangeStencilFromServer(int pNewStencilValue);
+
 	UFUNCTION(BlueprintCallable)
 	UCameraComp* GetCameraComponent();
 

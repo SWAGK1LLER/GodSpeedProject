@@ -16,8 +16,13 @@ USensorGadgetOfficerComponent::USensorGadgetOfficerComponent()
 	sensorGadgetOfficerMesh1 = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("SensorGadgetMesh1"));
 
 	sensorGadgetOfficerMesh2 = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("SensorGadgetMesh2"));
-}
 
+	sensorGadgetOfficerMesh1->SetCollisionResponseToChannel(ECollisionChannel::ECC_Pawn, ECollisionResponse::ECR_Overlap);
+	sensorGadgetOfficerMesh1->SetCollisionResponseToChannel(ECollisionChannel::ECC_WorldStatic, ECollisionResponse::ECR_Overlap);
+
+	sensorGadgetOfficerMesh2->SetCollisionResponseToChannel(ECollisionChannel::ECC_Pawn, ECollisionResponse::ECR_Overlap);
+	sensorGadgetOfficerMesh2->SetCollisionResponseToChannel(ECollisionChannel::ECC_WorldStatic, ECollisionResponse::ECR_Overlap);
+}
 
 void USensorGadgetOfficerComponent::ToggleEnable(bool Enabled)
 {
@@ -154,22 +159,3 @@ void USensorGadgetOfficerComponent::ServerSpawnSensor_Implementation(FVector pfi
 	Sensor->CalculateMiddleMesh();
 	Sensor->SetOfficerOwner(pOwner);
 }
-
-// Called when the game starts
-void USensorGadgetOfficerComponent::BeginPlay()
-{
-	Super::BeginPlay();
-
-	// ...
-	
-}
-
-
-// Called every frame
-void USensorGadgetOfficerComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
-{
-	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
-
-	// ...
-}
-
