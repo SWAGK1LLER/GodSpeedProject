@@ -31,6 +31,8 @@ public:
 	UPROPERTY(editAnywhere, BlueprintReadWrite, Category = SensorGadget, meta = (AllowPrivateAccess = "true"))
 		TSubclassOf<AActor> ActorTospawn;
 
+	void fetchData(float pRange, float pRevealTime, float pMaxAngle);
+
 	void ToggleEnable(bool Enabled);
 
 	void CalculateFirstPosition(AActor* IgnoredSelf, FVector CamLocation, FVector CamForward);
@@ -46,7 +48,11 @@ public:
 
 	class ASensorGadget* SpawnedSensor;
 
-	int Range = 1000;
+	float range = 0;
+
+	float revealTime = 0;
+
+	float maxAngle = 0;
 
 	bool CanPlace = false;
 

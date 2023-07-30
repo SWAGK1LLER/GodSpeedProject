@@ -32,6 +32,13 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = MotionVision, meta = (AllowPrivateAccess = "true"))
 	class UInputAction* SensorGadgetAction = nullptr;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = SensorGadget, meta = (AllowPrivateAccess = "true"))
+		float Range;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = SensorGadget, meta = (AllowPrivateAccess = "true"))
+		float RevealTime;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = SensorGadget, meta = (AllowPrivateAccess = "true"))
+		float MaxAngle;
 };
 
 UCLASS()
@@ -75,6 +82,8 @@ public:
 	AOfficer();
 
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
+
+	void SendDataToComponents();
 
 	void CreateTimeline();
 

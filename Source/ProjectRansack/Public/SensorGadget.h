@@ -32,6 +32,8 @@ public:
 	UFUNCTION(Server, Reliable)
 		void OverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
 
+	void SetRevealTime(float pRevealTime);
+
 	void CalculateMiddleMesh();
 
 	void SetOfficerOwner(AActor* pOwner);
@@ -42,13 +44,21 @@ public:
 	UFUNCTION(Server, Reliable)
 		void Ser_PingPlayer(AActor* pPlayerToPing);
 
+	UFUNCTION(Server, Reliable)
+		void Ser_UnPingPlayer(AActor* pPlayerToPing);
 
-
+	void UnPingPlayer();
 
 	UPROPERTY(Replicated, VisibleAnywhere, blueprintReadWrite)
 		AActor* placedActor = nullptr;
 
+	AActor* pingedActor = nullptr;
+
 	bool pinged = false;
+
+	float revealTime = 0.0f;
+
+	FTimerHandle RevealTimer;
 
 protected:
 	// Called when the game starts or when spawned

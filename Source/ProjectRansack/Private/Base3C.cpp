@@ -265,6 +265,8 @@ void ABase3C::ChangeStencilFromServer_Implementation(int pNewStencilValue) // th
 {
 	if (pNewStencilValue != 0)
 		Revealed = true;
+	else
+		Revealed = false;
 
 	GetMesh()->SetCustomDepthStencilValue(pNewStencilValue);
 }

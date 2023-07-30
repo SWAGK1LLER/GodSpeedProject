@@ -24,6 +24,13 @@ USensorGadgetOfficerComponent::USensorGadgetOfficerComponent()
 	sensorGadgetOfficerMesh2->SetCollisionResponseToChannel(ECollisionChannel::ECC_WorldStatic, ECollisionResponse::ECR_Overlap);
 }
 
+void USensorGadgetOfficerComponent::fetchData(float pRange, float pRevealTime, float pMaxAngle)
+{
+	range = pRange;
+	revealTime = pRevealTime;
+	maxAngle = pMaxAngle;
+}
+
 void USensorGadgetOfficerComponent::ToggleEnable(bool Enabled)
 {
 	if (!sensorGadgetOfficerMesh1 || !sensorGadgetOfficerMesh2)
@@ -81,7 +88,7 @@ void USensorGadgetOfficerComponent::CalculateSecondPosition(FVector FirstLocatio
 {
 	FHitResult Hit(ForceInit);
 	FVector Start = FirstLocation;
-	FVector End = Start + ForwardVector * Range;
+	FVector End = Start + ForwardVector * range;
 	FCollisionQueryParams CollisionParams;
 	CollisionParams.AddIgnoredActor(IgnoredSelf);
 
@@ -92,7 +99,11 @@ void USensorGadgetOfficerComponent::CalculateSecondPosition(FVector FirstLocatio
 		if (Hit.GetComponent() == sensorGadgetOfficerMesh2)
 			return;
 
-		if (FVector::CrossProduct(Hit.ImpactNormal, ForwardVector).Length() < 0.5f)
+		float Angle = asin(FVector::CrossProduct(Hit.ImpactNormal, ForwardVector).Length() / (Hit.ImpactNormal.Length() * ForwardVector.Length()));
+
+		Angle = Angle * 180/PI;
+
+		if (Angle < maxAngle)
 		{
 			FVector Point = Hit.ImpactPoint + (Hit.ImpactNormal * 0.01f);
 			FVector Normal = Hit.ImpactNormal;
@@ -158,4 +169,5 @@ void USensorGadgetOfficerComponent::ServerSpawnSensor_Implementation(FVector pfi
 
 	Sensor->CalculateMiddleMesh();
 	Sensor->SetOfficerOwner(pOwner);
+	Sensor->SetRevealTime(revealTime);
 }

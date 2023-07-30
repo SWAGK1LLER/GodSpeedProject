@@ -35,6 +35,7 @@ void AOfficer::BeginPlay()
 		return;
 
 	CreateTimeline();
+	SendDataToComponents();
 	flashLight->SetIntensity(0.f);
 	sensorGadgetOfficer->ToggleEnable(false);
 }
@@ -55,6 +56,11 @@ void AOfficer::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 		EnhancedInputComponent->BindAction(officerTableInstance->FlashlightAction, ETriggerEvent::Started, this, &AOfficer::ToggleFlashight);
 		EnhancedInputComponent->BindAction(officerTableInstance->SensorGadgetAction, ETriggerEvent::Started, this, &AOfficer::SensorGadgetAction);
 	}
+}
+
+void AOfficer::SendDataToComponents()
+{
+	sensorGadgetOfficer->fetchData(officerTableInstance->Range, officerTableInstance->RevealTime, officerTableInstance->MaxAngle);
 }
 
 void AOfficer::Tick(float DeltaTime)

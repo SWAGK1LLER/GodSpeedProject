@@ -37,22 +37,27 @@ void ASensorGadget::OverlapBegin_Implementation(UPrimitiveComponent* OverlappedC
 	{
 		Ser_PingPlayer(OtherActor);
 		Cast<AOfficer>(placedActor)->SetOfficerSensorScalor(1); //Need to set this for the material
+		
+		if (GetWorldTimerManager().IsTimerActive(RevealTimer))
+			GetWorldTimerManager().ClearTimer(RevealTimer);
+
+		GetWorldTimerManager().SetTimer(
+			RevealTimer, this, &ASensorGadget::UnPingPlayer, revealTime, false);
 	}
 }
 
-void ASensorGadget::Ser_PingPlayer_Implementation(AActor* pPlayerToPing)
-{
-	if (Cast<ABase3C>(pPlayerToPing)->GetMesh())
-	{
-		Cast<ABase3C>(pPlayerToPing)->ChangeStencilFromServer(2);
-	}
-}
+
 
 // Called when the game starts or when spawned
 void ASensorGadget::BeginPlay()
 {
 	MiddleMesh->OnComponentBeginOverlap.AddDynamic(this, &ASensorGadget::OverlapBegin);
 	Super::BeginPlay();
+}
+
+void ASensorGadget::SetRevealTime(float pRevealTime)
+{
+	revealTime = pRevealTime;
 }
 
 void ASensorGadget::CalculateMiddleMesh() //Computes middle mesh to fit in between Mesh1 and Mesh2
@@ -72,6 +77,29 @@ void ASensorGadget::SetOfficerOwner(AActor* pOwner) //Set the player who placed 
 		Ser_SetOfficer(pOwner);
 	}
 
+}
+
+void ASensorGadget::Ser_PingPlayer_Implementation(AActor* pPlayerToPing)
+{
+	if (Cast<ABase3C>(pPlayerToPing)->GetMesh())
+	{
+		Cast<ABase3C>(pPlayerToPing)->ChangeStencilFromServer(2);
+		pingedActor = pPlayerToPing;
+	}
+}
+
+void ASensorGadget::Ser_UnPingPlayer_Implementation(AActor* pPlayerToPing)
+{
+	if (Cast<ABase3C>(pPlayerToPing)->GetMesh())
+	{
+		Cast<ABase3C>(pPlayerToPing)->ChangeStencilFromServer(0);
+	}
+}
+
+void ASensorGadget::UnPingPlayer()
+{
+	Cast<AOfficer>(placedActor)->SetOfficerSensorScalor(0);
+	Ser_UnPingPlayer(pingedActor);
 }
 
 void ASensorGadget::Ser_SetOfficer_Implementation(AActor* pOwner)

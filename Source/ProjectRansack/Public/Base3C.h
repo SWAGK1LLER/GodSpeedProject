@@ -72,9 +72,6 @@ public:
 	TSubclassOf<UPlayerUI> WidgetClass;
 	UPlayerUI* WidgetUI = nullptr;
 
-	//UPROPERTY(editAnywhere, blueprintReadWrite)
-	//class USkeletalMeshComponent* skeletalMesh = nullptr;
-
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
 	class UCameraComp* cameraComponent = nullptr;
 
