@@ -81,9 +81,6 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
 	class UStunWeapon* StunWeapon = nullptr;
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Health, meta = (AllowPrivateAccess = "true"))
-	class UHealthComponent* healthComp = nullptr;
-
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	FString nickName = "";
 

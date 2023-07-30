@@ -6,7 +6,6 @@
 #include "GameFramework/SpringArmComponent.h"
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
-#include "HealthComponent.h"
 #include "CameraComp.h"
 #include "StunWeapon.h"
 #include <Kismet/GameplayStatics.h>
@@ -24,8 +23,7 @@ ABase3C::ABase3C()
 
 	cameraComponent = CreateDefaultSubobject<UCameraComp>(TEXT("Camera Component"));
 	cameraComponent->SetupCamera(RootComponent);
-	//Health Comp
-	healthComp = CreateDefaultSubobject<UHealthComponent>(TEXT("HealthComponent"));
+	
 	currentState = CharacterState::Gun;
 
 	StunWeapon = CreateDefaultSubobject<UStunWeapon>(TEXT("StunWeapon"));
@@ -99,7 +97,6 @@ void ABase3C::SendDataToComponents()
 		return;
 
 	cameraComponent->fetchData(tableInstance->maxPitchBottom, tableInstance->maxPitchTop);
-	healthComp->fetchData(tableInstance->currentHealth, tableInstance->maxHealth);
 }
 
 void ABase3C::SetClientNickname_Implementation(const FString& pNickName)
