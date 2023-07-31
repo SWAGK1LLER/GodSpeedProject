@@ -10,6 +10,8 @@
 #define MINUTE 60
 #define SECOND 60
 #define MAX_PLAYER 6
+#define MAX_ROUND 2
+
 
 /**
  * 
@@ -24,6 +26,7 @@ public:
 	int Timer = 10;
 	float CurrentTime = 0;
 	bool RoundStarted = false;
+	int TotalRound = 0;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	int ScoreTeamA = 0;
@@ -45,6 +48,12 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	TArray<class ABase3C*> TeamB;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	TMap<class APlayerController*, ETeam> PlayerTeams;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	TArray<class AGamePlayerStart*> PlayerSpawn;
 	
 	virtual void BeginPlay() override;
 
@@ -52,9 +61,11 @@ public:
 
 	virtual void PostLogin(class APlayerController* NewPlayer) override;
 
+	virtual void Logout(class AController* ExitPlayer) override;
+
 	void SpawnPlayer(const ETeam& team, class APlayerController* NewPlayer);
 
-	void FindSpawn(const ETeam& team, FTransform& Location, TSubclassOf<AActor>& ActorClass);
+	void FindSpawn(class APlayerController* NewPlayer, const ETeam& team, FTransform& Location, TSubclassOf<AActor>& ActorClass);
 
 	void SendPlayerName();
 
@@ -64,14 +75,24 @@ public:
 
 	void SpawnParticle(class UParticleSystem* particleEffect, const FTransform& position, const float& duration);
 
+	void StartRound();
+
 	UFUNCTION(BlueprintCallable)
-	void startRound();
+	void EndRound();
+
+	void EndGame();
 
 	UFUNCTION(BlueprintCallable)
 	FString getRemainingTimeText();
 	FString convertTimeToText();
 
 	void AddToScore(int pValue, int& pScore);
+	void RemoveToScore(int pValue, int& pScore);
 
 	void FreezeInput(float duration, ABase3C* actor);
+
+	UFUNCTION(BlueprintCallable)
+	void ArrestThief(ABase3C* other);
+
+
 };

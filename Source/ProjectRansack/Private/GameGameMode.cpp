@@ -17,15 +17,14 @@ void AGameGameMode::BeginPlay()
 {
 	Super::BeginPlay();
 
-	CurrentTime = Timer * MINUTE;
-
 	UEOSGameInstance* instance = Cast<UEOSGameInstance>(UGameplayStatics::GetGameInstance(GetWorld()));
 	if (instance != nullptr)
 	{
 		//instance->StartGame();
 	}
 
-	startRound();
+	//For testing
+	StartRound();
 }
 
 void AGameGameMode::Tick(float DeltaTime)
@@ -34,6 +33,9 @@ void AGameGameMode::Tick(float DeltaTime)
 	
 	if (RoundStarted)
 		CurrentTime -= DeltaTime;
+
+	if (CurrentTime <= 0)
+		EndRound();
 
 	FString timeRemaining = getRemainingTimeText();
 	for (APlayerController* aPC : PC)
@@ -55,7 +57,17 @@ void AGameGameMode::PostLogin(APlayerController* NewPlayer)
 	PC.Add(NewPlayer);
 
 	if (PC.Num() == MAX_PLAYER)
-		startRound();
+		StartRound();
+}
+
+void AGameGameMode::Logout(AController* ExitPlayer)
+{
+	APlayerController* playerController = Cast<APlayerController>(ExitPlayer);
+
+	PC.Remove(playerController);
+
+	UEOSGameInstance* instance = Cast<UEOSGameInstance>(GetGameInstance());
+	instance->unregisterPlayerToGameSession(playerController);
 }
 
 void AGameGameMode::SpawnPlayer(const ETeam& team, APlayerController* NewPlayer)
@@ -67,7 +79,7 @@ void AGameGameMode::SpawnPlayer(const ETeam& team, APlayerController* NewPlayer)
 	FTransform spawnTransform;
 	TSubclassOf<AActor> classToSpawn;
 
-	FindSpawn(team, spawnTransform, classToSpawn);
+	FindSpawn(NewPlayer, team, spawnTransform, classToSpawn);
 
 	ABase3C* actor = Cast<ABase3C>(GetWorld()->SpawnActor(classToSpawn, &spawnTransform));
 
@@ -81,10 +93,16 @@ void AGameGameMode::SpawnPlayer(const ETeam& team, APlayerController* NewPlayer)
 		break;
 	}
 
+	if (PlayerTeams.Contains(NewPlayer))
+		PlayerTeams[NewPlayer] = team;
+	else
+		PlayerTeams.Add(NewPlayer, team);
+	
+
 	NewPlayer->Possess(actor);
 }
 
-void AGameGameMode::FindSpawn(const ETeam& team, FTransform& Location, TSubclassOf<AActor>& ActorClass)
+void AGameGameMode::FindSpawn(APlayerController* NewPlayer, const ETeam& team, FTransform& Location, TSubclassOf<AActor>& ActorClass)
 {
 	TArray<AActor*> spawnPoint;
 	if (team == ETeam::A)
@@ -106,6 +124,8 @@ void AGameGameMode::FindSpawn(const ETeam& team, FTransform& Location, TSubclass
 
 		Location = spawn->GetActorTransform();
 		spawn->used = true;
+
+		PlayerSpawn.Add(spawn);
 		break;
 	}
 }
@@ -139,7 +159,8 @@ void AGameGameMode::UpdateTeamDuffleBag()
 	for (ABase3C* player : TeamA)
 	{
 		AGamePlayerController* aPC = Cast<AGamePlayerController>(player->GetController());
-		aPC->ClientUpdateTeamDuffleBagUI();
+		if(aPC)
+			aPC->ClientUpdateTeamDuffleBagUI();
 	}
 }
 
@@ -147,11 +168,6 @@ void AGameGameMode::SpawnParticle(UParticleSystem* particleEffect, const FTransf
 {
 	for (APlayerController* aPC : PC)
 		(Cast<AGamePlayerController>(aPC))->ClientSpawnParticle(particleEffect, position, duration);
-}
-
-void AGameGameMode::startRound()
-{
-	RoundStarted = true;
 }
 
 FString AGameGameMode::getRemainingTimeText()
@@ -172,6 +188,18 @@ FString AGameGameMode::convertTimeToText()
 void AGameGameMode::AddToScore(int pValue, int& pScore)
 {
 	pScore += pValue;
+	if (pScore < 0)
+		pScore = 0;
+
+	for (APlayerController* aPC : PC)
+		(Cast<AGamePlayerController>(aPC))->ClientUpdateScore(ScoreTeamA, ScoreTeamB);
+}
+
+void AGameGameMode::RemoveToScore(int pValue, int& pScore)
+{
+	pScore -= pValue;
+	if (pScore < 0)
+		pScore = 0;
 
 	for (APlayerController* aPC : PC)
 		(Cast<AGamePlayerController>(aPC))->ClientUpdateScore(ScoreTeamA, ScoreTeamB);
@@ -180,4 +208,68 @@ void AGameGameMode::AddToScore(int pValue, int& pScore)
 void AGameGameMode::FreezeInput(float duration, ABase3C* actor)
 {
 	actor->ClientFreezeInput(duration);
+}
+
+void AGameGameMode::ArrestThief(ABase3C* other)
+{
+	AGamePlayerController* playerController = Cast<AGamePlayerController>(other->GetController());
+	if (playerController == nullptr)
+		return;
+
+	playerController->ClientBeingArrest();
+}
+
+void AGameGameMode::StartRound()
+{
+	//TO DO: add cooldown before starting round
+
+	CurrentTime = Timer * MINUTE;
+	RoundStarted = true;
+	TotalRound++;
+}
+
+void AGameGameMode::EndRound()
+{
+	RoundStarted = false;
+
+	if (TotalRound == MAX_ROUND)
+	{
+		EndGame();
+		return;
+	}
+
+	//TO DO: Add cooldown before restarting round
+	for (int i = 0; i < PlayerSpawn.Num(); i++)
+		PlayerSpawn[i]->used = false;
+
+	TeamA.Empty();
+	TeamB.Empty();
+
+	std::swap(ScoreTeamA, ScoreTeamB);
+
+	for (int i = 0; i < PC.Num(); i++)
+	{
+		Cast<AGamePlayerController>(PC[i])->RestartRound();
+		(Cast<AGamePlayerController>(PC[i]))->ClientUpdateScore(ScoreTeamA, ScoreTeamB);
+	}
+
+	//TO DO call back when finish restarting
+	StartRound();
+}
+
+void AGameGameMode::EndGame()
+{
+	//TO DO: Show score tab
+
+	bool teamAWin = ScoreTeamA > ScoreTeamB;
+	bool teamBWin = !teamAWin;
+	bool tie = ScoreTeamA == ScoreTeamB;
+
+	for (int i = 0; i < PC.Num(); i++)
+	{
+		if (PlayerTeams[PC[i]] == ETeam::A)
+			Cast<AGamePlayerController>(PC[i])->EndGame(teamAWin, tie);
+		else
+			Cast<AGamePlayerController>(PC[i])->EndGame(teamBWin, tie);
+	}
 }

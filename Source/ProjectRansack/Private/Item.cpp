@@ -19,6 +19,8 @@ void AItem::BeginPlay()
 
     Trigger->OnComponentBeginOverlap.AddDynamic(this, &AItem::OnTriggerOverlapBegin);
     Trigger->OnComponentEndOverlap.AddDynamic(this, &AItem::OnTriggerOverlapEnd);
+
+    SpawningTransform = GetActorTransform();
 }
 
 void AItem::Tick(float DeltaTime)
@@ -121,4 +123,44 @@ void AItem::MulPlayerLootIt_Implementation()
 
     lootedItem = true;
     locked = true;
+}
+
+void AItem::dropItem(FVector dropLocation)
+{
+    HelperClass::activateActor(this);
+
+    currentTime = TimeToPickUp;
+    currentlyInteracting = false;
+    lootedItem = false;
+    locked = false;
+
+    SetActorTransform(FTransform(dropLocation));
+
+    if (Handle.IsValid())
+        Handle.Invalidate();
+
+    //Add 30 timer to pickup before respawn
+    GetWorld()->GetTimerManager().SetTimer(Handle, FTimerDelegate::CreateLambda([&] {
+        
+        if (lootedItem)
+            return;
+
+        reset();
+
+    }), TimeBeforeRespawn, false);
+}
+
+void AItem::reset()
+{
+    HelperClass::activateActor(this);
+
+    currentTime = 0;
+    currentlyInteracting = false;
+    lootedItem = false;
+    locked = false;
+
+    if (Handle.IsValid())
+        Handle.Invalidate();
+
+    SetActorTransform(SpawningTransform);
 }

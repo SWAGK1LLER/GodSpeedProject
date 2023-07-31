@@ -19,16 +19,28 @@ struct FOfficerTable : public FTableRowBase
 GENERATED_BODY()
 public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = MotionVision, meta = (AllowPrivateAccess = "true"))
-		class UInputAction* MotionVisionAction = nullptr;
+	class UInputAction* MotionVisionAction = nullptr;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = MotionVision, meta = (AllowPrivateAccess = "true"))
-		UCurveFloat* MotionVisionFloatCurve = nullptr;
+	UCurveFloat* MotionVisionFloatCurve = nullptr;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = MotionVision, meta = (AllowPrivateAccess = "true"))
-		class UMaterialParameterCollection* MotionVisionMPC = nullptr;
+	class UMaterialParameterCollection* MotionVisionMPC = nullptr;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = MotionVision, meta = (AllowPrivateAccess = "true"))
-		int MotionSensorStencilBufNumber = 0;
+	int MotionSensorStencilBufNumber = 0;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = MotionVision, meta = (AllowPrivateAccess = "true"))
-		class UInputAction* FlashlightAction = nullptr;
+	class UInputAction* FlashlightAction = nullptr;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = MotionVision, meta = (AllowPrivateAccess = "true"))
+	class UInputAction* SensorGadgetAction = nullptr;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = SensorGadget, meta = (AllowPrivateAccess = "true"))
+		float Range;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = SensorGadget, meta = (AllowPrivateAccess = "true"))
+		float RevealTime;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = SensorGadget, meta = (AllowPrivateAccess = "true"))
+		float MaxAngle;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = SensorGadget, meta = (AllowPrivateAccess = "true"))
+		int MaxAmountOfSensors;
 };
 
 UCLASS()
@@ -41,25 +53,39 @@ public:
 	IOfficerInteractibleActor* ItemUsing = nullptr;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Data, meta = (AllowPrivateAccess = "true"))
-		class UDataTable* officerDataTable = nullptr;
+	class UDataTable* officerDataTable = nullptr;
 
 	FOfficerTable* officerTableInstance = nullptr;
 
 	FTimeline MotionVisionTimeline;
 
 	bool MotionTimelineRunning = false;
-
 	bool motionSensorActive = false;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	int TimeToArrestThief = 6;
+
+	float arrestTime = 0;
+	bool startArrest = false;
+	ABase3C* ArrestingThief = nullptr;
+	TArray<ABase3C*> closeThief;
+
 	UPROPERTY(editAnywhere, BlueprintReadWrite, Category = Light, meta = (AllowPrivateAccess = "true"))
-		class USpotLightComponent* flashLight;
+	class USpotLightComponent* flashLight;
+
+	UPROPERTY(editAnywhere, BlueprintReadWrite, Category = SensorGadget, meta = (AllowPrivateAccess = "true"), replicated)
+	class USensorGadgetOfficerComponent* sensorGadgetOfficer;
 
 	bool flashLightOn = false;
+
+	bool usingSensorGadget = false;
 
 	// Called to bind functionality to input
 	AOfficer();
 
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
+
+	void SendDataToComponents();
 
 	void CreateTimeline();
 
@@ -71,10 +97,15 @@ public:
 
 	void ChangeStencilOnMovement();
 
+	UFUNCTION(Client, Reliable)
+	void SetOfficerSensorScalor(int newValue);
+
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
 	virtual void Tick(float DeltaTime) override;
+
+	virtual void MulReset_Implementation() override;
 
 	bool CheckTableInstance();
 
@@ -82,6 +113,16 @@ public:
 
 	void ToggleFlashight();
 
+	void SensorGadgetAction();
+
+	virtual void StartFire() override;
+
 	virtual void Interact() override;
 	virtual void StopInteract() override;
+
+	void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const;
+
+	UFUNCTION(Server, Reliable, BlueprintCallable)
+	void ArrestThief(ABase3C* other);
+	void ArrestThief_Implementation(ABase3C* other);
 };

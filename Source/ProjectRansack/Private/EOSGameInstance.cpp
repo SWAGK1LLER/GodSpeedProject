@@ -563,13 +563,75 @@ void UEOSGameInstance::registerPlayerToGameSession(APlayerController* InPlayerCo
 	}
 
 	TSharedPtr<const FUniqueNetId> UniqueNetId = UniqueNetIdRepl.GetUniqueNetId();
-	check(UniqueNetId != nullptr);
+	if (UniqueNetId == nullptr)
+		return;
 
 	IOnlineSessionPtr SessionPtr = OnlineSubsystem->GetSessionInterface();
 	if (!SessionPtr)
 		return;
 
 	SessionPtr->RegisterPlayer(FGameSessionName, *UniqueNetId, false);
+}
+
+void UEOSGameInstance::unregisterPlayerToGameSession(APlayerController* InPlayerController)
+{
+	check(IsValid(InPlayerController));
+
+	FUniqueNetIdRepl UniqueNetIdRepl;
+	if (InPlayerController->IsLocalPlayerController())
+	{
+		ULocalPlayer* LocalPlayer = InPlayerController->GetLocalPlayer();
+		if (IsValid(LocalPlayer))
+		{
+			UniqueNetIdRepl = LocalPlayer->GetPreferredUniqueNetId();
+		}
+		else
+		{
+			UNetConnection* RemoteNetConnection = Cast<UNetConnection>(InPlayerController->Player);
+			if (RemoteNetConnection == nullptr)
+				return;
+
+			UniqueNetIdRepl = RemoteNetConnection->PlayerId;
+		}
+	}
+	else
+	{
+		UNetConnection* RemoteNetConnection = Cast<UNetConnection>(InPlayerController->Player);
+		if (RemoteNetConnection == nullptr)
+			return;
+		UniqueNetIdRepl = RemoteNetConnection->PlayerId;
+	}
+
+	TSharedPtr<const FUniqueNetId> UniqueNetId = UniqueNetIdRepl.GetUniqueNetId();
+	if (UniqueNetId == nullptr)
+		return;
+
+	IOnlineSessionPtr SessionPtr = OnlineSubsystem->GetSessionInterface();
+	if (!SessionPtr)
+		return;
+
+	SessionPtr->UnregisterPlayer(FGameSessionName, *UniqueNetId);
+}
+
+void UEOSGameInstance::CloseGame()
+{
+	IOnlineSessionPtr SessionPtr = OnlineSubsystem->GetSessionInterface();
+	if (!SessionPtr)
+		return;
+
+	SessionPtr->OnDestroySessionCompleteDelegates.AddUObject(this, &UEOSGameInstance::OnGameCloseComplete);
+	SessionPtr->DestroySession(FGameSessionName);
+}
+
+void UEOSGameInstance::OnGameCloseComplete(FName SessionName, bool bWasSuccess)
+{
+	IOnlineSessionPtr SessionPtr = OnlineSubsystem->GetSessionInterface();
+	if (!SessionPtr)
+		return;
+
+	SessionPtr->ClearOnDestroySessionCompleteDelegates(this);
+
+	UGameplayStatics::OpenLevel(GetWorld(), "/Game/Maps/MainMenu", true);
 }
 
 void UEOSGameInstance::CancelFindGame()
@@ -699,11 +761,10 @@ void UEOSGameInstance::UploadPlayerData(TArray<uint8> pData)
 
 void UEOSGameInstance::OnWritePlayerDataCompleted(bool bWasSuccessful, const FUniqueNetId& user, const FString& FileName)
 {
-	IOnlineExternalUIPtr ExternalUI = OnlineSubsystem->GetExternalUIInterface();
-	if (!ExternalUI)
-		return;
-
-	ExternalUI->ShowFriendsUI(0);
+	if (bWasSuccessful)
+	{
+		SaveGameFinish.Broadcast();
+	}
 }
 
 void UEOSGameInstance::GetPlayerData()

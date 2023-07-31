@@ -47,7 +47,9 @@ void UStunWeapon::Fire()
 	ammo--;
 
     ABase3C* player = Cast<ABase3C>(GetOwner());
-    player->WidgetUI->UpdateRemainingAmmo(ammo);
+
+    if(player->WidgetUI)
+        player->WidgetUI->UpdateRemainingAmmo(ammo);
 
     FVector hitLocation;
     AActor* actor = HitScan(hitLocation);
@@ -60,9 +62,9 @@ void UStunWeapon::Fire()
 
     APawn* owner = Cast<APawn>(GetOwner());
     AGamePlayerController* playerController = Cast<AGamePlayerController>(owner->GetController());
-
-    if (!playerController)
+    if (playerController == nullptr)
         return;
+
 
     playerController->SRSpawnParticle(particleEffect, position, (hitableEnemy ? StunDuration : -1) );
 

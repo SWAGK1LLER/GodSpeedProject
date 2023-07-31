@@ -14,6 +14,7 @@
 #include "TeamDuffleBagUI.h"
 #include "Particles/ParticleSystemComponent.h"
 #include "GenericParticleSystemComponent.h"
+#include <Officer.h>
 
 void AGamePlayerController::BeginPlay()
 {
@@ -26,8 +27,14 @@ void AGamePlayerController::BeginPlay()
 	if (instance == nullptr)
 		return;
 
+	if (RoundUIWidget == nullptr)
+	{
+		RoundUIWidget = CreateWidget<URoundUI>(GetWorld(), RoundUIClass);
+		RoundUIWidget->AddToViewport();
+	}
+
 	instance->LoadSaveGame();
-	instance->LoadSaveSettings();
+	//instance->LoadSaveSettings();
 	SRSpawnPlayer(instance->team);
 }
 
@@ -41,25 +48,47 @@ void AGamePlayerController::PawnIsPossess(APawn* InPawn)
 	if (!IsLocalPlayerController())
 		return;
 
-
-	if (RoundUIWidget == nullptr)
+	AThief* thief = Cast<AThief>(InPawn);
+	if (thief == nullptr)
 	{
-		RoundUIWidget = CreateWidget<URoundUI>(GetWorld(), RoundUIClass);
-		RoundUIWidget->AddToViewport();
+		AOfficer* officer = Cast<AOfficer>(InPawn);
+		if (officer != nullptr)
+			officer->SetClientUI();
+		return;
 	}
+		
 
+	SetUpUI(thief);
+	SRGetTeamData();
+	SRUpdatePlayerName();
+}
+
+void AGamePlayerController::SetUpUI_Implementation(APawn* InPawn)
+{
 	AThief* thief = Cast<AThief>(InPawn);
 	if (thief == nullptr)
 		return;
 
-	DuffleBagUIWidget = CreateWidget<UDuffleBagUI>(GetWorld(), DuffleBagUIClass);
-	DuffleBagUIWidget->AddToViewport();
+	if (DuffleBagUIWidget == nullptr)
+	{
+		DuffleBagUIWidget = CreateWidget<UDuffleBagUI>(GetWorld(), DuffleBagUIClass);
+		DuffleBagUIWidget->AddToViewport();
+	}
+	else
+	{
+		if (thief->inventory == nullptr)
+			thief->inventory = NewObject<UInventory>();
 
-	TeamDuffleBagUIWidget = CreateWidget<UTeamDuffleBagUI>(GetWorld(), TeamDuffleBagUIClass);
-	TeamDuffleBagUIWidget->AddToViewport();
+		DuffleBagUIWidget->UpdateUI(thief->inventory->items);
+	}
 
-	SRGetTeamData();
-	SRUpdatePlayerName();
+	if (TeamDuffleBagUIWidget == nullptr)
+	{
+		TeamDuffleBagUIWidget = CreateWidget<UTeamDuffleBagUI>(GetWorld(), TeamDuffleBagUIClass);
+		TeamDuffleBagUIWidget->AddToViewport();
+	}
+
+	thief->SetClientUI();
 }
 
 void AGamePlayerController::SetPawn(APawn* InPawn)
@@ -137,6 +166,8 @@ void AGamePlayerController::ClientUpdateTeamDuffleBagUI_Implementation()
 	if (TeamA.Num() > 0)
 	{
 		AThief* thief = Cast<AThief>(TeamA[0]);
+		if (thief == nullptr)
+			return;
 
 		if (thief->inventory != nullptr)
 			TeamDuffleBagUIWidget->UpdateUIBag1(thief->nickName, thief->inventory->items);
@@ -147,6 +178,9 @@ void AGamePlayerController::ClientUpdateTeamDuffleBagUI_Implementation()
 	if (TeamA.Num() > 1)
 	{
 		AThief* thief = Cast<AThief>(TeamA[1]);
+		if (thief == nullptr)
+			return;
+
 		if (thief->inventory != nullptr)
 			TeamDuffleBagUIWidget->UpdateUIBag2(thief->nickName, thief->inventory->items);
 		else
@@ -226,4 +260,101 @@ void AGamePlayerController::ClientSpawnParticle_Implementation(UParticleSystem* 
 																														);
 	if (duration != -1)
 		particle->setLifeSpan(duration);
+}
+
+void AGamePlayerController::ClientBeingArrest_Implementation()
+{
+	AThief* thief = Cast<AThief>(GetPawn());
+	if (thief == nullptr)
+		return;
+
+	thief->SRDropInventory(thief->GetActorLocation());
+	thief->SRReset();
+}
+
+void AGamePlayerController::ClientFinishArrest_Implementation()
+{
+	AThief* thief = Cast<AThief>(GetPawn());
+	if (thief == nullptr)
+		return;
+
+	for (auto& it : interactibleUI)
+	{
+		it.Value->RemoveFromParent();
+	}
+
+	UpdateDuffleBagUI(thief->inventory->items);
+	UpdateTeamDuffleBagUI();
+}
+
+void AGamePlayerController::RestartRound_Implementation()
+{
+	UEOSGameInstance* instance = Cast<UEOSGameInstance>(UGameplayStatics::GetGameInstance(GetWorld()));
+	if (instance == nullptr)
+		return;
+
+	TArray<AActor*> FoundActors;
+	UGameplayStatics::GetAllActorsOfClass(GetWorld(), AItem::StaticClass(), FoundActors);
+
+	for (int i = 0; i < FoundActors.Num(); i++)
+		Cast<AItem>(FoundActors[i])->reset();
+
+	instance->team = instance->team == ETeam::A ? ETeam::B : ETeam::A;
+
+	ABase3C* base3c = Cast<ABase3C>(GetPawn());
+	if (base3c->WidgetUI != nullptr)
+	{
+		base3c->WidgetUI->RemoveFromParent();
+		base3c->WidgetUI = nullptr;
+	}
+	
+
+	if (DuffleBagUIWidget != nullptr)
+	{
+		DuffleBagUIWidget->RemoveFromParent();
+		DuffleBagUIWidget = nullptr;
+	}
+
+	if (TeamDuffleBagUIWidget != nullptr)
+	{
+		TeamDuffleBagUIWidget->RemoveFromParent();
+		TeamDuffleBagUIWidget = nullptr;
+	}
+
+	int playTimeDiff = UGameplayStatics::GetRealTimeSeconds((GetWorld())) - base3c->playTime;
+	if (base3c->IsA(AThief::StaticClass()))
+		instance->GetPlayerSaveGame()->timePlayThief += playTimeDiff;
+	else
+		instance->GetPlayerSaveGame()->timePlaySecurity += playTimeDiff;
+
+
+	SRSpawnPlayer(instance->team);
+}
+
+void AGamePlayerController::EndGame_Implementation(bool isWin, bool isTie)
+{
+	UEOSGameInstance* instance = Cast<UEOSGameInstance>(UGameplayStatics::GetGameInstance(GetWorld()));
+	if (instance == nullptr)
+		return;
+
+	if (isTie)
+		return;
+
+	if (isWin)
+		instance->GetPlayerSaveGame()->totalWin++;
+	else
+		instance->GetPlayerSaveGame()->totalLoose++;
+
+	instance->SaveGame();
+	instance->SaveGameFinish.AddDynamic(this, &AGamePlayerController::SaveGameFinish);
+}
+
+void AGamePlayerController::SaveGameFinish()
+{
+	UEOSGameInstance* instance = Cast<UEOSGameInstance>(UGameplayStatics::GetGameInstance(GetWorld()));
+	if (instance == nullptr)
+		return;
+
+	instance->SaveGameFinish.RemoveDynamic(this, &AGamePlayerController::SaveGameFinish);
+	UGameplayStatics::OpenLevel(GetGameInstance(), FName("Game/Maps/MainMenu"));
 }

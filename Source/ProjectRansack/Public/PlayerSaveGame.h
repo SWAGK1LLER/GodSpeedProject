@@ -33,7 +33,7 @@ public:
 	UPROPERTY(BlueprintReadWrite, Category = "Player Info")
 	int timePlaySecurity = 0;
 	UPROPERTY(BlueprintReadWrite, Category = "Player Info")
-	int totalCapture = 0;
+	int totalArest = 0;
 	UPROPERTY(BlueprintReadWrite, Category = "Player Info")
 	int totalCash = 0;
 	UPROPERTY(BlueprintReadWrite, Category = "Player Info")

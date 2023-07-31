@@ -57,9 +57,8 @@ public:
 UENUM()
 enum CharacterState
 {
-	Idle		UMETA(DisplayName = "Idle"),
-	Attacking   UMETA(DisplayName = "Attacking"),
-	Stunned		UMETA(DisplayName = "Stunned"),
+	Gun		UMETA(DisplayName = "Gun"),
+	SensorGadget	UMETA(DisplayName = "SensorGadget"),
 };
 
 
@@ -73,20 +72,17 @@ public:
 	TSubclassOf<UPlayerUI> WidgetClass;
 	UPlayerUI* WidgetUI = nullptr;
 
-	//UPROPERTY(editAnywhere, blueprintReadWrite)
-	//class USkeletalMeshComponent* skeletalMesh = nullptr;
-
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
 	class UCameraComp* cameraComponent = nullptr;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
 	class UStunWeapon* StunWeapon = nullptr;
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Health, meta = (AllowPrivateAccess = "true"))
-	class UHealthComponent* healthComp = nullptr;
-
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	FString nickName = "";
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	int playTime = 0;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Data, meta = (AllowPrivateAccess = "true"))
 	class UDataTable* dataTable = nullptr;
@@ -101,10 +97,26 @@ public:
 	float FreezeDuration = 0;
 	float TimeFreezed = 0;
 
+	FTransform SpawnTransform;
+
+	bool Revealed = false;
+
 	ABase3C();
+
+	// Called when the game starts or when spawned
+	virtual void BeginPlay() override;
+
+	// Called every frame
+	virtual void Tick(float DeltaTime) override;
+
+	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
 
 	bool CheckTableInstance();
 	void SendDataToComponents();
+
+	UFUNCTION(Client, Reliable, BlueprintCallable)
+	void SetClientUI();
+	void SetClientUI_Implementation();
 
 	UFUNCTION(Server, Reliable, BlueprintCallable)
 	void SetClientNickname(const FString& pNickName);
@@ -116,13 +128,18 @@ public:
 
 	UFUNCTION(Client, Reliable, BlueprintCallable)
 	void ClientFreezeInput(float duration);
-	void ClientFreezeInput_Implementation(float duration);
+	virtual void ClientFreezeInput_Implementation(float duration);
 
-	// Called when the game starts or when spawned
-	virtual void BeginPlay() override;
+	virtual void UnFreezeInput();
 
-	// Called every frame
-	virtual void Tick(float DeltaTime) override;
+	UFUNCTION(Server, Unreliable)
+	void SRReset();
+	void SRReset_Implementation();
+
+	UFUNCTION(NetMulticast, Unreliable)
+	virtual void MulReset();
+	virtual void MulReset_Implementation();
+
 
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
@@ -131,12 +148,14 @@ public:
 	void Move(const FInputActionValue& Value);
 
 	virtual void Interact();
-	
+
 	virtual void StopInteract();
 
 	void StartAim();
 
 	void StopAim();
+
+	virtual void StartFire() {};
 
 	void Fire();
 
@@ -149,6 +168,11 @@ public:
 	UFUNCTION(Server, Unreliable)
 	void TestDamage(AActor* DamageActor);
 
+	UFUNCTION(NetMulticast, Reliable)
+		void ChangeStencilFromServer(int pNewStencilValue);
+
 	UFUNCTION(BlueprintCallable)
-		UCameraComp* GetCameraComponent();
+	UCameraComp* GetCameraComponent();
+
+	void TryGeneratingOverlapEvent();
 };
