@@ -4,7 +4,6 @@
 
 #include "CoreMinimal.h"
 #include "Engine/GameInstance.h"
-
 #include "OnlineSessionSettings.h"
 #include "EnumTeam.h"
 #include "PlayerSetting.h"
@@ -30,6 +29,8 @@ enum EOutcomePins
 	Failure,
 	Success
 };
+
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnSaveGameFinish);
 
 UCLASS()
 class PROJECTRANSACK_API UEOSGameInstance : public UGameInstance
@@ -160,5 +161,7 @@ public:
 
 
 	FSaveGameSlot<class UPlayerSaveGame> ServerGameSlot = { "SaveGame.sav", 0, nullptr };
+	FOnSaveGameFinish SaveGameFinish;
+
 	FSaveGameSlot<class UPlayerSetting> SettingsGameSlot = { "Settings.sav", 1, nullptr };
 };

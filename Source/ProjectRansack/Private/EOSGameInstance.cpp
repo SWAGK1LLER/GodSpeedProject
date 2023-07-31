@@ -761,11 +761,10 @@ void UEOSGameInstance::UploadPlayerData(TArray<uint8> pData)
 
 void UEOSGameInstance::OnWritePlayerDataCompleted(bool bWasSuccessful, const FUniqueNetId& user, const FString& FileName)
 {
-	IOnlineExternalUIPtr ExternalUI = OnlineSubsystem->GetExternalUIInterface();
-	if (!ExternalUI)
-		return;
-
-	ExternalUI->ShowFriendsUI(0);
+	if (bWasSuccessful)
+	{
+		SaveGameFinish.Broadcast();
+	}
 }
 
 void UEOSGameInstance::GetPlayerData()

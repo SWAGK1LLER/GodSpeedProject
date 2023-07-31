@@ -232,13 +232,11 @@ void AGameGameMode::EndRound()
 {
 	RoundStarted = false;
 
-#if !WITH_EDITOR
-	/*if (TotalRound == MAX_ROUND)
+	if (TotalRound == MAX_ROUND)
 	{
 		EndGame();
 		return;
-	}*/
-#endif
+	}
 
 	//TO DO: Add cooldown before restarting round
 	for (int i = 0; i < PlayerSpawn.Num(); i++)

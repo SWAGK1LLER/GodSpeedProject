@@ -346,4 +346,15 @@ void AGamePlayerController::EndGame_Implementation(bool isWin, bool isTie)
 		instance->GetPlayerSaveGame()->totalLoose++;
 
 	instance->SaveGame();
+	instance->SaveGameFinish.AddDynamic(this, &AGamePlayerController::SaveGameFinish);
+}
+
+void AGamePlayerController::SaveGameFinish()
+{
+	UEOSGameInstance* instance = Cast<UEOSGameInstance>(UGameplayStatics::GetGameInstance(GetWorld()));
+	if (instance == nullptr)
+		return;
+
+	instance->SaveGameFinish.RemoveDynamic(this, &AGamePlayerController::SaveGameFinish);
+	UGameplayStatics::OpenLevel(GetGameInstance(), FName("Game/Maps/MainMenu"));
 }
