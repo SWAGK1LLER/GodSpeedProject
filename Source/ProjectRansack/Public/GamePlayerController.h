@@ -125,5 +125,6 @@ public:
 	void EndGame(bool isWin, bool isTie);
 	void EndGame_Implementation(bool isWin, bool isTie);
 
+	UFUNCTION()
 	void SaveGameFinish();
 };

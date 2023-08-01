@@ -272,4 +272,6 @@ void AGameGameMode::EndGame()
 		else
 			Cast<AGamePlayerController>(PC[i])->EndGame(teamBWin, tie);
 	}
+
+	PC.Empty();
 }

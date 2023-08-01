@@ -764,6 +764,11 @@ void UEOSGameInstance::OnWritePlayerDataCompleted(bool bWasSuccessful, const FUn
 	if (bWasSuccessful)
 	{
 		SaveGameFinish.Broadcast();
+		UE_LOG(LogTemp, Warning, TEXT("Save success"));
+	}
+	else
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Faile to save data"));
 	}
 }
 
