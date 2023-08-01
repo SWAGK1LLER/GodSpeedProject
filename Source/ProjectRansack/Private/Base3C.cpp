@@ -133,6 +133,9 @@ void ABase3C::SRReset_Implementation()
 void ABase3C::MulReset_Implementation()
 {
 	SetActorTransform(SpawnTransform);
+	bFreezeInput = false;
+	FreezeDuration = 0;
+	TimeFreezed = 0;
 }
 
 // Called to bind functionality to input
