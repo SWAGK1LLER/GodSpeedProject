@@ -48,6 +48,8 @@ void USensorGadgetOfficerComponent::CalculateFirstPosition(AActor* IgnoredSelf, 
 	FVector End = Start + CamForward * 1000;
 	FCollisionQueryParams CollisionParams;
 
+	CollisionParams.AddIgnoredActor(IgnoredSelf);
+
 	//DrawDebugLine(GetWorld(), Start, End, FColor::Green, true, 2.f, false, 4.f);
 
 	GetWorld()->LineTraceSingleByChannel(Hit, Start, End, ECC_WorldDynamic, CollisionParams);
@@ -97,30 +99,24 @@ void USensorGadgetOfficerComponent::CalculateSecondPosition(FVector FirstLocatio
 
 	if (Hit.IsValidBlockingHit())
 	{
-		if (Hit.GetComponent() == sensorGadgetOfficerMesh2)
+		if (Hit.GetComponent() == sensorGadgetOfficerMesh2 )//|| Hit.GetActor()->IsA(ABase3C::StaticClass()))
 			return;
 
-		float Angle = asin(FVector::CrossProduct(Hit.ImpactNormal, ForwardVector).Length() / (Hit.ImpactNormal.Length() * ForwardVector.Length()));
+		FVector Point = Hit.ImpactPoint + (Hit.ImpactNormal * 0.01f);
+		FVector Normal = Hit.ImpactNormal;
 
-		Angle = Angle * 180/PI;
+		FRotator Rotation = FRotationMatrix::MakeFromX(Normal).Rotator();
+		FRotator Offset = FRotator(90, 180, 0);
+		Rotation += Offset;
+		sensorGadgetOfficerMesh2->SetWorldLocation(Point);
+		sensorGadgetOfficerMesh2->SetWorldRotation(Rotation);
+		ChangeMaterial(true);
 
-		if (Angle < maxAngle)
-		{
-			FVector Point = Hit.ImpactPoint + (Hit.ImpactNormal * 0.01f);
-			FVector Normal = Hit.ImpactNormal;
+		secondLocation = Point;
+		secondRotation = Rotation;
 
-			FRotator Rotation = FRotationMatrix::MakeFromX(Normal).Rotator();
-			FRotator Offset = FRotator(90, 180, 0);
-			Rotation += Offset;
-			sensorGadgetOfficerMesh2->SetWorldLocation(Point);
-			sensorGadgetOfficerMesh2->SetWorldRotation(Rotation);
-			ChangeMaterial(true);
-
-			secondLocation = Point;
-			secondRotation = Rotation;
-
-			return;
-		}
+		return;
+		
 	}
 
 	sensorGadgetOfficerMesh2->SetVisibility(false);

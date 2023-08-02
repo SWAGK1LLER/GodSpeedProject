@@ -3,7 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "GameFramework/Actor.h"
+#include "Engine/TriggerBox.h"
 #include "Officer.h"
 #include "SensorGadget.generated.h"
 
@@ -27,10 +27,10 @@ public:
 		class UStaticMeshComponent* sensorGadgetMesh2 = nullptr;
 
 	UPROPERTY(editAnywhere, BlueprintReadWrite, Category = SensorGadget, meta = (AllowPrivateAccess = "true"))
-		class UStaticMeshComponent* MiddleMesh = nullptr;
+		class UBoxComponent* CollisionMesh = nullptr;
 
 	UFUNCTION(Server, Reliable)
-		void OverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
+		void OnOverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
 
 	void SetRevealTime(float pRevealTime);
 

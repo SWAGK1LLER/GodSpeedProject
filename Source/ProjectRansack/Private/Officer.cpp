@@ -38,6 +38,7 @@ void AOfficer::BeginPlay()
 	SendDataToComponents();
 	flashLight->SetIntensity(0.f);
 	sensorGadgetOfficer->ToggleEnable(false);
+	GetMesh()->SetOwnerNoSee(true); 
 }
 
 

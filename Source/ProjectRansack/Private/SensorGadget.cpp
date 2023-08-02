@@ -5,7 +5,7 @@
 #include "Components/StaticMeshComponent.h"
 #include "Base3C.h"
 #include <Net/UnrealNetwork.h>
-
+#include "Components/BoxComponent.h"
 ASensorGadget::ASensorGadget()
 {
 
@@ -17,12 +17,11 @@ ASensorGadget::ASensorGadget()
 	sensorGadgetMesh2->SetIsReplicated(true);
 	sensorGadgetMesh2->SetupAttachment(RootComponent);
 
-	MiddleMesh = CreateDefaultSubobject<UStaticMeshComponent>(FName("MiddleMesh"));
-	MiddleMesh->SetupAttachment(RootComponent);
-	MiddleMesh->SetIsReplicated(true);
+	CollisionMesh = CreateDefaultSubobject<UBoxComponent>(FName("MiddleMesh"));
+	CollisionMesh->SetupAttachment(RootComponent);
+	CollisionMesh->SetIsReplicated(true);
 
 	bReplicates = true;
-	MiddleMesh->SetCollisionResponseToChannel(ECollisionChannel::ECC_Pawn, ECollisionResponse::ECR_Overlap);
 }
 
 void ASensorGadget::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
@@ -31,28 +30,29 @@ void ASensorGadget::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLif
 	DOREPLIFETIME(ASensorGadget, placedActor); //Should replicate placedActor variable to all clients
 }
 
-void ASensorGadget::OverlapBegin_Implementation(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
+// Called when the game starts or when spawned
+void ASensorGadget::BeginPlay()
+{
+	Super::BeginPlay();
+	CollisionMesh->OnComponentBeginOverlap.AddDynamic(this, &ASensorGadget::OnOverlapBegin);
+}
+
+void ASensorGadget::OnOverlapBegin_Implementation(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
 	if (OtherActor->IsA(ABase3C::StaticClass()) && placedActor != OtherActor && !pinged)
 	{
+		if (!placedActor)
+			return;
+
 		Ser_PingPlayer(OtherActor);
 		Cast<AOfficer>(placedActor)->SetOfficerSensorScalor(1); //Need to set this for the material
-		
+
 		if (GetWorldTimerManager().IsTimerActive(RevealTimer))
 			GetWorldTimerManager().ClearTimer(RevealTimer);
 
 		GetWorldTimerManager().SetTimer(
 			RevealTimer, this, &ASensorGadget::UnPingPlayer, revealTime, false);
 	}
-}
-
-
-
-// Called when the game starts or when spawned
-void ASensorGadget::BeginPlay()
-{
-	MiddleMesh->OnComponentBeginOverlap.AddDynamic(this, &ASensorGadget::OverlapBegin);
-	Super::BeginPlay();
 }
 
 void ASensorGadget::SetRevealTime(float pRevealTime)
@@ -67,8 +67,8 @@ void ASensorGadget::CalculateMiddleMesh() //Computes middle mesh to fit in betwe
 
 	float Scale = FVector::Distance(sensorGadgetMesh1->GetComponentLocation(), sensorGadgetMesh2->GetComponentLocation()) / 2;
 	FTransform newTrans = FTransform(Rotation.Quaternion(), Location, FVector(Scale / 50, 0.1f, 0.1f));
-	MiddleMesh->SetWorldTransform(newTrans);
-
+	
+	CollisionMesh->SetWorldTransform(newTrans);
 }
 void ASensorGadget::SetOfficerOwner(AActor* pOwner) //Set the player who placed the Trip
 {
