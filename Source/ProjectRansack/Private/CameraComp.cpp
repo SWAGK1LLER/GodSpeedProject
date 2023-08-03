@@ -7,7 +7,7 @@
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
 #include "GameFramework/Character.h"
-
+#include "Base3C.h"
 // Sets default values for this component's properties
 UCameraComp::UCameraComp()
 {
@@ -38,6 +38,9 @@ void UCameraComp::fetchData(float pmaxPitchBottom, float pmaxPitchTop)
 
 void UCameraComp::look(const FInputActionValue& Value)
 {
+	if (Cast<ABase3C>(GetOwner())->bFreezeInput)
+		return;
+
 	FVector2D Direction = Value.Get<FVector2D>();
 	if (ACharacter* Character = CastChecked<ACharacter>(GetOwner()))
 	{

@@ -19,6 +19,8 @@
 #include <GamePlayerController.h>
 #include <HelperClass.h>
 
+
+#include "SecurityMonitor.h"
 AOfficer::AOfficer()
 {
 	bReplicates = true;
@@ -39,6 +41,8 @@ void AOfficer::BeginPlay()
 	flashLight->SetIntensity(0.f);
 	sensorGadgetOfficer->ToggleEnable(false);
 	GetMesh()->SetOwnerNoSee(true); 
+
+	securityMonitor = Cast<ASecurityMonitor>(UGameplayStatics::GetActorOfClass(GetWorld(), ASecurityMonitor::StaticClass()));
 }
 
 
@@ -49,13 +53,14 @@ void AOfficer::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 	if (!CheckTableInstance())
 		return;
 
-
-
 	if (UEnhancedInputComponent* EnhancedInputComponent = CastChecked<UEnhancedInputComponent>(PlayerInputComponent))
 	{
 		EnhancedInputComponent->BindAction(officerTableInstance->MotionVisionAction, ETriggerEvent::Started, this, &AOfficer::HandleMotionVision);
 		EnhancedInputComponent->BindAction(officerTableInstance->FlashlightAction, ETriggerEvent::Started, this, &AOfficer::ToggleFlashight);
 		EnhancedInputComponent->BindAction(officerTableInstance->SensorGadgetAction, ETriggerEvent::Started, this, &AOfficer::SensorGadgetAction);
+
+		EnhancedInputComponent->BindAction(officerTableInstance->RightAction, ETriggerEvent::Started, this, &AOfficer::SecurityMonitor_SwitchCameraRight);
+		EnhancedInputComponent->BindAction(officerTableInstance->LeftAction, ETriggerEvent::Started, this, &AOfficer::SecurityMonitor_SwitchCameraLeft);
 	}
 }
 
@@ -236,6 +241,7 @@ void AOfficer::StartFire()
 
 void AOfficer::Interact()
 {
+	Super::Interact();
 	if (closeThief.Num() != 0)
 	{
 		startArrest = true;
@@ -287,4 +293,16 @@ void AOfficer::ArrestThief_Implementation(ABase3C* other)
 
 	if (gameMode != nullptr)
 		gameMode->ArrestThief(other);
+}
+
+void AOfficer::SecurityMonitor_SwitchCameraRight()
+{
+	GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("Working Security Right!"));
+	securityMonitor->SwitchCameraRight();
+}
+
+void AOfficer::SecurityMonitor_SwitchCameraLeft()
+{
+	GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("Working Security left!"));
+	securityMonitor->SwitchCameraLeft();
 }

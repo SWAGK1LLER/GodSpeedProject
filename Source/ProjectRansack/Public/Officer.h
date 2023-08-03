@@ -6,6 +6,7 @@
 #include "Base3C.h"
 #include "OfficerInteractibleActor.h"
 #include "Components/TimelineComponent.h"
+#include "OfficerInteractibleActor.h"
 #include "Officer.generated.h"
 
 /**
@@ -32,6 +33,13 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = MotionVision, meta = (AllowPrivateAccess = "true"))
 	class UInputAction* SensorGadgetAction = nullptr;
+
+	//CAMERAS
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
+		class UInputAction* RightAction = nullptr;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
+		class UInputAction* LeftAction = nullptr;
+
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = SensorGadget, meta = (AllowPrivateAccess = "true"))
 		float Range;
@@ -80,6 +88,7 @@ public:
 
 	bool usingSensorGadget = false;
 
+	class ASecurityMonitor* securityMonitor = nullptr;
 	// Called to bind functionality to input
 	AOfficer();
 
@@ -120,9 +129,15 @@ public:
 	virtual void Interact() override;
 	virtual void StopInteract() override;
 
+
 	void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const;
 
 	UFUNCTION(Server, Reliable, BlueprintCallable)
 	void ArrestThief(ABase3C* other);
 	void ArrestThief_Implementation(ABase3C* other);
+
+
+	void SecurityMonitor_SwitchCameraRight();
+
+	void SecurityMonitor_SwitchCameraLeft();
 };
