@@ -29,6 +29,9 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = SecurityCamera, meta = (AllowPrivateAccess = "true"))
 		class USpotLightComponent* spotLight;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = SecurityCamera, meta = (AllowPrivateAccess = "true"))
+		int cameraNumber = 0;
+
 	UFUNCTION()
 		void OnTriggerOverlapBegin(class UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, class UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
 
@@ -38,4 +41,6 @@ public:
 
 	UFUNCTION(Server, Reliable)
 		void NotifyAllSecurity(class AThief* PingedActor);
+
+	
 };

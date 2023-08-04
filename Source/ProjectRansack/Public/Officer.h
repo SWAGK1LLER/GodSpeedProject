@@ -6,8 +6,10 @@
 #include "Base3C.h"
 #include "OfficerInteractibleActor.h"
 #include "Components/TimelineComponent.h"
+#include "OfficerNotificationUI.h"
 #include "OfficerInteractibleActor.h"
 #include "Officer.generated.h"
+
 
 /**
  * 
@@ -84,6 +86,12 @@ public:
 	UPROPERTY(editAnywhere, BlueprintReadWrite, Category = SensorGadget, meta = (AllowPrivateAccess = "true"), replicated)
 	class USensorGadgetOfficerComponent* sensorGadgetOfficer;
 
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+		TSubclassOf<UOfficerNotificationUI> notificationWidgetClass;
+
+	UOfficerNotificationUI* notificationUI = nullptr;
+
 	bool flashLightOn = false;
 
 	bool usingSensorGadget = false;
@@ -136,5 +144,8 @@ public:
 
 
 	UFUNCTION(Client, Reliable)
-	void ReceiveCameraPing();
+	void ReceiveCameraPing(int CameraNumb);
+
+
+	void SetupNotificationUI();
 };

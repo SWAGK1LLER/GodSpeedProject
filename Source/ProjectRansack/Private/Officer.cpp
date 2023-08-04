@@ -39,6 +39,7 @@ void AOfficer::BeginPlay()
 	flashLight->SetIntensity(0.f);
 	sensorGadgetOfficer->ToggleEnable(false);
 	GetMesh()->SetOwnerNoSee(true); 
+	SetupNotificationUI();
 }
 
 
@@ -288,7 +289,17 @@ void AOfficer::ArrestThief_Implementation(ABase3C* other)
 		gameMode->ArrestThief(other);
 }
 
-void AOfficer::ReceiveCameraPing_Implementation()
+void AOfficer::SetupNotificationUI()
+{
+	if (notificationUI != nullptr)
+		return;
+
+	notificationUI = CreateWidget<UOfficerNotificationUI>(GetWorld(), notificationWidgetClass);
+	notificationUI->AddToViewport();
+}
+
+void AOfficer::ReceiveCameraPing_Implementation(int CameraNumb)
 {
 	GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("CAMERA PINGED!"));
+	notificationUI->PingOfficer(CameraNumb);
 }

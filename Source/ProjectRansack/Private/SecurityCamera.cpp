@@ -55,6 +55,6 @@ void ASecurityCamera::NotifyAllSecurity_Implementation(AThief* PingedActor)
 
 	for (AActor* Officer : GameMode->TeamB)
 	{
-		Cast<AOfficer>(Officer)->ReceiveCameraPing();
+		Cast<AOfficer>(Officer)->ReceiveCameraPing(cameraNumber);
 	}
 }
