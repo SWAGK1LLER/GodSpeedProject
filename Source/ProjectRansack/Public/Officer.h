@@ -87,8 +87,6 @@ public:
 	bool flashLightOn = false;
 
 	bool usingSensorGadget = false;
-
-	class ASecurityMonitor* securityMonitor = nullptr;
 	// Called to bind functionality to input
 	AOfficer();
 
@@ -137,7 +135,6 @@ public:
 	void ArrestThief_Implementation(ABase3C* other);
 
 
-	void SecurityMonitor_SwitchCameraRight();
-
-	void SecurityMonitor_SwitchCameraLeft();
+	UFUNCTION(Client, Reliable)
+	void ReceiveCameraPing();
 };

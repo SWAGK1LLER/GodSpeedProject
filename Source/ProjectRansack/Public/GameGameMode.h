@@ -44,10 +44,10 @@ public:
 	TArray<class APlayerController*> PC;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	TArray<class ABase3C*> TeamA;
+	TArray<class ABase3C*> TeamA; //Thief
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	TArray<class ABase3C*> TeamB;
+	TArray<class ABase3C*> TeamB; //Security
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	TMap<class APlayerController*, ETeam> PlayerTeams;

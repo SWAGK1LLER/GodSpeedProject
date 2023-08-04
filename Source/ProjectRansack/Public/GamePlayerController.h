@@ -31,10 +31,10 @@ public:
 	class URoundUI* RoundUIWidget = nullptr;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	TArray<class ABase3C*> TeamA;
+	TArray<class ABase3C*> TeamA; //Thief
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	TArray<class ABase3C*> TeamB;
+	TArray<class ABase3C*> TeamB; //Security
 
 	TMap<class AActor*, class UUserWidget*> interactibleUI;
 
