@@ -32,6 +32,12 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = SecurityCamera, meta = (AllowPrivateAccess = "true"))
 		int cameraNumber = 0;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = SecurityCamera, meta = (AllowPrivateAccess = "true"))
+		class USoundCue* pingAudioCue;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = SecurityCamera, meta = (AllowPrivateAccess = "true"))
+		class UAudioComponent* pingAudioComponent;
+
 	UFUNCTION()
 		void OnTriggerOverlapBegin(class UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, class UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
 
@@ -43,4 +49,6 @@ public:
 		void NotifyAllSecurity(class AThief* PingedActor);
 
 	
+	UFUNCTION(NetMulticast, Reliable)
+		void PlayAudio();
 };

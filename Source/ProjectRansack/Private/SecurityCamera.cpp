@@ -7,6 +7,8 @@
 #include "Officer.h"
 #include "Thief.h"
 #include "GameGameMode.h"
+#include "Components/AudioComponent.h"
+#include "Sound/SoundCue.h"
 
 ASecurityCamera::ASecurityCamera()
 {
@@ -17,6 +19,11 @@ ASecurityCamera::ASecurityCamera()
 
 	coneShape = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Cone"));
 	coneShape->SetupAttachment(spotLight);
+
+
+	pingAudioComponent = CreateDefaultSubobject<UAudioComponent>(TEXT("CameraPingAudio"));
+	pingAudioComponent->bAutoActivate = false;
+	pingAudioComponent->SetupAttachment(RootComponent);
 }
 
 // Called when the game starts or when spawned
@@ -25,6 +32,10 @@ void ASecurityCamera::BeginPlay()
 	Super::BeginPlay();
 
 	coneShape->OnComponentBeginOverlap.AddDynamic(this, &ASecurityCamera::OnTriggerOverlapBegin);
+
+	if (pingAudioCue->IsValidLowLevelFast()) {
+		pingAudioComponent->SetSound(pingAudioCue);
+	}
 	
 }
 
@@ -49,6 +60,7 @@ void ASecurityCamera::OnTriggerOverlapEnd(UPrimitiveComponent* OverlappedComp, A
 {
 }
 
+
 void ASecurityCamera::NotifyAllSecurity_Implementation(AThief* PingedActor)
 {
 	AGameGameMode* GameMode = (AGameGameMode*)GetWorld()->GetAuthGameMode();
@@ -57,4 +69,12 @@ void ASecurityCamera::NotifyAllSecurity_Implementation(AThief* PingedActor)
 	{
 		Cast<AOfficer>(Officer)->ReceiveCameraPing(cameraNumber);
 	}
+
+	PlayAudio();
+}
+
+
+void ASecurityCamera::PlayAudio_Implementation() //this probably works but I can't test the sound from one computer
+{
+	pingAudioComponent->Play();
 }
