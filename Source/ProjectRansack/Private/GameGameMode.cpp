@@ -72,6 +72,14 @@ void AGameGameMode::Logout(AController* ExitPlayer)
 
 void AGameGameMode::SpawnPlayer(const ETeam& team, APlayerController* NewPlayer)
 {
+	ETeam pteam = ETeam::A;
+	static int a = 0;
+	if (a == 0)
+	{
+		pteam = ETeam::A;
+		a++;
+	}
+
 	APawn* pawn = NewPlayer->GetPawn();
 	if (pawn != nullptr)
 		pawn->K2_DestroyActor();
@@ -79,11 +87,11 @@ void AGameGameMode::SpawnPlayer(const ETeam& team, APlayerController* NewPlayer)
 	FTransform spawnTransform;
 	TSubclassOf<AActor> classToSpawn;
 
-	FindSpawn(NewPlayer, team, spawnTransform, classToSpawn);
+	FindSpawn(NewPlayer, pteam, spawnTransform, classToSpawn);
 
 	ABase3C* actor = Cast<ABase3C>(GetWorld()->SpawnActor(classToSpawn, &spawnTransform));
 
-	switch (team)
+	switch (pteam)
 	{
 	case ETeam::A: TeamA.Add(actor);
 		break;
@@ -94,9 +102,9 @@ void AGameGameMode::SpawnPlayer(const ETeam& team, APlayerController* NewPlayer)
 	}
 
 	if (PlayerTeams.Contains(NewPlayer))
-		PlayerTeams[NewPlayer] = team;
+		PlayerTeams[NewPlayer] = pteam;
 	else
-		PlayerTeams.Add(NewPlayer, team);
+		PlayerTeams.Add(NewPlayer, pteam);
 	
 
 	NewPlayer->Possess(actor);

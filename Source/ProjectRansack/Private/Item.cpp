@@ -38,6 +38,9 @@ void AItem::Tick(float DeltaTime)
         AThief* thief = Cast<AThief>(acteurUsingThis);
         AGamePlayerController* playerController = Cast<AGamePlayerController>(thief->GetController());
         UItemWidgetUI* widget = Cast<UItemWidgetUI>(playerController->GetWidget(this));
+        if (widget == nullptr)
+            return;
+
         widget->setProgressBarValue(HelperClass::mapValue(currentTime, 0, TimeToPickUp, 0, 1));
     }
 

@@ -712,6 +712,9 @@ void UEOSGameInstance::LoadSaveSettings()
 
 void UEOSGameInstance::SaveGame()
 {
+	if (ServerGameSlot.saveGame == nullptr)
+		return;
+
 	UGameplayStatics::SaveGameToSlot(ServerGameSlot.saveGame, ServerGameSlot.fileName, ServerGameSlot.slotIdx);
 	UploadPlayerData(ConvertSaveGameToUint());
 }

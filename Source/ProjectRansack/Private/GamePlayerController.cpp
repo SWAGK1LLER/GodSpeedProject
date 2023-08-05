@@ -15,6 +15,7 @@
 #include "Particles/ParticleSystemComponent.h"
 #include "GenericParticleSystemComponent.h"
 #include <Officer.h>
+#include "LightFuseBoxe.h"
 
 void AGamePlayerController::BeginPlay()
 {
@@ -233,6 +234,11 @@ UUserWidget* AGamePlayerController::GetWidget(AActor* pItem)
 		return nullptr;
 
 	return interactibleUI[pItem];
+}
+
+void AGamePlayerController::SRToggleLights_Implementation(ALightFuseBoxe* actor, bool pOpen)
+{
+	actor->ToggleLights(pOpen);
 }
 
 void AGamePlayerController::SRFreezeInput_Implementation(float duration, ABase3C* actor)

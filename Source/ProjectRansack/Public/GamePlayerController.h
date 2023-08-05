@@ -100,6 +100,9 @@ public:
 
 	UUserWidget* GetWidget(class AActor* pItem);
 
+	UFUNCTION(Server, Reliable, BlueprintCallable)
+	void SRToggleLights(ALightFuseBoxe* actor, bool pOpen);
+	void SRToggleLights_Implementation(ALightFuseBoxe* actor, bool pOpen);
 
 	UFUNCTION(Server, Reliable, BlueprintCallable)
 	void SRSpawnParticle(class UParticleSystem* particleEffect, const FTransform& position, const float& duration);
