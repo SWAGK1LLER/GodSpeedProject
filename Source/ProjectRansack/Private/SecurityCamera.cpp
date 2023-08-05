@@ -24,6 +24,9 @@ ASecurityCamera::ASecurityCamera()
 	pingAudioComponent = CreateDefaultSubobject<UAudioComponent>(TEXT("CameraPingAudio"));
 	pingAudioComponent->bAutoActivate = false;
 	pingAudioComponent->SetupAttachment(RootComponent);
+
+	cameraMesh = CreateDefaultSubobject<UStaticMeshComponent>(FName("CameraMesh"));
+	cameraMesh->SetupAttachment(spotLight);
 }
 
 // Called when the game starts or when spawned
@@ -32,11 +35,14 @@ void ASecurityCamera::BeginPlay()
 	Super::BeginPlay();
 
 	coneShape->OnComponentBeginOverlap.AddDynamic(this, &ASecurityCamera::OnTriggerOverlapBegin);
+	coneShape->OnComponentEndOverlap.AddDynamic(this, &ASecurityCamera::OnTriggerOverlapEnd);
 
-	if (pingAudioCue->IsValidLowLevelFast()) {
+	if (pingAudioCue->IsValidLowLevelFast()) 
+	{
 		pingAudioComponent->SetSound(pingAudioCue);
 	}
-	
+
+	CalculateBaseRotations();
 }
 
 // Called every frame
@@ -44,33 +50,48 @@ void ASecurityCamera::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
+	CheckUndetectedThieves();
+
+	CheckAndRotate();
 }
 
 void ASecurityCamera::OnTriggerOverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
-	GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("Seeing player!"));
-
 	if (Cast<AThief>(OtherActor))
 	{
-		NotifyAllSecurity(Cast<AThief>(OtherActor));
+		UndetectedThieves.Add(OtherActor);
 	}
 }
 
 void ASecurityCamera::OnTriggerOverlapEnd(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
 {
+	//GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("STOP SEARCHING!"));
+	if(UndetectedThieves.Find(OtherActor) != INDEX_NONE)
+		UndetectedThieves.Remove(OtherActor);
 }
 
-
-void ASecurityCamera::NotifyAllSecurity_Implementation(AThief* PingedActor)
+void ASecurityCamera::NotifyAllSecurity_Implementation(bool PingOrUnping)
 {
 	AGameGameMode* GameMode = (AGameGameMode*)GetWorld()->GetAuthGameMode();
 
 	for (AActor* Officer : GameMode->TeamB)
 	{
-		Cast<AOfficer>(Officer)->ReceiveCameraPing(cameraNumber);
+		if (PingOrUnping)
+		{
+			Cast<AOfficer>(Officer)->ReceiveCameraPing(cameraNumber);
+		}
+		else
+			Cast<AOfficer>(Officer)->ReceiveCameraUnPing();
 	}
 
-	PlayAudio();
+	if (PingOrUnping)
+	{
+		hasPinged = true;
+		PlayAudio();
+	}
+	else
+		hasPinged = false;
+		
 }
 
 
@@ -78,3 +99,68 @@ void ASecurityCamera::PlayAudio_Implementation() //this probably works but I can
 {
 	pingAudioComponent->Play();
 }
+
+
+void ASecurityCamera::CalculateBaseRotations()
+{
+	referenceForwardVector = GetActorForwardVector();
+}
+
+void ASecurityCamera::CheckAndRotate()
+{
+	if (rotationDirection == 0) //Right
+	{
+		FRotator newRotation = GetActorForwardVector().RotateAngleAxis(0.3f, GetActorUpVector()).Rotation();
+		SetActorRotation(newRotation);
+		float Angle = -acos(FVector::DotProduct(referenceForwardVector, GetActorForwardVector())) * 180/PI;
+
+		if (Angle < -rotateAmount)
+		{
+			rotationDirection = 1;
+		}
+	}
+	else if (rotationDirection == 1) //left
+	{
+		FRotator newRotation = GetActorForwardVector().RotateAngleAxis(-0.3f, GetActorUpVector()).Rotation();
+		SetActorRotation(newRotation);
+		float Angle = acos(FVector::DotProduct(referenceForwardVector, GetActorForwardVector())) * 180 / PI;
+
+		if (Angle > rotateAmount)
+		{
+			rotationDirection = 0;
+		}
+	}
+
+
+}
+
+void ASecurityCamera::CheckUndetectedThieves()
+{
+	bool hasDetected = false;
+	FHitResult Hit(ForceInit);
+	FVector Start = GetActorLocation();
+	FVector End;
+	FCollisionQueryParams CollisionParams;
+
+	CollisionParams.AddIgnoredActor(this);
+
+	for (AActor* Thief : UndetectedThieves)
+	{
+		//GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("SEARCHING!"));
+		End = Thief->GetActorLocation();
+		GetWorld()->LineTraceSingleByChannel(Hit, Start, End, ECC_WorldDynamic, CollisionParams);
+
+		if (Hit.GetActor() == Thief)
+		{
+			//GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("Found!"));
+			NotifyAllSecurity(true);
+			hasDetected = true;
+		}
+	}
+	if (!hasDetected)
+	{
+		if(hasPinged)
+			NotifyAllSecurity(false);
+	}
+}
+
