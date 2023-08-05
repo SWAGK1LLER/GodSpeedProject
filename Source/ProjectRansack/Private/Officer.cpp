@@ -289,6 +289,7 @@ void AOfficer::ArrestThief_Implementation(ABase3C* other)
 		gameMode->ArrestThief(other);
 }
 
+
 void AOfficer::SetupNotificationUI()
 {
 	if (notificationUI != nullptr)
@@ -300,6 +301,12 @@ void AOfficer::SetupNotificationUI()
 
 void AOfficer::ReceiveCameraPing_Implementation(int CameraNumb)
 {
-	GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("CAMERA PINGED!"));
+	//GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("CAMERA PINGED!"));
 	notificationUI->PingOfficer(CameraNumb);
+}
+
+
+void AOfficer::ReceiveCameraUnPing_Implementation()
+{
+	notificationUI->Reset();
 }
