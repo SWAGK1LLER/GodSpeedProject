@@ -12,6 +12,7 @@
 #include "GameFramework/PlayerState.h"
 #include "GamePlayerController.h"
 #include "Particles/ParticleSystemComponent.h"
+#include "SecurityCamera.h"
 
 void AGameGameMode::BeginPlay()
 {
@@ -208,6 +209,11 @@ void AGameGameMode::RemoveToScore(int pValue, int& pScore)
 void AGameGameMode::FreezeInput(float duration, ABase3C* actor)
 {
 	actor->ClientFreezeInput(duration);
+}
+
+void AGameGameMode::FreezeCamera(AActor* actor)
+{
+	Cast<ASecurityCamera>(actor)->Ser_FreezeCamera();
 }
 
 void AGameGameMode::ArrestThief(ABase3C* other)

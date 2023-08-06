@@ -9,6 +9,7 @@
 #include "Kismet/KismetMathLibrary.h"
 #include "Particles/ParticleSystemComponent.h"
 #include "GenericParticleSystemComponent.h"
+#include "SecurityCamera.h"
 
 UStunWeapon::UStunWeapon(const FObjectInitializer& ObjectInitializer) : UWeapon(ObjectInitializer)
 {
@@ -56,7 +57,9 @@ void UStunWeapon::Fire()
     if (actor == nullptr)
         return;
 
-    bool hitableEnemy = actor->IsA(EnemyHittable);
+    GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("Working fire"));
+
+    bool hitableEnemy = CheckHittableActor(actor);
 
     FTransform position = FTransform(hitLocation);
 
@@ -71,7 +74,9 @@ void UStunWeapon::Fire()
     if (!hitableEnemy)
         return;
 
-    playerController->SRFreezeInput(StunDuration, Cast<ABase3C>(actor));
+
+    HitEntity(playerController, actor);
+
 
     GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("Actor hitted!"));
 }
@@ -94,11 +99,31 @@ AActor* UStunWeapon::HitScan(FVector& hitLocation)
         OUT Hit,
         begin,
         LineTraceEnd,
-        FCollisionObjectQueryParams(ECollisionChannel::ECC_WorldStatic),
+        FCollisionObjectQueryParams(ECC_WorldDynamic),
         TraceParams
     );
 
     hitLocation = Hit.Location;
 
     return Hit.GetActor();
+}
+
+bool UStunWeapon::CheckHittableActor(AActor* pActorToCheck)
+{
+    for (TSubclassOf<AActor> Class : EnemyHittable)
+    {
+        if (pActorToCheck->IsA(Class))
+            return true;
+    }
+    return false;
+}
+
+void UStunWeapon::HitEntity(AGamePlayerController* PlayerController, AActor* pActorToHit)
+{
+    if (Cast<ABase3C>(pActorToHit))
+        PlayerController->SRFreezeInput(StunDuration, Cast<ABase3C>(pActorToHit));
+    else if(Cast<ASecurityCamera>(pActorToHit))
+    {
+        PlayerController->CameraFreezeInput(pActorToHit);
+    }
 }

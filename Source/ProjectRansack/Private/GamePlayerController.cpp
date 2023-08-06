@@ -243,6 +243,14 @@ void AGamePlayerController::SRFreezeInput_Implementation(float duration, ABase3C
 		gameMode->FreezeInput(duration, actor);
 }
 
+void AGamePlayerController::CameraFreezeInput_Implementation(AActor* actor)
+{
+	AGameGameMode* gameMode = Cast<AGameGameMode>(UGameplayStatics::GetGameMode(GetWorld()));
+
+	if (gameMode != nullptr)
+		gameMode->FreezeCamera(actor);
+}
+
 void AGamePlayerController::SRSpawnParticle_Implementation(UParticleSystem* particleEffect, const FTransform& position, const float& duration)
 {
 	AGameGameMode* gameMode = Cast<AGameGameMode>(UGameplayStatics::GetGameMode(GetWorld()));

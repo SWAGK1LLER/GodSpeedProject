@@ -95,6 +95,10 @@ public:
 	void SRFreezeInput(float duration, ABase3C* actor);
 	void SRFreezeInput_Implementation(float duration, ABase3C* actor);
 
+	UFUNCTION(Server, Reliable, BlueprintCallable)
+		void CameraFreezeInput(AActor* actor);
+	void CameraFreezeInput_Implementation(AActor* actor);
+
 	UUserWidget* AddInteractibleWidgetUI(class AActor* pItem, TSubclassOf<UUserWidget> pWidget);
 	void RemoveInteractibleWidgetUI(class AActor* pItem);
 

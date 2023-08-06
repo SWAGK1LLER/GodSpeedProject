@@ -18,8 +18,8 @@ class PROJECTRANSACK_API UStunWeapon : public UWeapon
 	GENERATED_BODY()
 
 public:
-	UPROPERTY(EditDefaultsOnly, Category = "Setup")
-	TSubclassOf<ABase3C> EnemyHittable;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Setup")
+	TArray<TSubclassOf<AActor>> EnemyHittable;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Setup")
 	UParticleSystem* particleEffect = nullptr;
@@ -39,4 +39,8 @@ public:
 	virtual void Fire() override;
 
 	AActor* HitScan(FVector& hitLocation);
+
+	bool CheckHittableActor(AActor* pActorToCheck);
+
+	void HitEntity(class AGamePlayerController* PlayerController, AActor* pActorToHit);
 };

@@ -12,16 +12,6 @@ class PROJECTRANSACK_API ASecurityCamera : public AActor
 	GENERATED_BODY()
 
 public:
-	// Sets default values for this pawn's properties
-	ASecurityCamera();
-
-protected:
-	// Called when the game starts or when spawned
-	virtual void BeginPlay() override;
-
-public:	
-	// Called every frame
-	virtual void Tick(float DeltaTime) override;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = SecurityCamera, meta = (AllowPrivateAccess = "true"))
 		class UStaticMeshComponent* coneShape;
@@ -38,10 +28,10 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = SecurityCamera, meta = (AllowPrivateAccess = "true"))
 		class UAudioComponent* pingAudioComponent;
 
-	UPROPERTY(editAnywhere, BlueprintReadWrite, Category = SensorGadget, meta = (AllowPrivateAccess = "true"))
+	UPROPERTY(editAnywhere, BlueprintReadWrite, Category = Mesh, meta = (AllowPrivateAccess = "true"))
 		class UStaticMeshComponent* cameraMesh = nullptr;
 
-	UPROPERTY(editAnywhere, BlueprintReadWrite, Category = SensorGadget, meta = (AllowPrivateAccess = "true"))
+	UPROPERTY(editAnywhere, BlueprintReadWrite, Category = Rotation, meta = (AllowPrivateAccess = "true"))
 		float rotateAmount = 30; //Amount to rotate in degrees
 
 	int rotationDirection = 0; //0 Right 1 Left
@@ -51,6 +41,24 @@ public:
 	TArray<AActor*> UndetectedThieves;
 
 	bool hasPinged = false;
+
+	
+	bool frozen;
+
+	UPROPERTY(editAnywhere, BlueprintReadWrite, Category = Stun, meta = (AllowPrivateAccess = "true"))
+	float timeToUnfreeze = 3.0f;
+
+	float currentTimetoUnfreeze = 0;
+
+	// Sets default values for this pawn's properties
+	ASecurityCamera();
+
+	// Called when the game starts or when spawned
+	virtual void BeginPlay() override;
+
+
+	// Called every frame
+	virtual void Tick(float DeltaTime) override;
 
 	UFUNCTION()
 		void OnTriggerOverlapBegin(class UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, class UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
@@ -71,4 +79,18 @@ public:
 	void CheckAndRotate();
 
 	void CheckUndetectedThieves();
+
+	UFUNCTION(Server, Reliable)
+		void Ser_FreezeCamera();
+
+	UFUNCTION(NetMulticast, Reliable)
+		void Mul_FreezeCamera();
+
+	UFUNCTION(Server, Reliable)
+		void Ser_UnFreezeCamera();
+
+	UFUNCTION(NetMulticast, Reliable)
+		void Mul_UnFreezeCamera();
+
+	void CheckUnfreeze(float Deltatime);
 };
