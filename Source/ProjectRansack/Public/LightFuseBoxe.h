@@ -39,6 +39,7 @@ public:
 	bool currentlyInteracting = false;
 
 	bool FuseStateOpen = true;
+	bool FuseBoxHacked = false;
 
 	ALightFuseBoxe();
 
@@ -55,6 +56,10 @@ public:
 
 	virtual void Interact_Implementation(class AActor* pActor) override;
 	virtual void StopInteract_Implementation(class AActor* pActor) override;
+
+	UFUNCTION(NetMulticast, Reliable, BlueprintCallable)
+	void HackLights();
+	void HackLights_Implementation();
 
 	UFUNCTION(NetMulticast, Reliable, BlueprintCallable)
 	void ToggleLights(bool pOpen);

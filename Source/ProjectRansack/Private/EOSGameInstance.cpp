@@ -35,12 +35,42 @@ void UEOSGameInstance::Init()
 }
 
 //Login
+void UEOSGameInstance::Logout()
+{
+	if (!bIsLogin)
+		return;
+
+	if (!OnlineSubsystem)
+		return;
+
+	IOnlineIdentityPtr Identity = OnlineSubsystem->GetIdentityInterface();
+	if (!Identity)
+		return;
+
+	Identity->OnLogoutCompleteDelegates->AddUObject(this, &UEOSGameInstance::logoutCompleted);
+	Identity->Logout(0);
+}
+
+void UEOSGameInstance::logoutCompleted(int32 LocalUserNum, bool bWasSuccessful)
+{
+	if (!OnlineSubsystem)
+		return;
+
+	IOnlineIdentityPtr Identity = OnlineSubsystem->GetIdentityInterface();
+	if (!Identity)
+		return;
+
+	Identity->ClearOnLogoutCompleteDelegates(0, this);
+	bIsLogin = false;
+	LogoutSuccessful();
+}
+
 void UEOSGameInstance::Login()
 {
 	if (bIsLogin)
 	{
 		LoginSuccessful();
-		CreateParty();
+		//CreateParty();
 		return;
 	}
 
@@ -87,6 +117,14 @@ void UEOSGameInstance::OnLoginCompleteTry(int32 LocalUserNum, bool bWasSuccessfu
 {
 	bIsLogin = bWasSuccessful;
 
+	if (!bIsLogin)
+	{
+		if (Error.Equals(TEXT("Already logged in"), ESearchCase::IgnoreCase))
+		{
+			bIsLogin = true;
+		}
+	}
+
 	if (!OnlineSubsystem)
 		return;
 
@@ -124,7 +162,10 @@ void UEOSGameInstance::OnLoginCompleteEOS(int32 LocalUserNum, bool bWasSuccessfu
 		//CreateParty();
 	}
 	else
+	{
+		UE_LOG(LogTemp, Warning, TEXT("error %s"), *Error);
 		LoginFail();
+	}
 }
 //--------
 //Party creation

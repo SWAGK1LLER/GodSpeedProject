@@ -53,6 +53,8 @@ void ALightFuseBoxe::Tick(float DeltaTime)
             currentlyInteracting = false;
             currentTime = 0;
 
+            //HackLights();
+
             AGamePlayerController* playerController = Cast<AGamePlayerController>(player->GetController());
             playerController->SRToggleLights(this, false);
 
@@ -99,6 +101,12 @@ void ALightFuseBoxe::OnTriggerOverlapEnd(UPrimitiveComponent* OverlappedComp, AA
 
 void ALightFuseBoxe::Interact_Implementation(AActor* pActor)
 {
+    /*AThief* thief = Cast<AThief>(pActor);
+    if (thief != nullptr && FuseBoxHacked)
+    {
+        ToggleLights(!FuseStateOpen);
+    }*/
+
     if (!FuseStateOpen)
         return;
 
@@ -129,6 +137,11 @@ void ALightFuseBoxe::StopInteract_Implementation(AActor* pActor)
         return;
 
     widget->ActivateDefaultText();
+}
+
+void ALightFuseBoxe::HackLights_Implementation()
+{
+    FuseBoxHacked = true;
 }
 
 void ALightFuseBoxe::ToggleLights_Implementation(bool pOpen)

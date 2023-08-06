@@ -44,6 +44,11 @@ public:
 
 	//Login
 	UFUNCTION(BlueprintCallable)
+	void Logout();
+	void logoutCompleted(int32 LocalUserNum, bool bWasSuccessful);
+	UFUNCTION(BlueprintImplementableEvent)
+	void LogoutSuccessful();
+	UFUNCTION(BlueprintCallable)
 	void Login();
 	void TryLogin();
 	void EOSLogin();
