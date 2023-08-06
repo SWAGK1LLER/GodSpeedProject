@@ -91,6 +91,8 @@ public:
 
 	void FreezeInput(float duration, ABase3C* actor);
 
+	void FreezeCamera(AActor* actor);
+
 	UFUNCTION(BlueprintCallable)
 	void ArrestThief(ABase3C* other);
 
