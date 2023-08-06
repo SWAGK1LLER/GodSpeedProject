@@ -39,6 +39,7 @@ ASecurityCamera::ASecurityCamera()
 void ASecurityCamera::BeginPlay()
 {
 	Super::BeginPlay();
+	CheckDataTable();
 
 	coneShape->OnComponentBeginOverlap.AddDynamic(this, &ASecurityCamera::OnTriggerOverlapBegin);
 	coneShape->OnComponentEndOverlap.AddDynamic(this, &ASecurityCamera::OnTriggerOverlapEnd);
@@ -63,6 +64,15 @@ void ASecurityCamera::Tick(float DeltaTime)
 	if (frozen)
 	{
 		CheckUnfreeze(DeltaTime);
+	}
+}
+
+
+void ASecurityCamera::CheckDataTable()
+{
+	if (dataTable)
+	{
+		tableInstance = dataTable->FindRow<FSecurityCameraDataTable>(FName(TEXT("SecurityCamera")), "");
 	}
 }
 
@@ -125,22 +135,22 @@ void ASecurityCamera::CheckAndRotate()
 
 	if (rotationDirection == 0) //Right
 	{
-		FRotator newRotation = GetActorForwardVector().RotateAngleAxis(0.3f, GetActorUpVector()).Rotation();
+		FRotator newRotation = GetActorForwardVector().RotateAngleAxis(tableInstance->rotationSpeed, GetActorUpVector()).Rotation();
 		SetActorRotation(newRotation);
 		float Angle = -acos(FVector::DotProduct(referenceForwardVector, GetActorForwardVector())) * 180/PI;
 
-		if (Angle < -rotateAmount)
+		if (Angle < -tableInstance->rotateAmount)
 		{
 			rotationDirection = 1;
 		}
 	}
 	else if (rotationDirection == 1) //left
 	{
-		FRotator newRotation = GetActorForwardVector().RotateAngleAxis(-0.3f, GetActorUpVector()).Rotation();
+		FRotator newRotation = GetActorForwardVector().RotateAngleAxis(-tableInstance->rotationSpeed, GetActorUpVector()).Rotation();
 		SetActorRotation(newRotation);
 		float Angle = acos(FVector::DotProduct(referenceForwardVector, GetActorForwardVector())) * 180 / PI;
 
-		if (Angle > rotateAmount)
+		if (Angle > tableInstance->rotateAmount)
 		{
 			rotationDirection = 0;
 		}
