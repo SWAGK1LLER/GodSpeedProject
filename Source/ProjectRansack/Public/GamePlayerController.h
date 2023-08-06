@@ -119,6 +119,14 @@ public:
 	void SRHackLights_Implementation(ALightFuseBoxe* actor);
 
 	UFUNCTION(Server, Reliable, BlueprintCallable)
+	void SRToggleDoor(ADoor* actor, bool pOpen);
+	void SRToggleDoor_Implementation(ADoor* actor, bool pOpen);
+
+	UFUNCTION(Server, Reliable, BlueprintCallable)
+	void SRHackDoor(ADoor* actor);
+	void SRHackDoor_Implementation(ADoor* actor);
+
+	UFUNCTION(Server, Reliable, BlueprintCallable)
 	void SRSpawnParticle(class UParticleSystem* particleEffect, const FTransform& position, const float& duration);
 	void SRSpawnParticle_Implementation(class UParticleSystem* particleEffect, const FTransform& position, const float& duration);
 

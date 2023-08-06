@@ -16,6 +16,7 @@
 #include "GenericParticleSystemComponent.h"
 #include <Officer.h>
 #include "LightFuseBoxe.h"
+#include <Door.h>
 
 void AGamePlayerController::BeginPlay()
 {
@@ -254,6 +255,16 @@ void AGamePlayerController::SRHackLights_Implementation(ALightFuseBoxe* actor)
 void AGamePlayerController::SRToggleLights_Implementation(ALightFuseBoxe* actor, bool pOpen)
 {
 	actor->ToggleLights(pOpen);
+}
+
+void AGamePlayerController::SRHackDoor_Implementation(ADoor* actor)
+{
+	actor->HackDoor();
+}
+
+void AGamePlayerController::SRToggleDoor_Implementation(ADoor* actor, bool pOpen)
+{
+	actor->ToggleDoor(pOpen);
 }
 
 void AGamePlayerController::SRFreezeInput_Implementation(float duration, ABase3C* actor)
