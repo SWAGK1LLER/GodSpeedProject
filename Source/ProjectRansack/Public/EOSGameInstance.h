@@ -162,6 +162,9 @@ public:
 	int numberSlotneeded = 1;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	bool isLoadingSaveGame = false;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	ETeam team = ETeam::A;
 
 

@@ -762,6 +762,7 @@ void UEOSGameInstance::SaveGame()
 
 void UEOSGameInstance::LoadSaveGame()
 {
+	isLoadingSaveGame = true;
 	GetPlayerData();
 }
 
@@ -820,17 +821,24 @@ void UEOSGameInstance::GetPlayerData()
 {
 	IOnlineIdentityPtr identityPointerRef = OnlineSubsystem->GetIdentityInterface();
 	if (!identityPointerRef)
+	{
+		isLoadingSaveGame = false;
 		return;
+	}
 
 	IOnlineUserCloudPtr cloundPointerRef = OnlineSubsystem->GetUserCloudInterface();
 	if (!cloundPointerRef)
+	{
+		isLoadingSaveGame = false;
 		return;
+	}
 
 	TSharedPtr<const FUniqueNetId> userIdRef = identityPointerRef->GetUniquePlayerId(0);
 	if (!userIdRef.IsValid())
 	{
 		//In editor
 		ServerGameSlot.saveGame = (UPlayerSaveGame*)(UGameplayStatics::CreateSaveGameObject(UPlayerSaveGame::StaticClass()));
+		isLoadingSaveGame = false;
 		return;
 	}
 
@@ -846,6 +854,7 @@ void UEOSGameInstance::OnGetPlayerDataCompleted(bool bWasSuccessful, const FUniq
 	}
 	else
 	{
+		isLoadingSaveGame = false;
 		//New account, no file on server
 		ServerGameSlot.saveGame = (UPlayerSaveGame*)(UGameplayStatics::CreateSaveGameObject(UPlayerSaveGame::StaticClass()));
 		SaveGame();
@@ -857,16 +866,30 @@ void UEOSGameInstance::ReadPlayerData(const FString& FileName)
 {
 	IOnlineIdentityPtr identityPointerRef = OnlineSubsystem->GetIdentityInterface();
 	if (!identityPointerRef)
+	{
+		isLoadingSaveGame = false;
 		return;
+	}
 
 	IOnlineUserCloudPtr cloundPointerRef = OnlineSubsystem->GetUserCloudInterface();
 	if (!cloundPointerRef)
+	{
+		isLoadingSaveGame = false;
 		return;
+	}
 
 	TSharedPtr<const FUniqueNetId> userIdRef = identityPointerRef->GetUniquePlayerId(0);
+	if (!userIdRef.IsValid())
+	{
+		isLoadingSaveGame = false;
+		return;
+	}
+
 
 	TArray<uint8> data;
 	cloundPointerRef->GetFileContents(*userIdRef, FileName, data);
+
+	isLoadingSaveGame = false;
 
 	ServerGameSlot.saveGame = Cast<UPlayerSaveGame>(ConvertUintToSaveGame(data));
 
