@@ -313,12 +313,9 @@ void AGamePlayerController::ClientFinishArrest_Implementation(float respawnDurat
 	UpdateDuffleBagUI(thief->inventory->items);
 	UpdateTeamDuffleBagUI();
 
-	if (RespawnUI == nullptr)
-	{
-		respawnCurrentTime = respawnDuration;
-		RespawnUI = CreateWidget<URespawnUI>(GetWorld(), RespawnWidgetClass);
-		RespawnUI->AddToViewport();
-	}
+	respawnCurrentTime = respawnDuration;
+	RespawnUI = CreateWidget<URespawnUI>(GetWorld(), RespawnWidgetClass);
+	RespawnUI->AddToViewport();
 }
 
 void AGamePlayerController::RestartRound_Implementation()

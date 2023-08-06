@@ -52,7 +52,7 @@ void AThief::MulReset_Implementation()
 
 	FTimerHandle Handle;
 	GetWorld()->GetTimerManager().SetTimer(Handle, FTimerDelegate::CreateLambda([&] {
-		Super::MulReset_Implementation();
+		ABase3C::MulReset_Implementation();
 		HelperClass::activateActor(this);
 	}), respawnTime, false);
 }

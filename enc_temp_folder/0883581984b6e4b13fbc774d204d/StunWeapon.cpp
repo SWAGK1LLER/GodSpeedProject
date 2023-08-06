@@ -57,6 +57,8 @@ void UStunWeapon::Fire()
     if (actor == nullptr)
         return;
 
+    GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("Working fire"));
+
     bool hitableEnemy = CheckHittableActor(actor);
 
     FTransform position = FTransform(hitLocation);
@@ -97,7 +99,7 @@ AActor* UStunWeapon::HitScan(FVector& hitLocation)
         OUT Hit,
         begin,
         LineTraceEnd,
-        FCollisionObjectQueryParams(ECC_WorldDynamic | ECC_WorldStatic),
+        FCollisionObjectQueryParams(ECC_WorldDynamic),
         TraceParams
     );
 

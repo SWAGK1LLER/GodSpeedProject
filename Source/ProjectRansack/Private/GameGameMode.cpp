@@ -14,7 +14,7 @@
 #include "Particles/ParticleSystemComponent.h"
 #include "SecurityCamera.h"
 
-#define FORCE_SPAWN_BOTH_SIDE 0
+#define FORCE_SPAWN_BOTH_SIDE 1
 
 void AGameGameMode::BeginPlay()
 {
@@ -88,7 +88,12 @@ void AGameGameMode::SpawnPlayer(ETeam team, APlayerController* NewPlayer)
 
 	APawn* pawn = NewPlayer->GetPawn();
 	if (pawn != nullptr)
+	{
+		if (TeamA.Contains(pawn))
+			TeamA.Remove(Cast<ABase3C>(pawn));
+
 		pawn->K2_DestroyActor();
+	}
 
 	FTransform spawnTransform;
 	TSubclassOf<AActor> classToSpawn;

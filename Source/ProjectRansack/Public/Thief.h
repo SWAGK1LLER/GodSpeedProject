@@ -25,6 +25,9 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	int costOnArrest = 400;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	int respawnTime = 10;
+
 	TArray<IThiefInteractibleActor*> closeItems;
 	IThiefInteractibleActor* ItemUsing = nullptr;
 
@@ -38,7 +41,7 @@ public:
 	virtual void BeginPlay() override;
 	virtual void Tick(float DeltaTime) override;
 	virtual void MulReset_Implementation() override;
-	
+
 	UFUNCTION(Server, Reliable, BlueprintCallable)
 	void SRAddItem(class AItem* pItem);
 	void SRAddItem_Implementation(class AItem* pItem);

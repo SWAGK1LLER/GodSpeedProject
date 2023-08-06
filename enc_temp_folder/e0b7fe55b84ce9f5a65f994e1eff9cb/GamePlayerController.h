@@ -27,7 +27,7 @@ public:
 	TSubclassOf<class UTeamDuffleBagUI> TeamDuffleBagUIClass;
 	class UTeamDuffleBagUI* TeamDuffleBagUIWidget = nullptr;
 
-	UPROPERTY(EditAnywhere, Category = "widget")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	TSubclassOf<URespawnUI> RespawnWidgetClass;
 	URespawnUI* RespawnUI;
 	float respawnCurrentTime = 0;
