@@ -63,7 +63,7 @@ public:
 
 	virtual void Logout(class AController* ExitPlayer) override;
 
-	void SpawnPlayer(const ETeam& team, class APlayerController* NewPlayer);
+	void SpawnPlayer(ETeam team, class APlayerController* NewPlayer);
 
 	void FindSpawn(class APlayerController* NewPlayer, const ETeam& team, FTransform& Location, TSubclassOf<AActor>& ActorClass);
 

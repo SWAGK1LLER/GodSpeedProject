@@ -14,6 +14,8 @@
 #include "Particles/ParticleSystemComponent.h"
 #include "SecurityCamera.h"
 
+#define FORCE_SPAWN_BOTH_SIDE 0
+
 void AGameGameMode::BeginPlay()
 {
 	Super::BeginPlay();
@@ -71,14 +73,17 @@ void AGameGameMode::Logout(AController* ExitPlayer)
 	instance->unregisterPlayerToGameSession(playerController);
 }
 
-void AGameGameMode::SpawnPlayer(const ETeam& team, APlayerController* NewPlayer)
+void AGameGameMode::SpawnPlayer(ETeam team, APlayerController* NewPlayer)
 {
-	ETeam pteam = ETeam::A;
-	static int a = 0;
-	if (a == 0)
+	if (FORCE_SPAWN_BOTH_SIDE)
 	{
-		pteam = ETeam::A;
-		a++;
+		team = ETeam::A;
+		static int a = 0;
+		if (a == 0)
+		{
+			team = ETeam::B;
+			a++;
+		}
 	}
 
 	APawn* pawn = NewPlayer->GetPawn();
@@ -88,11 +93,11 @@ void AGameGameMode::SpawnPlayer(const ETeam& team, APlayerController* NewPlayer)
 	FTransform spawnTransform;
 	TSubclassOf<AActor> classToSpawn;
 
-	FindSpawn(NewPlayer, pteam, spawnTransform, classToSpawn);
+	FindSpawn(NewPlayer, team, spawnTransform, classToSpawn);
 
 	ABase3C* actor = Cast<ABase3C>(GetWorld()->SpawnActor(classToSpawn, &spawnTransform));
 
-	switch (pteam)
+	switch (team)
 	{
 	case ETeam::A: TeamA.Add(actor);
 		break;
@@ -103,9 +108,9 @@ void AGameGameMode::SpawnPlayer(const ETeam& team, APlayerController* NewPlayer)
 	}
 
 	if (PlayerTeams.Contains(NewPlayer))
-		PlayerTeams[NewPlayer] = pteam;
+		PlayerTeams[NewPlayer] = team;
 	else
-		PlayerTeams.Add(NewPlayer, pteam);
+		PlayerTeams.Add(NewPlayer, team);
 	
 
 	NewPlayer->Possess(actor);

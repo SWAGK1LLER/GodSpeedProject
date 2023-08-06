@@ -38,7 +38,6 @@ public:
 	float currentTime = 0;
 	bool currentlyInteracting = false;
 
-	//UPROPERTY(replicated)
 	bool FuseStateOpen = true;
 
 	ALightFuseBoxe();

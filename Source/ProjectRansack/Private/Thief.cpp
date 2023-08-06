@@ -3,6 +3,7 @@
 
 #include "Thief.h"
 #include "Item.h"
+#include "HighTierItem.h"
 #include <GamePlayerController.h>
 #include <Kismet/GameplayStatics.h>
 #include <GameGameMode.h>
@@ -88,10 +89,13 @@ void AThief::MUlAddItem_Implementation(AItem* pItem)
 		PC->UpdateDuffleBagUI(inventory->items);
 		PC->UpdateTeamDuffleBagUI();
 
-		//if (pItem->IsA(A))
+		if (pItem->IsA(AHighTierItem::StaticClass()))
 		{
 			UEOSGameInstance* instance = Cast<UEOSGameInstance>(UGameplayStatics::GetGameInstance(GetWorld()));
 			if (instance == nullptr)
+				return;
+
+			if (instance->GetPlayerSaveGame() == nullptr)
 				return;
 
 			instance->GetPlayerSaveGame()->totalHightLoot++;
@@ -126,6 +130,9 @@ void AThief::MUlClearItems_Implementation(int score)
 
 		UEOSGameInstance* instance = Cast<UEOSGameInstance>(UGameplayStatics::GetGameInstance(GetWorld()));
 		if (instance == nullptr)
+			return;
+
+		if (instance->GetPlayerSaveGame() == nullptr)
 			return;
 
 		instance->GetPlayerSaveGame()->totalCash += score;
