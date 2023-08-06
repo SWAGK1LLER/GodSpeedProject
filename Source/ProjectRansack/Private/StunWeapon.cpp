@@ -97,7 +97,7 @@ AActor* UStunWeapon::HitScan(FVector& hitLocation)
         OUT Hit,
         begin,
         LineTraceEnd,
-        FCollisionObjectQueryParams(ECC_WorldDynamic | ECC_WorldStatic),
+        FCollisionObjectQueryParams(ECollisionChannel::ECC_WorldStatic),
         TraceParams
     );
 
