@@ -3,8 +3,20 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "Engine/DataTable.h"
 #include "GameFramework/Actor.h"
 #include "SecurityCamera.generated.h"
+
+USTRUCT(BlueprintType)
+struct FSecurityCameraDataTable : public FTableRowBase
+{
+	GENERATED_BODY()
+	UPROPERTY(editAnywhere, BlueprintReadWrite, Category = Rotation, meta = (AllowPrivateAccess = "true"))
+		float rotateAmount = 30; //Amount to rotate in degrees
+
+	UPROPERTY(editAnywhere, BlueprintReadWrite, Category = Rotation, meta = (AllowPrivateAccess = "true"))
+		float rotationSpeed = 0.3f;
+};
 
 UCLASS()
 class PROJECTRANSACK_API ASecurityCamera : public AActor
@@ -31,8 +43,10 @@ public:
 	UPROPERTY(editAnywhere, BlueprintReadWrite, Category = Mesh, meta = (AllowPrivateAccess = "true"))
 		class UStaticMeshComponent* cameraMesh = nullptr;
 
-	UPROPERTY(editAnywhere, BlueprintReadWrite, Category = Rotation, meta = (AllowPrivateAccess = "true"))
-		float rotateAmount = 30; //Amount to rotate in degrees
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Data, meta = (AllowPrivateAccess = "true"))
+	class UDataTable* dataTable = nullptr;
+
+	FSecurityCameraDataTable* tableInstance = nullptr;
 
 	int rotationDirection = 0; //0 Right 1 Left
 
@@ -59,6 +73,8 @@ public:
 
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
+
+	void CheckDataTable();
 
 	UFUNCTION()
 		void OnTriggerOverlapBegin(class UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, class UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);

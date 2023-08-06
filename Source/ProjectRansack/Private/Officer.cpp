@@ -60,7 +60,7 @@ void AOfficer::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 
 void AOfficer::SendDataToComponents()
 {
-	sensorGadgetOfficer->fetchData(officerTableInstance->Range, officerTableInstance->RevealTime, officerTableInstance->MaxAngle, officerTableInstance->MaxAmountOfSensors);
+	sensorGadgetOfficer->fetchData(officerTableInstance->Range, officerTableInstance->RevealTime, officerTableInstance->MaxAmountOfSensors);
 }
 
 void AOfficer::Tick(float DeltaTime)

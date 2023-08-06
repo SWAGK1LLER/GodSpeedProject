@@ -48,8 +48,6 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = SensorGadget, meta = (AllowPrivateAccess = "true"))
 		float RevealTime;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = SensorGadget, meta = (AllowPrivateAccess = "true"))
-		float MaxAngle;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = SensorGadget, meta = (AllowPrivateAccess = "true"))
 		int MaxAmountOfSensors;
 };
 

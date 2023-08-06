@@ -24,11 +24,10 @@ USensorGadgetOfficerComponent::USensorGadgetOfficerComponent()
 	sensorGadgetOfficerMesh2->SetCollisionResponseToChannel(ECollisionChannel::ECC_WorldStatic, ECollisionResponse::ECR_Overlap);
 }
 
-void USensorGadgetOfficerComponent::fetchData(float pRange, float pRevealTime, float pMaxAngle, unsigned int pMaxSensors)
+void USensorGadgetOfficerComponent::fetchData(float pRange, float pRevealTime, unsigned int pMaxSensors)
 {
 	range = pRange;
 	revealTime = pRevealTime;
-	maxAngle = pMaxAngle;
 	maxSensors = pMaxSensors;
 }
 
