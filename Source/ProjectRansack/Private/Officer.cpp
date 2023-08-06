@@ -235,7 +235,9 @@ void AOfficer::StartFire()
 
 void AOfficer::Interact()
 {
-	Super::Interact();
+	if (bFreezeInput)
+		return;
+
 	if (closeThief.Num() != 0)
 	{
 		startArrest = true;

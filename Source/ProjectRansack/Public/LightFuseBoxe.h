@@ -5,11 +5,13 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
 #include "ThiefInteractibleActor.h"
-#include "ItemWidgetUI.h"
+#include "OfficerInteractibleActor.h"
+#include <LightFuseBoxUI.h>
 #include "LightFuseBoxe.generated.h"
 
+
 UCLASS()
-class PROJECTRANSACK_API ALightFuseBoxe : public AActor, public IThiefInteractibleActor
+class PROJECTRANSACK_API ALightFuseBoxe : public AActor, public IThiefInteractibleActor, public IOfficerInteractibleActor
 {
 	GENERATED_BODY()
 	
@@ -21,8 +23,8 @@ public:
 	class UShapeComponent* Trigger = nullptr;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	TSubclassOf<UItemWidgetUI> WidgetClass;
-	UItemWidgetUI* Widget = nullptr;
+	TSubclassOf<ULightFuseBoxUI> WidgetClass;
+	ULightFuseBoxUI* Widget = nullptr;
 
 	class AActor* acteurUsingThis = nullptr;
 
@@ -33,7 +35,7 @@ public:
 	float TimeToInteract = 5;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	float LightOffDuration = 2;
+	float HackDuration = 2;
 
 	float currentTime = 0;
 	bool currentlyInteracting = false;
@@ -64,4 +66,10 @@ public:
 	UFUNCTION(NetMulticast, Reliable, BlueprintCallable)
 	void ToggleLights(bool pOpen);
 	void ToggleLights_Implementation(bool pOpen);
+
+	void UpdateProgressHack(float DeltaTime);
+
+	UFUNCTION(NetMulticast, Reliable, BlueprintCallable)
+	void UpdateUIText();
+	void UpdateUIText_Implementation();
 };

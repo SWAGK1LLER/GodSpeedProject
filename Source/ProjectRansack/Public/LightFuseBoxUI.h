@@ -4,20 +4,17 @@
 
 #include "CoreMinimal.h"
 #include "Blueprint/UserWidget.h"
-#include "ItemWidgetUI.generated.h"
+#include "LightFuseBoxUI.generated.h"
 
 /**
  * 
  */
 UCLASS()
-class PROJECTRANSACK_API UItemWidgetUI : public UUserWidget
+class PROJECTRANSACK_API ULightFuseBoxUI : public UUserWidget
 {
 	GENERATED_BODY()
-	
-public:
-	UFUNCTION(BlueprintImplementableEvent)
-	void ActivateDefaultText();
 
+public:
 	UFUNCTION(BlueprintImplementableEvent)
 	void SetDefaultText(const FString& msg);
 

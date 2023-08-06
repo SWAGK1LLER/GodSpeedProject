@@ -199,13 +199,10 @@ void ABase3C::Interact()
 {
 	if (bFreezeInput)
 		return;
-
-	TestDamage(this);
 }
 
 void ABase3C::StopInteract()
 {
-	GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("Stop Interact!"));
 }
 
 void ABase3C::StartAim()
@@ -238,12 +235,6 @@ void ABase3C::Sprint()
 		return;
 
 	GetCharacterMovement()->MaxWalkSpeed = normalWalkSpeed * tableInstance->sprintSpeed;
-}
-
-void ABase3C::TestDamage_Implementation(AActor* DamageActor)
-{
-	GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("Working!"));
-	UGameplayStatics::ApplyDamage(DamageActor, 1, this->GetInstigatorController(), this, UDamageType::StaticClass());
 }
 
 void ABase3C::StopSprint()

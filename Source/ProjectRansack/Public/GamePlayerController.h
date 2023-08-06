@@ -115,6 +115,10 @@ public:
 	void SRToggleLights_Implementation(ALightFuseBoxe* actor, bool pOpen);
 
 	UFUNCTION(Server, Reliable, BlueprintCallable)
+	void SRHackLights(ALightFuseBoxe* actor);
+	void SRHackLights_Implementation(ALightFuseBoxe* actor);
+
+	UFUNCTION(Server, Reliable, BlueprintCallable)
 	void SRSpawnParticle(class UParticleSystem* particleEffect, const FTransform& position, const float& duration);
 	void SRSpawnParticle_Implementation(class UParticleSystem* particleEffect, const FTransform& position, const float& duration);
 

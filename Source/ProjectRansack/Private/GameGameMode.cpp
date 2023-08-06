@@ -14,7 +14,7 @@
 #include "Particles/ParticleSystemComponent.h"
 #include "SecurityCamera.h"
 
-#define FORCE_SPAWN_BOTH_SIDE 0
+#define FORCE_SPAWN_BOTH_SIDE 1
 
 void AGameGameMode::BeginPlay()
 {

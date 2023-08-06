@@ -178,6 +178,9 @@ void AThief::MUlDropInventory_Implementation(FVector location)
 
 void AThief::Interact()
 {
+	if (bFreezeInput)
+		return;
+
 	if (closeItems.Num() == 0)
 		return;
 

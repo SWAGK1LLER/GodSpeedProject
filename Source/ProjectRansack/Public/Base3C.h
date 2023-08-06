@@ -165,11 +165,8 @@ public:
 
 	void BindInputHandler();
 	
-	UFUNCTION(Server, Unreliable)
-	void TestDamage(AActor* DamageActor);
-
 	UFUNCTION(NetMulticast, Reliable)
-		void ChangeStencilFromServer(int pNewStencilValue);
+	void ChangeStencilFromServer(int pNewStencilValue);
 
 	UFUNCTION(BlueprintCallable)
 	UCameraComp* GetCameraComponent();

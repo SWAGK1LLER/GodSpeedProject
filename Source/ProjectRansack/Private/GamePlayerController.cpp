@@ -246,6 +246,11 @@ UUserWidget* AGamePlayerController::GetWidget(AActor* pItem)
 	return interactibleUI[pItem];
 }
 
+void AGamePlayerController::SRHackLights_Implementation(ALightFuseBoxe* actor)
+{
+	actor->HackLights();
+}
+
 void AGamePlayerController::SRToggleLights_Implementation(ALightFuseBoxe* actor, bool pOpen)
 {
 	actor->ToggleLights(pOpen);
