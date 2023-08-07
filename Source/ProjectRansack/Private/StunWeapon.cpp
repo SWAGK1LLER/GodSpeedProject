@@ -21,36 +21,27 @@ void UStunWeapon::BeginPlay()
     Super::BeginPlay();
 }
 
-
 void UStunWeapon::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
 {
     Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
+
+    ABase3C* player = Cast<ABase3C>(GetOwner());
+    if (player->WidgetUI == nullptr)
+        return;
+
+    if (CoolDownCurrentTime > 0)
+        player->WidgetUI->UpdateCooldown(CoolDownCurrentTime);
+    else
+        player->WidgetUI->ShowGunReady();
     
-    if (!maxAmmoSetUI)
-    {
-        ABase3C* player = Cast<ABase3C>(GetOwner());
-
-        if (player->WidgetUI == nullptr)
-            return;
-
-        player->WidgetUI->UpdateRemainingAmmo(MaxAmmo);
-        player->WidgetUI->SetMaxAmmo(MaxAmmo);
-        maxAmmoSetUI = true;
-    }
 }
 
 void UStunWeapon::Fire()
 {
-	if (CoolDownCurrentTime < coolDown || ammo - 1 < 0)
+	if (CoolDownCurrentTime > 0)
 		return;
 
-    CoolDownCurrentTime = 0;
-	ammo--;
-
-    ABase3C* player = Cast<ABase3C>(GetOwner());
-
-    if(player->WidgetUI)
-        player->WidgetUI->UpdateRemainingAmmo(ammo);
+    CoolDownCurrentTime = coolDown;
 
     FVector hitLocation;
     AActor* actor = HitScan(hitLocation);
@@ -109,10 +100,8 @@ AActor* UStunWeapon::HitScan(FVector& hitLocation)
 bool UStunWeapon::CheckHittableActor(AActor* pActorToCheck)
 {
     for (TSubclassOf<AActor> Class : EnemyHittable)
-    {
         if (pActorToCheck->IsA(Class))
             return true;
-    }
     return false;
 }
 
@@ -121,7 +110,5 @@ void UStunWeapon::HitEntity(AGamePlayerController* PlayerController, AActor* pAc
     if (Cast<ABase3C>(pActorToHit))
         PlayerController->SRFreezeInput(StunDuration, Cast<ABase3C>(pActorToHit));
     else if(Cast<ASecurityCamera>(pActorToHit))
-    {
         PlayerController->CameraFreezeInput(pActorToHit);
-    }
 }

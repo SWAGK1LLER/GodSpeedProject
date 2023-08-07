@@ -16,8 +16,8 @@ class PROJECTRANSACK_API UPlayerUI : public UUserWidget
 	
 public:
 	UFUNCTION(BlueprintImplementableEvent)
-	void UpdateRemainingAmmo(int ammo);
+	void UpdateCooldown(float time);
 
 	UFUNCTION(BlueprintImplementableEvent)
-	void SetMaxAmmo(int maxAmmo);
+	void ShowGunReady();
 };

@@ -14,14 +14,8 @@ class PROJECTRANSACK_API UWeapon : public UStaticMeshComponent
 
 public:	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	float coolDown = 0.5;
+	float coolDown = 20;
 	float CoolDownCurrentTime = 0;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	int ammo = 6;
-
-	int MaxAmmo = 0;
-	bool maxAmmoSetUI = false;
 
 	UWeapon(const FObjectInitializer& ObjectInitializer);
 

@@ -38,9 +38,6 @@ void UCameraComp::fetchData(float pmaxPitchBottom, float pmaxPitchTop)
 
 void UCameraComp::look(const FInputActionValue& Value)
 {
-	if (Cast<ABase3C>(GetOwner())->bFreezeInput)
-		return;
-
 	FVector2D Direction = Value.Get<FVector2D>();
 	if (ACharacter* Character = CastChecked<ACharacter>(GetOwner()))
 	{
