@@ -40,7 +40,9 @@ public:
 	AThief();
 	virtual void BeginPlay() override;
 	virtual void Tick(float DeltaTime) override;
-	virtual void MulReset_Implementation() override;
+
+	virtual void SRReset_Implementation() override;
+	virtual void MulReset_Implementation(FTransform transform) override;
 
 	UFUNCTION(Server, Reliable, BlueprintCallable)
 	void SRAddItem(class AItem* pItem);

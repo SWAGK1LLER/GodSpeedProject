@@ -133,12 +133,12 @@ public:
 	virtual void UnFreezeInput();
 
 	UFUNCTION(Server, Unreliable)
-	void SRReset();
-	void SRReset_Implementation();
+	virtual void SRReset();
+	virtual void SRReset_Implementation();
 
 	UFUNCTION(NetMulticast, Unreliable)
-	virtual void MulReset();
-	virtual void MulReset_Implementation();
+	virtual void MulReset(FTransform transform);
+	virtual void MulReset_Implementation(FTransform transform);
 
 
 	// Called to bind functionality to input

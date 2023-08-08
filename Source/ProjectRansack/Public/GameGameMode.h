@@ -55,6 +55,8 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	TArray<class AGamePlayerStart*> PlayerSpawn;
 	
+	FString extractSpawnTag = TEAM_A_STR;
+
 	virtual void BeginPlay() override;
 
 	virtual void Tick(float DeltaTime) override;

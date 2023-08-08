@@ -9,6 +9,7 @@
 #include <GameGameMode.h>
 #include <Components/BoxComponent.h>
 #include <Officer.h>
+#include "GamePlayerStart.h"
 #include "HelperClass.h"
 
 AThief::AThief()
@@ -39,7 +40,17 @@ void AThief::Tick(float DeltaTime)
 	ChangeStencilOnMovement();
 }
 
-void AThief::MulReset_Implementation()
+void AThief::SRReset_Implementation()
+{
+	TArray<AActor*> spawnPoint;
+	UGameplayStatics::GetAllActorsOfClassWithTag(GetWorld(), AGamePlayerStart::StaticClass(), TEAM_A_STR, spawnPoint);
+
+	int idx = FMath::RandRange(0, spawnPoint.Num() - 1);
+
+	MulReset(spawnPoint[idx]->GetActorTransform());
+}
+
+void AThief::MulReset_Implementation(FTransform transform)
 {
 	HelperClass::deactivateActor(this);
 	HelperClass::deactivateTrigger(ArrestArea);
@@ -51,8 +62,8 @@ void AThief::MulReset_Implementation()
 	pc->ClientFinishArrest(respawnTime);
 
 	FTimerHandle Handle;
-	GetWorld()->GetTimerManager().SetTimer(Handle, FTimerDelegate::CreateLambda([&] {
-		Super::MulReset_Implementation();
+	GetWorld()->GetTimerManager().SetTimer(Handle, FTimerDelegate::CreateLambda([=] {
+		Super::MulReset_Implementation(transform);
 		HelperClass::activateActor(this);
 	}), respawnTime, false);
 }

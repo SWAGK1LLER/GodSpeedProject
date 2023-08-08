@@ -38,17 +38,17 @@ public:
 
 	//CAMERAS
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
-		class UInputAction* RightAction = nullptr;
+	class UInputAction* RightAction = nullptr;
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
-		class UInputAction* LeftAction = nullptr;
+	class UInputAction* LeftAction = nullptr;
 
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = SensorGadget, meta = (AllowPrivateAccess = "true"))
-		float Range;
+	float Range;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = SensorGadget, meta = (AllowPrivateAccess = "true"))
-		float RevealTime;
+	float RevealTime;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = SensorGadget, meta = (AllowPrivateAccess = "true"))
-		int MaxAmountOfSensors;
+	int MaxAmountOfSensors;
 };
 
 UCLASS()
@@ -118,7 +118,7 @@ public:
 
 	virtual void Tick(float DeltaTime) override;
 
-	virtual void MulReset_Implementation() override;
+	virtual void MulReset_Implementation(FTransform transform) override;
 
 	bool CheckTableInstance();
 

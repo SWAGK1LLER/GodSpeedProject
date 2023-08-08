@@ -127,12 +127,12 @@ void ABase3C::UnFreezeInput()
 
 void ABase3C::SRReset_Implementation()
 {
-	MulReset();
+	MulReset(SpawnTransform);
 }
 
-void ABase3C::MulReset_Implementation()
+void ABase3C::MulReset_Implementation(FTransform transform)
 {
-	SetActorTransform(SpawnTransform);
+	SetActorTransform(transform);
 	bFreezeInput = false;
 	FreezeDuration = 0;
 	TimeFreezed = 0;

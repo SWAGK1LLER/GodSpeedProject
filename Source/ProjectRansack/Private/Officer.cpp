@@ -104,9 +104,9 @@ void AOfficer::Tick(float DeltaTime)
 			cameraComponent->camera->GetForwardVector());
 }
 
-void AOfficer::MulReset_Implementation()
+void AOfficer::MulReset_Implementation(FTransform transform)
 {
-	Super::MulReset_Implementation();
+	Super::MulReset_Implementation(transform);
 }
 
 void AOfficer::TimelineProgress(float value)

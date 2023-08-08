@@ -13,8 +13,9 @@
 #include "GamePlayerController.h"
 #include "Particles/ParticleSystemComponent.h"
 #include "SecurityCamera.h"
+#include <ExtractionZone.h>
 
-#define FORCE_SPAWN_BOTH_SIDE 0
+#define FORCE_SPAWN_BOTH_SIDE 1
 
 void AGameGameMode::BeginPlay()
 {
@@ -28,6 +29,12 @@ void AGameGameMode::BeginPlay()
 
 	//For testing
 	StartRound();
+
+	TArray<AActor*> actors;
+	UGameplayStatics::GetAllActorsOfClass(GetWorld(), AExtractionZone::StaticClass(), actors);
+
+	if (actors.Num() != 0)
+		extractSpawnTag.AppendInt(FMath::RandRange(1, actors.Num()));
 }
 
 void AGameGameMode::Tick(float DeltaTime)
@@ -126,7 +133,7 @@ void AGameGameMode::FindSpawn(APlayerController* NewPlayer, const ETeam& team, F
 	TArray<AActor*> spawnPoint;
 	if (team == ETeam::A)
 	{
-		UGameplayStatics::GetAllActorsOfClassWithTag(GetWorld(), AGamePlayerStart::StaticClass(), TEAM_A_STR, spawnPoint);
+		UGameplayStatics::GetAllActorsOfClassWithTag(GetWorld(), AGamePlayerStart::StaticClass(), *extractSpawnTag, spawnPoint);
 		ActorClass = ThiefClass;
 	}
 	else if (team == ETeam::B)
