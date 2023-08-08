@@ -207,7 +207,7 @@ void ASecurityCamera::Mul_FreezeCamera_Implementation()
 {
 	GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("Multi CAMERA FROZEN!"));
 	frozen = true;
-	currentTimetoUnfreeze = timeToUnfreeze;
+	currentTimetoUnfreeze = tableInstance->timeToUnfreeze;
 }
 
 

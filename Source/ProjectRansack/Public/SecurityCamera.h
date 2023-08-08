@@ -16,6 +16,9 @@ struct FSecurityCameraDataTable : public FTableRowBase
 
 	UPROPERTY(editAnywhere, BlueprintReadWrite, Category = Rotation, meta = (AllowPrivateAccess = "true"))
 		float rotationSpeed = 0.3f;
+
+	UPROPERTY(editAnywhere, BlueprintReadWrite, Category = Stun, meta = (AllowPrivateAccess = "true"))
+		float timeToUnfreeze = 3.0f;
 };
 
 UCLASS()
@@ -59,8 +62,7 @@ public:
 	
 	bool frozen;
 
-	UPROPERTY(editAnywhere, BlueprintReadWrite, Category = Stun, meta = (AllowPrivateAccess = "true"))
-	float timeToUnfreeze = 3.0f;
+
 
 	float currentTimetoUnfreeze = 0;
 
