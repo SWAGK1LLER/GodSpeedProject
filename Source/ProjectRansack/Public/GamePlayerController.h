@@ -93,6 +93,10 @@ public:
 	void ClientUpdateRoundTimeRemaining_Implementation(const FString& pTime);
 
 	UFUNCTION(Client, Unreliable, BlueprintCallable)
+	void ClientUpdateCustomTimer(const FString& text, const float& pTime);
+	void ClientUpdateCustomTimer_Implementation(const FString& text, const float& pTime);
+
+	UFUNCTION(Client, Unreliable, BlueprintCallable)
 	void ClientUpdateScore(int pTeamA, int pTeamB);
 	void ClientUpdateScore_Implementation(int pTeamA, int pTeamB);
 

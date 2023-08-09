@@ -93,8 +93,8 @@ public:
 
 	CharacterState currentState;
 
-	bool bFreezeInput = false;
-	float FreezeDuration = 0;
+	bool bFreezeInput = true;
+	float FreezeDuration = -1;
 	float TimeFreezed = 0;
 
 	FTransform SpawnTransform;
@@ -130,7 +130,9 @@ public:
 	void ClientFreezeInput(float duration);
 	virtual void ClientFreezeInput_Implementation(float duration);
 
-	virtual void UnFreezeInput();
+	UFUNCTION(Client, Reliable, BlueprintCallable)
+	void UnFreezeInput();
+	virtual void UnFreezeInput_Implementation();
 
 	UFUNCTION(Server, Unreliable)
 	virtual void SRReset();

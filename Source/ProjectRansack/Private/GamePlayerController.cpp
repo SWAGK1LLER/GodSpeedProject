@@ -211,6 +211,14 @@ void AGamePlayerController::ClientUpdateRoundTimeRemaining_Implementation(const 
 	RoundUIWidget->SetTime(pTime);
 }
 
+void AGamePlayerController::ClientUpdateCustomTimer_Implementation(const FString& text, const float& pTime)
+{
+	if (RoundUIWidget == nullptr || !IsLocalPlayerController())
+		return;
+
+	RoundUIWidget->SetTextTimer(text, pTime);
+}
+
 void AGamePlayerController::ClientUpdateScore_Implementation(int pTeamA, int pTeamB)
 {
 	if (RoundUIWidget == nullptr)

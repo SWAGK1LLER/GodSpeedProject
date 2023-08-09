@@ -85,7 +85,7 @@ public:
 
 	void ClientFreezeInput_Implementation(float duration) override;
 
-	virtual void UnFreezeInput() override;
+	virtual void UnFreezeInput_Implementation() override;
 
 	UFUNCTION()
 	void OnArrestTriggerOverlapBegin(class UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, class UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);

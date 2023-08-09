@@ -86,7 +86,7 @@ public:
 
 
 	UFUNCTION(Server, Reliable)
-		void NotifyAllSecurity(bool PingOrUnping);
+	void NotifyAllSecurity(bool PingOrUnping);
 
 	
 	UFUNCTION(NetMulticast, Reliable)
@@ -98,17 +98,6 @@ public:
 
 	void CheckUndetectedThieves();
 
-	UFUNCTION(Server, Reliable)
-		void Ser_FreezeCamera();
-
 	UFUNCTION(NetMulticast, Reliable)
-		void Mul_FreezeCamera();
-
-	UFUNCTION(Server, Reliable)
-		void Ser_UnFreezeCamera();
-
-	UFUNCTION(NetMulticast, Reliable)
-		void Mul_UnFreezeCamera();
-
-	void CheckUnfreeze(float Deltatime);
+	void Mul_FreezeCamera();
 };

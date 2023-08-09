@@ -60,11 +60,6 @@ void ASecurityCamera::Tick(float DeltaTime)
 	CheckUndetectedThieves();
 
 	CheckAndRotate();
-
-	if (frozen)
-	{
-		CheckUnfreeze(DeltaTime);
-	}
 }
 
 
@@ -197,42 +192,17 @@ void ASecurityCamera::CheckUndetectedThieves()
 	}
 }
 
-void ASecurityCamera::Ser_FreezeCamera_Implementation()
-{
-	GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("Server CAMERA FROZEN!"));
-	Mul_FreezeCamera();
-}
-
 void ASecurityCamera::Mul_FreezeCamera_Implementation()
 {
+	if (frozen)
+		return;
+
 	GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("Multi CAMERA FROZEN!"));
 	frozen = true;
-	currentTimetoUnfreeze = tableInstance->timeToUnfreeze;
-}
 
-
-void ASecurityCamera::CheckUnfreeze(float Deltatime)
-{
-	if (currentTimetoUnfreeze <= 0)
-	{
-		Ser_UnFreezeCamera();
-	}
-	else
-	{
-		currentTimetoUnfreeze -= Deltatime;
-	}
-}
-
-
-void ASecurityCamera::Ser_UnFreezeCamera_Implementation()
-{
-	GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("SERVER CAMERA UNFREEZING!"));
-	Mul_UnFreezeCamera();
-}
-
-
-void ASecurityCamera::Mul_UnFreezeCamera_Implementation()
-{
-	GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("MULTI CAMERA UNFREEZING!"));
-	frozen = false;
+	FTimerHandle Handle;
+	GetWorld()->GetTimerManager().SetTimer(Handle, FTimerDelegate::CreateLambda([&] {
+		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("CAMERA UNFREEZING!"));
+		frozen = false;
+	}), tableInstance->timeToUnfreeze, false);
 }

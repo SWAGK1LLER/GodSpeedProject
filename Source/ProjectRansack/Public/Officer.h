@@ -145,7 +145,7 @@ public:
 	void ReceiveCameraPing(int CameraNumb);
 
 	UFUNCTION(Client, Reliable)
-		void ReceiveCameraUnPing();
+	void ReceiveCameraUnPing();
 
 
 	void SetupNotificationUI();

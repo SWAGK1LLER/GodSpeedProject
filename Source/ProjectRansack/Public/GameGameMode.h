@@ -13,6 +13,8 @@
 #define MAX_ROUND 2
 
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnCustomTimerFinish);
+
 /**
  * 
  */
@@ -24,9 +26,14 @@ class PROJECTRANSACK_API AGameGameMode : public AGameMode
 public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	int Timer = 10;
-	float CurrentTime = 0;
+	float CurrentTime = Timer * MINUTE;
 	bool RoundStarted = false;
 	int TotalRound = 0;
+
+	int warmupTimer = 15;
+	int EndTimer = 5;
+	float warmupCurrentTime = warmupTimer;
+	FString timerText;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	int ScoreTeamA = 0;
@@ -57,6 +64,8 @@ public:
 	
 	FString extractSpawnTag = TEAM_A_STR;
 
+	FOnCustomTimerFinish onCustomTimerFinish;
+
 	virtual void BeginPlay() override;
 
 	virtual void Tick(float DeltaTime) override;
@@ -77,11 +86,16 @@ public:
 
 	void SpawnParticle(class UParticleSystem* particleEffect, const FTransform& position, const float& duration);
 
+	UFUNCTION()
 	void StartRound();
 
 	UFUNCTION(BlueprintCallable)
 	void EndRound();
 
+	UFUNCTION()
+	void RestartRound();
+
+	UFUNCTION()
 	void EndGame();
 
 	UFUNCTION(BlueprintCallable)

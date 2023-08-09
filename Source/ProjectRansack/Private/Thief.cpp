@@ -225,9 +225,9 @@ void AThief::MulActivateArrestTrigger_Implementation()
 	HelperClass::activateTrigger(ArrestArea);
 }
 
-void AThief::UnFreezeInput()
+void AThief::UnFreezeInput_Implementation()
 {
-	Super::UnFreezeInput();
+	Super::UnFreezeInput_Implementation();
 	HelperClass::deactivateTrigger(ArrestArea);
 }
 

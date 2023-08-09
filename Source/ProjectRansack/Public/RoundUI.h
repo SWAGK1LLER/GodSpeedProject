@@ -16,11 +16,14 @@ class PROJECTRANSACK_API URoundUI : public UUserWidget
 public:
 
 	UFUNCTION(BlueprintImplementableEvent)
-	void SetTime(const FString& time);
+	void SetTime(const FString& pTime);
 
 	UFUNCTION(BlueprintImplementableEvent)
 	void SetScoreA(const int& pScore);
 
 	UFUNCTION(BlueprintImplementableEvent)
 	void SetScoreB(const int& pScore);
+
+	UFUNCTION(BlueprintImplementableEvent)
+	void SetTextTimer(const FString& text, const float& pTime);
 };

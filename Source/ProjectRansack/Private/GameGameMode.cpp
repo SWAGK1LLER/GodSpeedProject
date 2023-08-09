@@ -24,39 +24,59 @@ void AGameGameMode::BeginPlay()
 	UEOSGameInstance* instance = Cast<UEOSGameInstance>(UGameplayStatics::GetGameInstance(GetWorld()));
 	if (instance != nullptr)
 	{
-		//instance->StartGame();
+		instance->StartGame();
 	}
-
-	//For testing
-	StartRound();
 
 	TArray<AActor*> actors;
 	UGameplayStatics::GetAllActorsOfClass(GetWorld(), AExtractionZone::StaticClass(), actors);
 
 	if (actors.Num() != 0)
 		extractSpawnTag.AppendInt(FMath::RandRange(1, actors.Num()));
+
+	onCustomTimerFinish.AddDynamic(this, &AGameGameMode::StartRound);
+	timerText = "Round start in ";
 }
 
 void AGameGameMode::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 	
-	if (RoundStarted)
-		CurrentTime -= DeltaTime;
-
-	if (CurrentTime <= 0)
-		EndRound();
-
-	FString timeRemaining = getRemainingTimeText();
-	for (APlayerController* aPC : PC)
+	if (!RoundStarted)
 	{
-		if (!aPC->IsValidLowLevel())
+		warmupCurrentTime -= DeltaTime;
+
+		for (APlayerController* aPC : PC)
 		{
-			PC.Remove(aPC);
-			continue;
+			if (!aPC->IsValidLowLevel())
+			{
+				PC.Remove(aPC);
+				continue;
+			}
+
+			(Cast<AGamePlayerController>(aPC))->ClientUpdateCustomTimer(timerText, warmupCurrentTime);
 		}
 
-		(Cast<AGamePlayerController>(aPC))->ClientUpdateRoundTimeRemaining(timeRemaining);
+		if (warmupCurrentTime < 0)
+			onCustomTimerFinish.Broadcast();
+	}
+	else
+	{
+		CurrentTime -= DeltaTime;
+
+		FString timeRemaining = getRemainingTimeText();
+		for (APlayerController* aPC : PC)
+		{
+			if (!aPC->IsValidLowLevel())
+			{
+				PC.Remove(aPC);
+				continue;
+			}
+
+			(Cast<AGamePlayerController>(aPC))->ClientUpdateRoundTimeRemaining(timeRemaining);
+		}
+
+		if (CurrentTime < 0)
+			onCustomTimerFinish.Broadcast();
 	}
 }
 
@@ -238,7 +258,7 @@ void AGameGameMode::FreezeInput(float duration, ABase3C* actor)
 
 void AGameGameMode::FreezeCamera(AActor* actor)
 {
-	Cast<ASecurityCamera>(actor)->Ser_FreezeCamera();
+	Cast<ASecurityCamera>(actor)->Mul_FreezeCamera();
 }
 
 void AGameGameMode::ArrestThief(ABase3C* other)
@@ -252,7 +272,13 @@ void AGameGameMode::ArrestThief(ABase3C* other)
 
 void AGameGameMode::StartRound()
 {
-	//TO DO: add cooldown before starting round
+	onCustomTimerFinish.RemoveDynamic(this, &AGameGameMode::StartRound);
+	onCustomTimerFinish.AddDynamic(this, &AGameGameMode::EndRound);
+
+	for (APlayerController* aPC : PC)
+	{
+		((ABase3C*)aPC->GetPawn())->UnFreezeInput();
+	}
 
 	CurrentTime = Timer * MINUTE;
 	RoundStarted = true;
@@ -261,15 +287,29 @@ void AGameGameMode::StartRound()
 
 void AGameGameMode::EndRound()
 {
+	onCustomTimerFinish.RemoveDynamic(this, &AGameGameMode::EndRound);
+	onCustomTimerFinish.AddDynamic(this, &AGameGameMode::RestartRound);
+	timerText = "Round End in ";
+
 	RoundStarted = false;
+	warmupCurrentTime = EndTimer;
 
 	if (TotalRound == MAX_ROUND)
 	{
 		EndGame();
 		return;
 	}
+}
 
-	//TO DO: Add cooldown before restarting round
+void AGameGameMode::RestartRound()
+{
+	onCustomTimerFinish.RemoveDynamic(this, &AGameGameMode::RestartRound);
+	onCustomTimerFinish.AddDynamic(this, &AGameGameMode::StartRound);
+	timerText = "Round start in ";
+
+	RoundStarted = false;
+	warmupCurrentTime = warmupTimer;
+
 	for (int i = 0; i < PlayerSpawn.Num(); i++)
 		PlayerSpawn[i]->used = false;
 
@@ -283,9 +323,6 @@ void AGameGameMode::EndRound()
 		Cast<AGamePlayerController>(PC[i])->RestartRound();
 		(Cast<AGamePlayerController>(PC[i]))->ClientUpdateScore(ScoreTeamA, ScoreTeamB);
 	}
-
-	//TO DO call back when finish restarting
-	StartRound();
 }
 
 void AGameGameMode::EndGame()
