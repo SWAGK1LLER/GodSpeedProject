@@ -106,7 +106,7 @@ public:
 	void SRFreezeInput_Implementation(float duration, ABase3C* actor);
 
 	UFUNCTION(Server, Reliable, BlueprintCallable)
-		void CameraFreezeInput(AActor* actor);
+	void CameraFreezeInput(AActor* actor);
 	void CameraFreezeInput_Implementation(AActor* actor);
 
 	UUserWidget* AddInteractibleWidgetUI(class AActor* pItem, TSubclassOf<UUserWidget> pWidget);
@@ -156,4 +156,8 @@ public:
 
 	UFUNCTION()
 	void SaveGameFinish();
+
+	UFUNCTION(Server, Reliable, BlueprintCallable)
+	void SRBeginArrestThief(AThief* pThief, bool pArrest, AOfficer* pOfficer);
+	void SRBeginArrestThief_Implementation(AThief* pThief, bool pArrest, AOfficer* pOfficer);
 };

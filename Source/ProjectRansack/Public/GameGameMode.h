@@ -5,7 +5,9 @@
 #include "CoreMinimal.h"
 #include "GameFramework/GameMode.h"
 #include "EnumTeam.h"
+#include <Thief.h>
 #include "GameGameMode.generated.h"
+
 
 #define MINUTE 60
 #define SECOND 60
@@ -91,6 +93,8 @@ public:
 	void UpdateTeamDuffleBag();
 
 	void SpawnParticle(class UParticleSystem* particleEffect, const FTransform& position, const float& duration);
+
+	void beginArrestThief(bool pArrest, AThief* pThief, AOfficer* pOfficer);
 
 	UFUNCTION()
 	void StartWarmup();

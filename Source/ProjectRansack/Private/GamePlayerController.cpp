@@ -423,3 +423,11 @@ void AGamePlayerController::SaveGameFinish()
 	instance->SaveGameFinish.RemoveDynamic(this, &AGamePlayerController::SaveGameFinish);
 	UGameplayStatics::OpenLevel(GetGameInstance(), FName("Game/Maps/MainMenu"));
 }
+
+void AGamePlayerController::SRBeginArrestThief_Implementation(AThief* pThief, bool pArrest, AOfficer* pOfficer)
+{
+	AGameGameMode* gameMode = Cast<AGameGameMode>(UGameplayStatics::GetGameMode(GetWorld()));
+
+	if (gameMode != nullptr)
+		gameMode->beginArrestThief(pArrest, pThief, pOfficer);
+}

@@ -73,7 +73,7 @@ void AGameGameMode::SpawnPlayer(ETeam team, APlayerController* NewPlayer)
 	{
 		team = ETeam::A;
 		static int a = 0;
-		if (a == 0)
+		if (a <= 1)
 		{
 			team = ETeam::B;
 			a++;
@@ -369,4 +369,9 @@ void AGameGameMode::SetCustomTimerCallback(float time, const FOnCustomTimerTick&
 
 	eventTimer.onTick = onTick;
 	eventTimer.onFinish = onFinish;
+}
+
+void AGameGameMode::beginArrestThief(bool pArrest, AThief* pThief, AOfficer* pOfficer)
+{
+	pThief->MulSetBeingArrest(pArrest, pOfficer);
 }
