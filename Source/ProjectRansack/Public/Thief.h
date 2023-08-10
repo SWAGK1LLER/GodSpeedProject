@@ -8,7 +8,9 @@
 #include "ThiefInteractibleActor.h"
 #include "EOSGameInstance.h"
 #include "ArrestUI.h"
+#include <Officer.h>
 #include "Thief.generated.h"
+
 
 /**
  * 
@@ -27,6 +29,8 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	int respawnTime = 10;
+	bool beingArrest = false;
+	AOfficer* officerArresting = nullptr;
 
 	TArray<IThiefInteractibleActor*> closeItems;
 	IThiefInteractibleActor* ItemUsing = nullptr;
@@ -75,6 +79,10 @@ public:
 	UFUNCTION(NetMulticast, Reliable, BlueprintCallable)
 	void MulActivateArrestTrigger();
 	void MulActivateArrestTrigger_Implementation();
+
+	UFUNCTION(NetMulticast, Reliable, BlueprintCallable)
+	void MulSetBeingArrest(bool pArrest, AOfficer* pOfficer);
+	void MulSetBeingArrest_Implementation(bool pArrest, AOfficer* pOfficer);
 
 	bool ValidateSpaceItem(class AItem& pItem);
 

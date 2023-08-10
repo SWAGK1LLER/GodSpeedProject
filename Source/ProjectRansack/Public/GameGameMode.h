@@ -5,7 +5,9 @@
 #include "CoreMinimal.h"
 #include "GameFramework/GameMode.h"
 #include "EnumTeam.h"
+#include <Thief.h>
 #include "GameGameMode.generated.h"
+
 
 #define MINUTE 60
 #define SECOND 60
@@ -13,7 +15,16 @@
 #define MAX_ROUND 2
 
 
-DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnCustomTimerFinish);
+DECLARE_DELEGATE(FOnCustomTimerFinish);
+DECLARE_DELEGATE(FOnCustomTimerTick);
+
+struct CustomTimer
+{
+	FOnCustomTimerTick onTick;
+	FOnCustomTimerFinish onFinish;
+	float currentTime = 0;
+	bool used = false;
+};
 
 /**
  * 
@@ -25,15 +36,14 @@ class PROJECTRANSACK_API AGameGameMode : public AGameMode
 
 public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	int Timer = 10;
-	float CurrentTime = Timer * MINUTE;
-	bool RoundStarted = false;
-	int TotalRound = 0;
-
+	int RoundTimer = 10 * MINUTE;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	int warmupTimer = 15;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	int EndTimer = 5;
-	float warmupCurrentTime = warmupTimer;
-	FString timerText;
+
+	CustomTimer eventTimer;
+	int TotalRound = 0;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	int ScoreTeamA = 0;
@@ -64,8 +74,6 @@ public:
 	
 	FString extractSpawnTag = TEAM_A_STR;
 
-	FOnCustomTimerFinish onCustomTimerFinish;
-
 	virtual void BeginPlay() override;
 
 	virtual void Tick(float DeltaTime) override;
@@ -85,6 +93,11 @@ public:
 	void UpdateTeamDuffleBag();
 
 	void SpawnParticle(class UParticleSystem* particleEffect, const FTransform& position, const float& duration);
+
+	void beginArrestThief(bool pArrest, AThief* pThief, AOfficer* pOfficer);
+
+	UFUNCTION()
+	void StartWarmup();
 
 	UFUNCTION()
 	void StartRound();
@@ -112,5 +125,5 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void ArrestThief(ABase3C* other);
 
-
+	void SetCustomTimerCallback(float time, const FOnCustomTimerTick& onTick, const FOnCustomTimerFinish& onFinish);
 };

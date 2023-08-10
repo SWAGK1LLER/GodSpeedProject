@@ -37,6 +37,44 @@ void AThief::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
+	if (beingArrest)
+	{
+		bFreezeInput = true;
+
+		TArray<AActor*> actors;
+		ArrestArea->GetOverlappingActors(actors, AOfficer::StaticClass());
+
+		for (AActor* actor : actors)
+		{
+			if (actor == officerArresting)
+				continue;
+
+			AController* PC = ((AOfficer*)actor)->GetController();
+			if (PC != nullptr && PC->IsLocalPlayerController())
+			{
+				AGamePlayerController* playerController = Cast<AGamePlayerController>(PC);
+				UArrestUI* ui = (UArrestUI*)playerController->GetWidget(this);
+				ui->ShowAlreadyArresting();
+			}
+		}
+	}
+	else if (bFreezeInput)
+	{
+		TArray<AActor*> actors;
+		ArrestArea->GetOverlappingActors(actors, AOfficer::StaticClass());
+
+		for (AActor* actor : actors)
+		{
+			AController* PC = ((AOfficer*)actor)->GetController();
+			if (PC != nullptr && PC->IsLocalPlayerController())
+			{
+				AGamePlayerController* playerController = Cast<AGamePlayerController>(PC);
+				UArrestUI* ui = (UArrestUI*)playerController->GetWidget(this);
+				ui->Reset();
+			}
+		}
+	}
+
 	ChangeStencilOnMovement();
 }
 
@@ -225,6 +263,12 @@ void AThief::MulActivateArrestTrigger_Implementation()
 	HelperClass::activateTrigger(ArrestArea);
 }
 
+void AThief::MulSetBeingArrest_Implementation(bool pArrest, AOfficer* pOfficer)
+{
+	beingArrest = pArrest;
+	officerArresting = pOfficer;
+}
+
 void AThief::UnFreezeInput_Implementation()
 {
 	Super::UnFreezeInput_Implementation();
@@ -255,7 +299,11 @@ void AThief::OnArrestTriggerOverlapEnd(UPrimitiveComponent* OverlappedComp, AAct
 
 	player->closeThief.Remove(this);
 	if (player->ArrestingThief == this)
+	{
 		player->ArrestingThief = nullptr;
+		beingArrest = false;
+		officerArresting = nullptr;
+	}
 
 	AController* PC = player->GetController();
 	if (PC != nullptr && PC->IsLocalPlayerController())

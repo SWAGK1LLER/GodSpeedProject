@@ -24,4 +24,6 @@ public:
 	UFUNCTION(BlueprintImplementableEvent)
 	void Reset();
 
+	UFUNCTION(BlueprintImplementableEvent)
+	void ShowAlreadyArresting();
 };

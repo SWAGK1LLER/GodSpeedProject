@@ -36,6 +36,13 @@ void AExtractionZone::Tick(float DeltaTime)
 
     UExtractionZoneUI* widget = Cast<UExtractionZoneUI>(playerController->GetWidget(this));
 
+    if (playerInZone->bFreezeInput)
+    {
+        timeInZone = 0;
+        widget->ShowThiefFreezed();
+        return;
+    }
+
     if (playerInZone->inventory == nullptr || playerInZone->inventory->items.Num() == 0)
     {
         widget->ShowEmptyInventory();

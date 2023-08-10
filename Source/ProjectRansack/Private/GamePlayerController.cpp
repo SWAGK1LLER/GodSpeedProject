@@ -408,6 +408,9 @@ void AGamePlayerController::EndGame_Implementation(bool isWin, bool isTie)
 	if (instance == nullptr)
 		return;
 
+	if (instance->GetPlayerSaveGame() == nullptr)
+		return;
+
 	if (isTie)
 	{
 		instance->SaveGameFinish.AddDynamic(this, &AGamePlayerController::SaveGameFinish);
@@ -422,7 +425,6 @@ void AGamePlayerController::EndGame_Implementation(bool isWin, bool isTie)
 
 	instance->SaveGameFinish.AddDynamic(this, &AGamePlayerController::SaveGameFinish);
 	instance->SaveGame();
-	
 }
 
 void AGamePlayerController::SaveGameFinish()
@@ -433,4 +435,12 @@ void AGamePlayerController::SaveGameFinish()
 
 	instance->SaveGameFinish.RemoveDynamic(this, &AGamePlayerController::SaveGameFinish);
 	UGameplayStatics::OpenLevel(GetGameInstance(), FName("Game/Maps/MainMenu"));
+}
+
+void AGamePlayerController::SRBeginArrestThief_Implementation(AThief* pThief, bool pArrest, AOfficer* pOfficer)
+{
+	AGameGameMode* gameMode = Cast<AGameGameMode>(UGameplayStatics::GetGameMode(GetWorld()));
+
+	if (gameMode != nullptr)
+		gameMode->beginArrestThief(pArrest, pThief, pOfficer);
 }

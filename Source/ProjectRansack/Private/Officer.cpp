@@ -240,9 +240,18 @@ void AOfficer::Interact()
 
 	if (closeThief.Num() != 0)
 	{
+		if (((AThief*)(closeThief[0]))->beingArrest)
+			return;
+		
 		startArrest = true;
 		arrestTime = 0;
 		ArrestingThief = closeThief[0];
+
+		AGamePlayerController* playerController = Cast<AGamePlayerController>(GetController());
+		if (playerController == nullptr)
+			return;
+
+		playerController->SRBeginArrestThief((AThief*)ArrestingThief, true, this);
 		return;
 	}
 
@@ -265,11 +274,10 @@ void AOfficer::StopInteract()
 		UArrestUI* ui = Cast<UArrestUI>(playerController->GetWidget(ArrestingThief));
 		ui->Reset();
 
+		playerController->SRBeginArrestThief((AThief*)ArrestingThief, false, nullptr);
 		startArrest = false;
 		ArrestingThief = nullptr;
 	}
-
-	
 
 	if (ItemUsing == nullptr)
 		return;
