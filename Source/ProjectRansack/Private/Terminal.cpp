@@ -8,6 +8,7 @@
 #include <GamePlayerController.h>
 #include "HelperClass.h"
 #include <Officer.h>
+#include "SecurityCamera.h"
 // Sets default values
 ATerminal::ATerminal()
 {
@@ -186,8 +187,24 @@ void ATerminal::DisableCameras_Implementation(bool pOpen)
 
     TerminalOpenState = pOpen;
 
-   // mesh->SetVisibility(pOpen);
+    if (!pOpen)
+    {
 
+        for (AActor* Camera : SecurityCameras)
+        {
+            Cast<ASecurityCamera>(Camera)->frozen = true;
+        }
+
+    }
+    else
+    {
+
+        for (AActor* Camera : SecurityCameras)
+        {
+            Cast<ASecurityCamera>(Camera)->frozen = false;
+        }
+
+    }
 
     UpdateUIText();
 }

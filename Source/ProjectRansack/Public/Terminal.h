@@ -30,6 +30,8 @@ public:
 
 	AActor* UsedOwner = nullptr;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+		TArray<AActor*> SecurityCameras;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 		float TimeToInteract = 5;
