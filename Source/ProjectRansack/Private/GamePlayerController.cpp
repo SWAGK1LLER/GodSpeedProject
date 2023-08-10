@@ -395,6 +395,9 @@ void AGamePlayerController::EndGame_Implementation(bool isWin, bool isTie)
 	if (instance == nullptr)
 		return;
 
+	if (instance->GetPlayerSaveGame() == nullptr)
+		return;
+
 	if (isTie)
 	{
 		instance->SaveGameFinish.AddDynamic(this, &AGamePlayerController::SaveGameFinish);
@@ -409,7 +412,6 @@ void AGamePlayerController::EndGame_Implementation(bool isWin, bool isTie)
 
 	instance->SaveGameFinish.AddDynamic(this, &AGamePlayerController::SaveGameFinish);
 	instance->SaveGame();
-	
 }
 
 void AGamePlayerController::SaveGameFinish()

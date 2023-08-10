@@ -800,6 +800,9 @@ void UEOSGameInstance::UploadPlayerData(TArray<uint8> pData)
 		return;
 		
 	TSharedPtr<const FUniqueNetId> userIdRef = identityPointerRef->GetUniquePlayerId(0);
+	if (userIdRef == nullptr)
+		return;
+
 	cloundPointerRef->OnWriteUserFileCompleteDelegates.AddUObject(this, &UEOSGameInstance::OnWritePlayerDataCompleted);
 	cloundPointerRef->WriteUserFile(*userIdRef, ServerGameSlot.fileName, pData);
 }
