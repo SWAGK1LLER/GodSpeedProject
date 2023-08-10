@@ -24,4 +24,7 @@ public:
 
 	UFUNCTION(BlueprintImplementableEvent)
 	void ShowEmptyInventory();
+
+	UFUNCTION(BlueprintImplementableEvent)
+	void ShowThiefFreezed();
 };

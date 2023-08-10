@@ -118,6 +118,7 @@ void ABase3C::ClientFreezeInput_Implementation(float duration)
 	bFreezeInput = true;
 	FreezeDuration = duration;
 	TimeFreezed = 0;
+	StopInteract();
 }
 
 void ABase3C::UnFreezeInput_Implementation()

@@ -34,7 +34,7 @@ class PROJECTRANSACK_API AGameGameMode : public AGameMode
 
 public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	int RoundTimer = 10;//* MINUTE;
+	int RoundTimer = 10 * MINUTE;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	int warmupTimer = 15;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)

@@ -126,11 +126,11 @@ public:
 	void MulticastSetClientNickname(const FString& pNickName);
 	void MulticastSetClientNickname_Implementation(const FString& pNickName);
 
-	UFUNCTION(Client, Reliable, BlueprintCallable)
+	UFUNCTION(NetMulticast, Reliable, BlueprintCallable)
 	void ClientFreezeInput(float duration);
 	virtual void ClientFreezeInput_Implementation(float duration);
 
-	UFUNCTION(Client, Reliable, BlueprintCallable)
+	UFUNCTION(NetMulticast, Reliable, BlueprintCallable)
 	void UnFreezeInput();
 	virtual void UnFreezeInput_Implementation();
 
