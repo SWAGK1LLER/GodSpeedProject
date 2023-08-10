@@ -17,6 +17,7 @@
 #include <Officer.h>
 #include "LightFuseBoxe.h"
 #include <Door.h>
+#include "Terminal.h"
 
 void AGamePlayerController::BeginPlay()
 {
@@ -37,8 +38,10 @@ void AGamePlayerController::BeginPlay()
 
 	instance->LoadSaveGame();
 	//instance->LoadSaveSettings();
+
+	int a = FMath::RandRange(0, 2);
 	
-	SRSpawnPlayer(instance->team);
+	SRSpawnPlayer(ETeam(a));
 }
 
 void AGamePlayerController::Tick(float DeltaTime)
@@ -268,6 +271,16 @@ void AGamePlayerController::SRToggleLights_Implementation(ALightFuseBoxe* actor,
 void AGamePlayerController::SRHackDoor_Implementation(ADoor* actor)
 {
 	actor->HackDoor();
+}
+
+void AGamePlayerController::SRToggleCameras_Implementation(ATerminal* actor, bool pOn) //TODO 
+{
+	actor->DisableCameras(pOn);
+}
+
+void AGamePlayerController::SRHackTerminal_Implementation(ATerminal* actor)
+{
+	actor->HackTerminal();
 }
 
 void AGamePlayerController::SRToggleDoor_Implementation(ADoor* actor, bool pOpen)
