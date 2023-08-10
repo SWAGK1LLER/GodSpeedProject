@@ -34,7 +34,10 @@ public:
 		TArray<AActor*> SecurityCameras;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-		float TimeToInteract = 5;
+		float TimeToInteractThief = 5;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+		float TimeToInteractOfficer = 2;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 		float HackDuration = 2;
@@ -64,6 +67,10 @@ public:
 	UFUNCTION(NetMulticast, Reliable, BlueprintCallable)
 		void HackTerminal();
 	void HackTerminal_Implementation();
+
+	UFUNCTION(NetMulticast, Reliable, BlueprintCallable)
+		void FixTerminal();
+	void FixTerminal_Implementation();
 
 	UFUNCTION(NetMulticast, Reliable, BlueprintCallable)
 		void DisableCameras(bool pOpen);

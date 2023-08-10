@@ -139,6 +139,10 @@ public:
 	void SRHackTerminal_Implementation(ATerminal* actor);
 
 	UFUNCTION(Server, Reliable, BlueprintCallable)
+		void SRFixTerminal(ATerminal* actor);
+	void SRFixTerminal_Implementation(ATerminal* actor);
+
+	UFUNCTION(Server, Reliable, BlueprintCallable)
 	void SRSpawnParticle(class UParticleSystem* particleEffect, const FTransform& position, const float& duration);
 	void SRSpawnParticle_Implementation(class UParticleSystem* particleEffect, const FTransform& position, const float& duration);
 

@@ -39,7 +39,7 @@ void AGamePlayerController::BeginPlay()
 	instance->LoadSaveGame();
 	//instance->LoadSaveSettings();
 
-	int a = FMath::RandRange(0, 2);
+	int a = FMath::RandRange(0, 3);
 	
 	SRSpawnPlayer(ETeam(a));
 }
@@ -281,6 +281,13 @@ void AGamePlayerController::SRToggleCameras_Implementation(ATerminal* actor, boo
 void AGamePlayerController::SRHackTerminal_Implementation(ATerminal* actor)
 {
 	actor->HackTerminal();
+	actor->UpdateUIText();
+}
+
+void AGamePlayerController::SRFixTerminal_Implementation(ATerminal* actor)
+{
+	actor->FixTerminal();
+	actor->UpdateUIText();
 }
 
 void AGamePlayerController::SRToggleDoor_Implementation(ADoor* actor, bool pOpen)

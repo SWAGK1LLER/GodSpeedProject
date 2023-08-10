@@ -23,7 +23,7 @@ public:
 	UFUNCTION(BlueprintImplementableEvent)
 		void setProgressBarValue(float percentage);
 
-	FString getTextStateOfficer(bool CamerasOff);
+	FString getTextStateOfficer(bool hacked, bool CamerasOff);
 
 	FString getTextStateThief(bool hacked, bool CamerasOff);
 

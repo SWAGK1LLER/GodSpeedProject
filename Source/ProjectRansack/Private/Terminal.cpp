@@ -71,7 +71,7 @@ void ATerminal::OnTriggerOverlapBegin(UPrimitiveComponent* OverlappedComponent, 
             AGamePlayerController* playerController = Cast<AGamePlayerController>(PC);
             UTerminalUI* widget = Cast<UTerminalUI>(playerController->AddInteractibleWidgetUI(this, WidgetClass));
 
-            widget->SetDefaultText(widget->getTextStateOfficer(TerminalOpenState));
+            widget->SetDefaultText(widget->getTextStateOfficer(TerminalHacked, TerminalOpenState));
         }
 
         return;
@@ -123,7 +123,7 @@ void ATerminal::Interact_Implementation(AActor* pActor)
             UTerminalUI* widget = Cast<UTerminalUI>(playerController->GetWidget(this));
             widget->SetDefaultText(widget->getTextStateThief(TerminalHacked, !TerminalOpenState));
 
-            playerController->SRToggleCameras(this, !TerminalOpenState); //TODO
+            playerController->SRToggleCameras(this, !TerminalOpenState);
         }
         else
         {
@@ -143,18 +143,34 @@ void ATerminal::Interact_Implementation(AActor* pActor)
     AOfficer* officer = Cast<AOfficer>(pActor);
     if (officer != nullptr)
     {
-        AGamePlayerController* playerController = Cast<AGamePlayerController>(officer->GetController());
+        if (TerminalHacked)
+        {
+            currentlyInteracting = true;
+            currentTime = 0;
+            UsedOwner = pActor;
 
-        UTerminalUI* widget = Cast<UTerminalUI>(playerController->GetWidget(this));
-        widget->SetDefaultText(widget->getTextStateOfficer(!TerminalOpenState));
+            //Show progress bar
+            AGamePlayerController* playerController = Cast<AGamePlayerController>(officer->GetController());
+            UTerminalUI* widget = Cast<UTerminalUI>(playerController->GetWidget(this));
+            widget->SetDefaultText(widget->getTextStateOfficer(TerminalHacked, !TerminalOpenState));
+            widget->ActivateProgressBar();
+        }
+        else
+        {
+            AGamePlayerController* playerController = Cast<AGamePlayerController>(officer->GetController());
 
-        playerController->SRToggleCameras(this, !TerminalOpenState); //TODO
+            UTerminalUI* widget = Cast<UTerminalUI>(playerController->GetWidget(this));
+            widget->SetDefaultText(widget->getTextStateOfficer(TerminalHacked, !TerminalOpenState));
+
+            playerController->SRToggleCameras(this, !TerminalOpenState);
+        }
     }
 }
 
 void ATerminal::StopInteract_Implementation(AActor* pActor)
 {
     AThief* thief = Cast<AThief>(pActor);
+    AOfficer* officer = Cast<AOfficer>(pActor);
     if (thief != nullptr)
     {
         if (UsedOwner == nullptr)
@@ -167,17 +183,28 @@ void ATerminal::StopInteract_Implementation(AActor* pActor)
         UTerminalUI* widget = Cast<UTerminalUI>(playerController->GetWidget(this));
         widget->SetDefaultText(widget->getTextStateThief(TerminalHacked, TerminalOpenState));
     }
+    else if (officer)
+    {
+        if (UsedOwner == nullptr)
+            return;
+
+        currentlyInteracting = false;
+        UsedOwner = nullptr;
+
+        AGamePlayerController* playerController = Cast<AGamePlayerController>(officer->GetController());
+        UTerminalUI* widget = Cast<UTerminalUI>(playerController->GetWidget(this));
+        widget->SetDefaultText(widget->getTextStateOfficer(TerminalHacked, TerminalOpenState));
+    }
 }
 
 void ATerminal::HackTerminal_Implementation()
 {
     TerminalHacked = true;
+}
 
-    //FTimerHandle Handle;
-    //GetWorld()->GetTimerManager().SetTimer(Handle, FTimerDelegate::CreateLambda([&] {
-    //    TerminalHacked = false;
-    //    UpdateUIText();
-    //    }), HackDuration, false);
+void ATerminal::FixTerminal_Implementation()
+{
+    TerminalHacked = false;
 }
 
 void ATerminal::DisableCameras_Implementation(bool pOpen)
@@ -211,39 +238,81 @@ void ATerminal::DisableCameras_Implementation(bool pOpen)
 
 void ATerminal::UpdateProgressHack(float DeltaTime)
 {
-    if (currentlyInteracting)
+    if (Cast<AOfficer>(UsedOwner))
     {
-        currentTime += DeltaTime;
-
-        //Update ui progress bar
-        AThief* thief = Cast<AThief>(UsedOwner);
-        AGamePlayerController* playerController = Cast<AGamePlayerController>(thief->GetController());
-        UTerminalUI* widget = Cast<UTerminalUI>(playerController->GetWidget(this));
-        if (widget == nullptr)
-            return;
-
-        widget->setProgressBarValue(HelperClass::mapValue(currentTime, 0, TimeToInteract, 0, 1));
-    }
-
-    if (currentTime >= TimeToInteract && currentlyInteracting)
-    {
-        AThief* player = Cast<AThief>(UsedOwner);
-        if (player != nullptr)
+        if (currentlyInteracting)
         {
-            currentlyInteracting = false;
-            currentTime = 0;
+            currentTime += DeltaTime;
 
-            AGamePlayerController* playerController = Cast<AGamePlayerController>(player->GetController());
-
+            //Update ui progress bar
+            AOfficer* officer = Cast<AOfficer>(UsedOwner);
+            AGamePlayerController* playerController = Cast<AGamePlayerController>(officer->GetController());
             UTerminalUI* widget = Cast<UTerminalUI>(playerController->GetWidget(this));
             if (widget == nullptr)
                 return;
 
-            widget->SetDefaultText(widget->getTextStateThief(true, TerminalOpenState));
+            widget->setProgressBarValue(HelperClass::mapValue(currentTime, 0, TimeToInteractOfficer, 0, 1));
+        }
 
-            playerController->SRHackTerminal(this); //TODO
+        if (currentTime >= TimeToInteractOfficer && currentlyInteracting)
+        {
+            AOfficer* player = Cast<AOfficer>(UsedOwner);
+            if (player != nullptr)
+            {
+                currentlyInteracting = false;
+                currentTime = 0;
+
+                AGamePlayerController* playerController = Cast<AGamePlayerController>(player->GetController());
+
+                UTerminalUI* widget = Cast<UTerminalUI>(playerController->GetWidget(this));
+                if (widget == nullptr)
+                    return;
+
+                playerController->SRFixTerminal(this);
+
+                widget->SetDefaultText(widget->getTextStateOfficer(false, TerminalOpenState));
+            }
         }
     }
+    else
+    {
+        if (currentlyInteracting)
+        {
+            currentTime += DeltaTime;
+
+            //Update ui progress bar
+            AThief* thief = Cast<AThief>(UsedOwner);
+            AGamePlayerController* playerController = Cast<AGamePlayerController>(thief->GetController());
+            UTerminalUI* widget = Cast<UTerminalUI>(playerController->GetWidget(this));
+            if (widget == nullptr)
+                return;
+
+            widget->setProgressBarValue(HelperClass::mapValue(currentTime, 0, TimeToInteractThief, 0, 1));
+        }
+
+        if (currentTime >= TimeToInteractThief && currentlyInteracting)
+        {
+            AThief* player = Cast<AThief>(UsedOwner);
+            if (player != nullptr)
+            {
+                currentlyInteracting = false;
+                currentTime = 0;
+
+                AGamePlayerController* playerController = Cast<AGamePlayerController>(player->GetController());
+
+                UTerminalUI* widget = Cast<UTerminalUI>(playerController->GetWidget(this));
+                if (widget == nullptr)
+                    return;
+
+                widget->SetDefaultText(widget->getTextStateThief(true, TerminalOpenState));
+
+                playerController->SRHackTerminal(this);
+
+                UpdateUIText();
+            }
+        }
+    }
+
 }
 
 void ATerminal::UpdateUIText_Implementation()
@@ -278,7 +347,7 @@ void ATerminal::UpdateUIText_Implementation()
                 if (widget == nullptr)
                     return;
 
-                widget->SetDefaultText(widget->getTextStateOfficer(TerminalOpenState));
+                widget->SetDefaultText(widget->getTextStateOfficer(TerminalHacked, TerminalOpenState));
                 return;
             }
         }

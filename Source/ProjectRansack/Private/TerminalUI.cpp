@@ -3,8 +3,11 @@
 
 #include "TerminalUI.h"
 
-FString UTerminalUI::getTextStateOfficer(bool CamerasOff)
+FString UTerminalUI::getTextStateOfficer(bool hacked, bool CamerasOff)
 {
+	if (hacked)
+		return FString("Hold E to Fix Terminal");
+
 	if (CamerasOff)
 		return FString("Press E to disable Cameras");
 	return FString("Press E to enable Cameras");
