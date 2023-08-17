@@ -39,9 +39,8 @@ void AGamePlayerController::BeginPlay()
 	instance->LoadSaveGame();
 	//instance->LoadSaveSettings();
 
-	int a = FMath::RandRange(0, 3);
 	
-	SRSpawnPlayer(ETeam(a));
+	SRSpawnPlayer(instance->team);
 }
 
 void AGamePlayerController::Tick(float DeltaTime)

@@ -11,10 +11,18 @@
 #include <Officer.h>
 #include "Thief.generated.h"
 
+USTRUCT(BlueprintType)
+struct FThiefTable : public FTableRowBase
+{
+	GENERATED_BODY()
+public:
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+		int costOnArrest = 400;
 
-/**
- * 
- */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+		int respawnTime = 10;
+};
+
 UCLASS()
 class PROJECTRANSACK_API AThief : public ABase3C
 {
@@ -24,11 +32,11 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	class UShapeComponent* ArrestArea = nullptr;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	int costOnArrest = 400;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Data, meta = (AllowPrivateAccess = "true"))
+		class UDataTable* thiefDataTable = nullptr;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	int respawnTime = 10;
+	FThiefTable* thiefTableInstance = nullptr;
+
 	bool beingArrest = false;
 	AOfficer* officerArresting = nullptr;
 
@@ -44,6 +52,8 @@ public:
 	AThief();
 	virtual void BeginPlay() override;
 	virtual void Tick(float DeltaTime) override;
+
+	void SetupTableInstance();
 
 	virtual void SRReset_Implementation() override;
 	virtual void MulReset_Implementation(FTransform transform) override;

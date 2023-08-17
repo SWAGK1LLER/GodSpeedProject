@@ -28,6 +28,7 @@ void AThief::BeginPlay()
 {
 	Super::BeginPlay();
 
+	SetupTableInstance();
 	ArrestArea->OnComponentBeginOverlap.AddDynamic(this, &AThief::OnArrestTriggerOverlapBegin);
 	ArrestArea->OnComponentEndOverlap.AddDynamic(this, &AThief::OnArrestTriggerOverlapEnd);
 	HelperClass::deactivateTrigger(ArrestArea);
@@ -78,6 +79,17 @@ void AThief::Tick(float DeltaTime)
 	ChangeStencilOnMovement();
 }
 
+void AThief::SetupTableInstance()
+{
+	if (thiefTableInstance)
+		return;
+
+	if (!thiefDataTable)
+		return;
+
+	thiefTableInstance = thiefDataTable->FindRow<FThiefTable>(FName(TEXT("Thief")), "");
+}
+
 void AThief::SRReset_Implementation()
 {
 	TArray<AActor*> spawnPoint;
@@ -97,13 +109,13 @@ void AThief::MulReset_Implementation(FTransform transform)
 	if (pc == nullptr)
 		return;
 
-	pc->ClientFinishArrest(respawnTime);
+	pc->ClientFinishArrest(thiefTableInstance->respawnTime);
 
 	FTimerHandle Handle;
 	GetWorld()->GetTimerManager().SetTimer(Handle, FTimerDelegate::CreateLambda([=] {
 		Super::MulReset_Implementation(transform);
 		HelperClass::activateActor(this);
-	}), respawnTime, false);
+	}), thiefTableInstance->respawnTime, false);
 }
 
 bool AThief::ValidateSpaceItem(AItem& pItem)
@@ -203,9 +215,9 @@ void AThief::SRDropInventory_Implementation(FVector location)
 
 	switch (team)
 	{
-	case ETeam::A: gameMode->RemoveToScore(costOnArrest, gameMode->ScoreTeamA);
+	case ETeam::A: gameMode->RemoveToScore(thiefTableInstance->costOnArrest, gameMode->ScoreTeamA);
 		break;
-	case ETeam::B: gameMode->RemoveToScore(costOnArrest, gameMode->ScoreTeamB);
+	case ETeam::B: gameMode->RemoveToScore(thiefTableInstance->costOnArrest, gameMode->ScoreTeamB);
 		break;
 	}
 
