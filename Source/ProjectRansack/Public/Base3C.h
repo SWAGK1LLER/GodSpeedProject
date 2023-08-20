@@ -34,6 +34,11 @@ public:
 	UPROPERTY(editAnywhere, BlueprintReadWrite, Category = CameraParameters, meta = (AllowPrivateAccess = "true"))
 		float maxPitchTop = 30;
 
+	UPROPERTY(editAnywhere, BlueprintReadWrite, Category = CameraParameters, meta = (AllowPrivateAccess = "true"))
+		float aimZoom = 30;
+	UPROPERTY(editAnywhere, BlueprintReadWrite, Category = CameraParameters, meta = (AllowPrivateAccess = "true"))
+		float aimZoomSpeed = 0.1f;
+
 	/* Input */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
 		class UInputMappingContext* inputHandler = nullptr;
@@ -96,6 +101,8 @@ public:
 	bool bFreezeInput = true;
 	float FreezeDuration = -1;
 	float TimeFreezed = 0;
+	bool bIsZooming = false;
+	float zoomTime = 0;
 
 	FTransform SpawnTransform;
 

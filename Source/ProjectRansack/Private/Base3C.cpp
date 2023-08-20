@@ -11,6 +11,7 @@
 #include <Kismet/GameplayStatics.h>
 #include "GameFramework/CharacterMovementComponent.h"
 #include <EOSGameInstance.h>
+#include <HelperClass.h>
 
 
 
@@ -58,7 +59,33 @@ void ABase3C::Tick(float DeltaTime)
 		TimeFreezed += DeltaTime;
 		if (TimeFreezed >= FreezeDuration)
 			UnFreezeInput();
-	}		
+	}
+
+	if (bIsZooming)
+	{
+		//Zoom
+		if (zoomTime < tableInstance->aimZoomSpeed)
+		{
+			zoomTime += DeltaTime;
+			zoomTime = FMath::Clamp(zoomTime, zoomTime, tableInstance->aimZoomSpeed);
+
+			float alpha = HelperClass::mapValue(zoomTime, 0, tableInstance->aimZoomSpeed, 0, 1);
+			float zoom = -FMath::Lerp(0, tableInstance->aimZoom, alpha);
+			cameraComponent->camera->ClearAdditiveOffset();
+			cameraComponent->camera->AddAdditiveOffset(FTransform(), zoom);
+		}
+	}
+	else if (zoomTime > 0)
+	{
+		//Un zoom
+		zoomTime -= DeltaTime;
+		zoomTime = FMath::Clamp(zoomTime, 0, zoomTime);
+
+		float alpha = HelperClass::mapValue(zoomTime, 0, tableInstance->aimZoomSpeed, 0, 1);
+		float zoom = -FMath::Lerp(0, tableInstance->aimZoom, alpha);
+		cameraComponent->camera->ClearAdditiveOffset();
+		cameraComponent->camera->AddAdditiveOffset(FTransform(), zoom);
+	}
 }
 
 void ABase3C::EndPlay(const EEndPlayReason::Type EndPlayReason)
@@ -119,6 +146,7 @@ void ABase3C::ClientFreezeInput_Implementation(float duration)
 	FreezeDuration = duration;
 	TimeFreezed = 0;
 	StopInteract();
+	StopAim();
 }
 
 void ABase3C::UnFreezeInput_Implementation()
@@ -211,12 +239,12 @@ void ABase3C::StartAim()
 	if (bFreezeInput)
 		return;
 
-	GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("Aiming!"));
+	bIsZooming = true;
 }
 
 void ABase3C::StopAim()
 {
-	GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("StopAiming!"));
+	bIsZooming = false;
 }
 
 void ABase3C::Fire()
