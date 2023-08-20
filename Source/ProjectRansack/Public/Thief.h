@@ -101,6 +101,9 @@ public:
 	virtual void Interact() override;
 	virtual void StopInteract() override;
 
+	virtual void Tab() override;
+	virtual void StopTab() override;
+
 	void ClientFreezeInput_Implementation(float duration) override;
 
 	virtual void UnFreezeInput_Implementation() override;

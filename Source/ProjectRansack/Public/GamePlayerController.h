@@ -80,6 +80,8 @@ public:
 
 	void UpdateTeamDuffleBagUI();
 
+	void ToogleTeamDuffleBagUI(bool show);
+
 	UFUNCTION(Server, Reliable, BlueprintCallable)
 	void SRUpdateTeamDuffleBagUI();
 	void SRUpdateTeamDuffleBagUI_Implementation();

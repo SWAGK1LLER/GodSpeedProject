@@ -167,6 +167,11 @@ void AGamePlayerController::UpdateTeamDuffleBagUI()
 	SRUpdateTeamDuffleBagUI();
 }
 
+void AGamePlayerController::ToogleTeamDuffleBagUI(bool show)
+{
+	TeamDuffleBagUIWidget->ToogleView(show);
+}
+
 void AGamePlayerController::SRUpdateTeamDuffleBagUI_Implementation()
 {
 	AGameGameMode* gameMode = Cast<AGameGameMode>(UGameplayStatics::GetGameMode(GetWorld()));

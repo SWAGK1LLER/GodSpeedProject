@@ -11,6 +11,7 @@
 #include <Officer.h>
 #include "GamePlayerStart.h"
 #include "HelperClass.h"
+#include <EnhancedInputComponent.h>
 
 AThief::AThief()
 {
@@ -257,6 +258,20 @@ void AThief::StopInteract()
 
 	IThiefInteractibleActor::Execute_StopInteract(ItemUsing->_getUObject(), this);
 	ItemUsing = nullptr;
+}
+
+void AThief::Tab()
+{
+	AGamePlayerController* PC = Cast<AGamePlayerController>(Controller);
+	if (PC != nullptr)
+		PC->ToogleTeamDuffleBagUI(true);
+}
+
+void AThief::StopTab()
+{
+	AGamePlayerController* PC = Cast<AGamePlayerController>(Controller);
+	if (PC != nullptr)
+		PC->ToogleTeamDuffleBagUI(false);
 }
 
 void AThief::ClientFreezeInput_Implementation(float duration)

@@ -192,7 +192,8 @@ void ABase3C::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 		EnhancedInputComponent->BindAction(tableInstance->SprintAction, ETriggerEvent::Started, this, &ABase3C::Sprint);
 		EnhancedInputComponent->BindAction(tableInstance->SprintAction, ETriggerEvent::Completed, this, &ABase3C::StopSprint);
 
-
+		EnhancedInputComponent->BindAction(tableInstance->TabAction, ETriggerEvent::Started, this, &ABase3C::Tab);
+		EnhancedInputComponent->BindAction(tableInstance->TabAction, ETriggerEvent::Completed, this, &ABase3C::StopTab);
 	}
 	cameraComponent->SetupInputComponent(PlayerInputComponent, tableInstance->lookAction);
 }
@@ -269,6 +270,16 @@ void ABase3C::Sprint()
 void ABase3C::StopSprint()
 {
 	GetCharacterMovement()->MaxWalkSpeed = normalWalkSpeed * tableInstance->movementSpeed;
+}
+
+void ABase3C::Tab()
+{
+
+}
+
+void ABase3C::StopTab()
+{
+	
 }
 
 void ABase3C::BindInputHandler()

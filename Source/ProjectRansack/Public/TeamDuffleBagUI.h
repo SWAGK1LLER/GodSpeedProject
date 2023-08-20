@@ -27,4 +27,7 @@ public:
 
 	UFUNCTION(BlueprintImplementableEvent)
 	void UpdateUIBag2(const FString& nickname, const TArray<FItemLooted>& Items);
+
+	UFUNCTION(BlueprintImplementableEvent)
+	void ToogleView(bool bShow);
 };

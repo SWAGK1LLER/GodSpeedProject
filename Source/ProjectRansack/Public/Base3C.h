@@ -57,6 +57,9 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
 		class UInputAction* SprintAction = nullptr;
 
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
+		class UInputAction* TabAction = nullptr;
+
 };
 
 UENUM()
@@ -171,6 +174,10 @@ public:
 	void Sprint();
 
 	void StopSprint();
+
+	virtual void Tab();
+
+	virtual void StopTab();
 
 	void BindInputHandler();
 	
