@@ -12,6 +12,7 @@
 #include "GamePlayerStart.h"
 #include "HelperClass.h"
 #include <EnhancedInputComponent.h>
+#include "GameFramework/PawnMovementComponent.h"
 
 AThief::AThief()
 {
@@ -33,6 +34,7 @@ void AThief::BeginPlay()
 	ArrestArea->OnComponentBeginOverlap.AddDynamic(this, &AThief::OnArrestTriggerOverlapBegin);
 	ArrestArea->OnComponentEndOverlap.AddDynamic(this, &AThief::OnArrestTriggerOverlapEnd);
 	HelperClass::deactivateTrigger(ArrestArea);
+	GetMovementComponent()->GetNavAgentPropertiesRef().bCanCrouch = true;
 }
 
 void AThief::Tick(float DeltaTime)
@@ -78,6 +80,21 @@ void AThief::Tick(float DeltaTime)
 	}
 
 	ChangeStencilOnMovement();
+}
+
+void AThief::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
+{
+	Super::SetupPlayerInputComponent(PlayerInputComponent);
+	Super::SetupPlayerInputComponent(PlayerInputComponent);
+
+	SetupTableInstance();
+
+	//Moving
+	if (UEnhancedInputComponent* EnhancedInputComponent = CastChecked<UEnhancedInputComponent>(PlayerInputComponent))
+	{
+		EnhancedInputComponent->BindAction(thiefTableInstance->crouchAction, ETriggerEvent::Started, this, &AThief::StartCrouch);
+		EnhancedInputComponent->BindAction(thiefTableInstance->crouchAction, ETriggerEvent::Completed, this, &AThief::StopCrouch);
+	}
 }
 
 void AThief::SetupTableInstance()
@@ -338,4 +355,15 @@ void AThief::OnArrestTriggerOverlapEnd(UPrimitiveComponent* OverlappedComp, AAct
 		AGamePlayerController* playerController = Cast<AGamePlayerController>(PC);
 		playerController->RemoveInteractibleWidgetUI(this);
 	}
+}
+
+void AThief::StartCrouch()
+{
+	Crouch();
+}
+
+
+void AThief::StopCrouch()
+{
+	UnCrouch();
 }

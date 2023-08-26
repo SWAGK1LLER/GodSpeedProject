@@ -21,6 +21,9 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 		int respawnTime = 10;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
+		class UInputAction* crouchAction = nullptr;
 };
 
 UCLASS()
@@ -52,6 +55,9 @@ public:
 	AThief();
 	virtual void BeginPlay() override;
 	virtual void Tick(float DeltaTime) override;
+
+	// Called to bind functionality to input
+	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
 	void SetupTableInstance();
 
@@ -113,4 +119,8 @@ public:
 
 	UFUNCTION()
 	void OnArrestTriggerOverlapEnd(class UPrimitiveComponent* OverlappedComp, AActor* OtherActor, class UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);
+
+	void StartCrouch();
+
+	void StopCrouch();
 };
