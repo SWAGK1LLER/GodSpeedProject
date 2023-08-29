@@ -24,6 +24,9 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
 		class UInputAction* crouchAction = nullptr;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
+		class UInputAction* climbAction = nullptr;
 };
 
 UCLASS()
@@ -52,12 +55,22 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	TSubclassOf<UArrestUI> ArrestWidgetClass;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+		class UShapeComponent* ClimbingArea = nullptr;
+
+	bool CanClimb = false;
+
+	UPROPERTY(BlueprintReadWrite, VisibleAnywhere)
+		bool IsClimbing = false;
+
 	AThief();
 	virtual void BeginPlay() override;
 	virtual void Tick(float DeltaTime) override;
 
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
+
+	virtual void Move(const FInputActionValue& Value) override;
 
 	void SetupTableInstance();
 
@@ -100,6 +113,24 @@ public:
 	void MulSetBeingArrest(bool pArrest, AOfficer* pOfficer);
 	void MulSetBeingArrest_Implementation(bool pArrest, AOfficer* pOfficer);
 
+	void CheckCanClimb();
+
+	UFUNCTION(Server, Reliable, BlueprintCallable)
+		void SRStartClimbing();
+	void SRStartClimbing_Implementation();
+
+	UFUNCTION(NetMulticast, Reliable, BlueprintCallable)
+		void MulStartClimbing();
+	void MulStartClimbing_Implementation();
+
+	UFUNCTION(Server, Reliable, BlueprintCallable)
+		void SRStopClimbing();
+	void SRStopClimbing_Implementation();
+
+	UFUNCTION(NetMulticast, Reliable, BlueprintCallable)
+		void MulStopClimbing();
+	void MulStopClimbing_Implementation();
+
 	bool ValidateSpaceItem(class AItem& pItem);
 
 	void ChangeStencilOnMovement();
@@ -120,7 +151,16 @@ public:
 	UFUNCTION()
 	void OnArrestTriggerOverlapEnd(class UPrimitiveComponent* OverlappedComp, AActor* OtherActor, class UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);
 
+	UFUNCTION()
+		void ClimbTriggerOverlapBegin(class UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, class UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
+
+	UFUNCTION()
+		void ClimbTriggerOverlapEnd(class UPrimitiveComponent* OverlappedComp, AActor* OtherActor, class UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);
+
+
 	void StartCrouch();
 
 	void StopCrouch();
+
+	FHitResult ClimbingLineTrace();
 };
