@@ -99,6 +99,10 @@ void AThief::Tick(float DeltaTime)
 			CurrentRotation.Yaw = Rot.Yaw;
 			SetActorRotation(CurrentRotation);
 		}
+		//else
+		//{
+		//	SRStopClimbing();
+		//}
 	}
 	ChangeStencilOnMovement();
 }
@@ -483,11 +487,13 @@ void AThief::StopCrouch()
 FHitResult AThief::ClimbingLineTrace()
 {
 	FHitResult OutHit;
-	FVector Start = GetActorLocation();
+	FVector Start = GetActorLocation() - GetActorScale().Z/2;
 
 	FVector ForwardVector = GetActorForwardVector();
-	FVector End = ((ForwardVector * 100.f) + Start);
+	FVector End = ((ForwardVector * 1000.f) + Start);
 	FCollisionQueryParams CollisionParams;
+
+	DrawDebugLine(GetWorld(), Start, End, FColor::Green, false, 1, 0, 1);
 
 	GetWorld()->LineTraceSingleByChannel(OutHit, Start, End, ECC_Visibility, CollisionParams);
 
