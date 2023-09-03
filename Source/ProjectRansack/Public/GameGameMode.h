@@ -38,7 +38,7 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	int RoundTimer = 10 * MINUTE;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	int warmupTimer = 15;
+	int warmupTimer = 3;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	int EndTimer = 5;
 

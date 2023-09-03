@@ -99,10 +99,6 @@ void AThief::Tick(float DeltaTime)
 			CurrentRotation.Yaw = Rot.Yaw;
 			SetActorRotation(CurrentRotation);
 		}
-		//else
-		//{
-		//	SRStopClimbing();
-		//}
 	}
 	ChangeStencilOnMovement();
 }
@@ -458,7 +454,7 @@ void AThief::ClimbTriggerOverlapBegin(UPrimitiveComponent* OverlappedComponent, 
 {
 	if (OtherActor->ActorHasTag("CanClimb"))
 	{
-		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("CLimbing!"));
+		//GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("CLimbing!"));
 		CanClimb = true;
 	}
 }
@@ -467,7 +463,7 @@ void AThief::ClimbTriggerOverlapEnd(UPrimitiveComponent* OverlappedComp, AActor*
 {
 	if (OtherActor->ActorHasTag("CanClimb"))
 	{
-		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("stop cLimbing!"));
+		//GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("stop cLimbing!"));
 		CanClimb = false;
 		SRStopClimbing();
 	}
@@ -487,13 +483,14 @@ void AThief::StopCrouch()
 FHitResult AThief::ClimbingLineTrace()
 {
 	FHitResult OutHit;
-	FVector Start = GetActorLocation() - GetActorScale().Z/2;
+	FVector Start = GetActorLocation();
+	Start.Z -= GetActorScale().Z;
 
 	FVector ForwardVector = GetActorForwardVector();
 	FVector End = ((ForwardVector * 1000.f) + Start);
 	FCollisionQueryParams CollisionParams;
 
-	DrawDebugLine(GetWorld(), Start, End, FColor::Green, false, 1, 0, 1);
+	//DrawDebugLine(GetWorld(), Start, End, FColor::Green, false, 1, 0, 1);
 
 	GetWorld()->LineTraceSingleByChannel(OutHit, Start, End, ECC_Visibility, CollisionParams);
 

@@ -261,7 +261,7 @@ void AGameGameMode::StartWarmup()
 	UGameplayStatics::GetAllActorsOfClass(GetWorld(), AExtractionZone::StaticClass(), actors);
 
 	if (actors.Num() != 0)
-		extractSpawnTag.AppendInt(FMath::RandRange(1, actors.Num()));
+		extractSpawnTag.AppendInt(FMath::RandRange(1, actors.Num() > 3 ? 3 : actors.Num()));
 }
 
 void AGameGameMode::StartRound()
