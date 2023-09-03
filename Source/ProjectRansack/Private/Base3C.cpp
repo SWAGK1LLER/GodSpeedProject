@@ -201,8 +201,8 @@ void ABase3C::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 
 void ABase3C::Move(const FInputActionValue& Value)
 {
-	if (bFreezeInput)
-		return;
+	//if (bFreezeInput) temporary for debug purposes
+	//	return;
 
 	// input is a Vector2D
 	FVector2D MovementVector = Value.Get<FVector2D>();
