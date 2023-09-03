@@ -139,8 +139,8 @@ void ABase3C::MulticastSetClientNickname_Implementation(const FString& pNickName
 
 void ABase3C::ClientFreezeInput_Implementation(float duration)
 {
-	if (bFreezeInput)
-		return;
+	/*if (bFreezeInput)
+		return;*/
 
 	bFreezeInput = true;
 	FreezeDuration = duration;
@@ -201,8 +201,8 @@ void ABase3C::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 
 void ABase3C::Move(const FInputActionValue& Value)
 {
-	//if (bFreezeInput) temporary for debug purposes
-	//	return;
+	if (bFreezeInput)
+		return;
 
 	// input is a Vector2D
 	FVector2D MovementVector = Value.Get<FVector2D>();

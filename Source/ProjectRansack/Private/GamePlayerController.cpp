@@ -39,7 +39,7 @@ void AGamePlayerController::BeginPlay()
 	instance->LoadSaveGame();
 	//instance->LoadSaveSettings();
 
-	
+	int a = FMath::RandRange(0, 1);
 	SRSpawnPlayer(instance->team);
 }
 

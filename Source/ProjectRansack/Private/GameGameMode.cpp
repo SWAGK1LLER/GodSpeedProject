@@ -120,7 +120,7 @@ void AGameGameMode::FindSpawn(APlayerController* NewPlayer, const ETeam& team, F
 	TArray<AActor*> spawnPoint;
 	if (team == ETeam::A)
 	{
-		UGameplayStatics::GetAllActorsOfClassWithTag(GetWorld(), AGamePlayerStart::StaticClass(), *extractSpawnTag, spawnPoint);
+		UGameplayStatics::GetAllActorsOfClassWithTag(GetWorld(), AGamePlayerStart::StaticClass(), TEAM_A_STR, spawnPoint);
 		ActorClass = ThiefClass;
 	}
 	else if (team == ETeam::B)
