@@ -171,6 +171,22 @@ public:
 
 	void Fire();
 
+	UFUNCTION(Server, Reliable, BlueprintCallable)
+		void SRStartSprinting();
+	void SRStartSprinting_Implementation();
+
+	UFUNCTION(NetMulticast, Reliable, BlueprintCallable)
+		void MulStartSprinting();
+	void MulStartSprinting_Implementation();
+
+	UFUNCTION(Server, Reliable, BlueprintCallable)
+		void SRStopSprinting();
+	void SRStopSprinting_Implementation();
+
+	UFUNCTION(NetMulticast, Reliable, BlueprintCallable)
+		void MulStopSprinting();
+	void MulStopSprinting_Implementation();
+
 	void Sprint();
 
 	void StopSprint();

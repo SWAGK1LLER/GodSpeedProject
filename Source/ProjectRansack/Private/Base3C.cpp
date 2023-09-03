@@ -189,8 +189,8 @@ void ABase3C::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 		EnhancedInputComponent->BindAction(tableInstance->FireAction, ETriggerEvent::Started, this, &ABase3C::StartFire);
 		EnhancedInputComponent->BindAction(tableInstance->FireAction, ETriggerEvent::Triggered, this, &ABase3C::Fire);
 
-		EnhancedInputComponent->BindAction(tableInstance->SprintAction, ETriggerEvent::Started, this, &ABase3C::Sprint);
-		EnhancedInputComponent->BindAction(tableInstance->SprintAction, ETriggerEvent::Completed, this, &ABase3C::StopSprint);
+		EnhancedInputComponent->BindAction(tableInstance->SprintAction, ETriggerEvent::Started, this, &ABase3C::SRStartSprinting);
+		EnhancedInputComponent->BindAction(tableInstance->SprintAction, ETriggerEvent::Completed, this, &ABase3C::SRStopSprinting);
 
 		EnhancedInputComponent->BindAction(tableInstance->TabAction, ETriggerEvent::Started, this, &ABase3C::Tab);
 		EnhancedInputComponent->BindAction(tableInstance->TabAction, ETriggerEvent::Completed, this, &ABase3C::StopTab);
@@ -257,6 +257,29 @@ void ABase3C::Fire()
 
 	//Ugly hack to trigger overlap event if actor is already in trigger volume
 	TryGeneratingOverlapEvent();
+}
+
+void ABase3C::SRStartSprinting_Implementation()
+{
+	MulStartSprinting();
+}
+
+void ABase3C::MulStartSprinting_Implementation()
+{
+	if (bFreezeInput)
+		return;
+
+	GetCharacterMovement()->MaxWalkSpeed = normalWalkSpeed * tableInstance->sprintSpeed;
+}
+
+void ABase3C::SRStopSprinting_Implementation()
+{
+	MulStopSprinting();
+}
+
+void ABase3C::MulStopSprinting_Implementation()
+{
+	GetCharacterMovement()->MaxWalkSpeed = normalWalkSpeed * tableInstance->movementSpeed;
 }
 
 void ABase3C::Sprint()

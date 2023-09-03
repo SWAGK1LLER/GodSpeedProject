@@ -122,8 +122,8 @@ void AThief::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 
 void AThief::Move(const FInputActionValue& Value)
 {
-	if (bFreezeInput)
-		return;
+	//if (bFreezeInput)
+	//	return;
 
 	// input is a Vector2D
 	FVector2D MovementVector = Value.Get<FVector2D>();
