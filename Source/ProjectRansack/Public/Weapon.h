@@ -14,7 +14,7 @@ class PROJECTRANSACK_API UWeapon : public UStaticMeshComponent
 
 public:	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	float coolDown = 20;
+	float coolDown = 2;
 	float CoolDownCurrentTime = 0;
 
 	UWeapon(const FObjectInitializer& ObjectInitializer);
