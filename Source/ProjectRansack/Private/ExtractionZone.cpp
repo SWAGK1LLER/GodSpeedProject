@@ -79,7 +79,6 @@ void AExtractionZone::OnTriggerOverlapBegin(UPrimitiveComponent* OverlappedCompo
         AGamePlayerController* playerController = Cast<AGamePlayerController>(PC);
         UExtractionZoneUI* widget = Cast<UExtractionZoneUI>(playerController->AddInteractibleWidgetUI(this, WidgetClass));
 
-
         if (playerInZone->inventory == nullptr || playerInZone->inventory->items.Num() == 0)
             widget->ShowEmptyInventory();
     }

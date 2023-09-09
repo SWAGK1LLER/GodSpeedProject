@@ -237,6 +237,11 @@ void AGamePlayerController::ClientUpdateScore_Implementation(int pTeamA, int pTe
 
 UUserWidget* AGamePlayerController::AddInteractibleWidgetUI(AActor* pItem, TSubclassOf<UUserWidget> pWidget)
 {
+	if (interactibleUI.Contains(pItem))
+	{
+		return interactibleUI[pItem];
+	}
+
 	UUserWidget* Widget = CreateWidget<UUserWidget>(GetWorld(), pWidget);
 	Widget->AddToViewport();
 
