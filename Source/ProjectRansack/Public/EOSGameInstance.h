@@ -77,7 +77,7 @@ public:
 	void OnPartyQuitComplete(FName SessionName, bool bWasSuccess);
 	UFUNCTION(BlueprintCallable)
 	void CloseParty();
-	void OnPartyCloseComplete(FName SessionName, bool bWasSuccess);
+	//void OnPartyCloseComplete(FName SessionName, bool bWasSuccess);
 	//------------
 	//Find game
 	UFUNCTION(BlueprintCallable)
@@ -160,6 +160,7 @@ public:
 	FOnlineSessionSearchResult PartyToJoin;
 	bool bHasSession = false;
 	int numberSlotneeded = 1;
+	int partyLimite = 3;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	bool isLoadingSaveGame = false;

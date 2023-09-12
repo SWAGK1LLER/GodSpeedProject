@@ -43,6 +43,8 @@ void UEOSGameInstance::Logout()
 	if (!OnlineSubsystem)
 		return;
 
+	CloseParty();
+
 	IOnlineIdentityPtr Identity = OnlineSubsystem->GetIdentityInterface();
 	if (!Identity)
 		return;
@@ -70,7 +72,7 @@ void UEOSGameInstance::Login()
 	if (bIsLogin)
 	{
 		LoginSuccessful();
-		//CreateParty();
+		CreateParty();
 		return;
 	}
 
@@ -139,7 +141,7 @@ void UEOSGameInstance::OnLoginCompleteTry(int32 LocalUserNum, bool bWasSuccessfu
 	else
 	{
 		LoginSuccessful();
-		//CreateParty();
+		CreateParty();
 	}
 }
 
@@ -159,7 +161,7 @@ void UEOSGameInstance::OnLoginCompleteEOS(int32 LocalUserNum, bool bWasSuccessfu
 	if (bIsLogin)
 	{
 		LoginSuccessful();
-		//CreateParty();
+		CreateParty();
 	}
 	else
 	{
@@ -185,12 +187,12 @@ void UEOSGameInstance::CreateParty(bool pTravel)
 	SessionSettings.bIsDedicated = false;
 	SessionSettings.bShouldAdvertise = true;
 	SessionSettings.bIsLANMatch = false;
-	SessionSettings.NumPublicConnections = 3;
+	SessionSettings.NumPublicConnections = partyLimite;
 	SessionSettings.bAllowJoinInProgress = true;
 	SessionSettings.bAllowJoinViaPresence = true;
 	SessionSettings.bUsesPresence = true;
 	SessionSettings.bUseLobbiesIfAvailable = true;
-	SessionSettings.bUseLobbiesVoiceChatIfAvailable = true;
+	SessionSettings.bUseLobbiesVoiceChatIfAvailable = false;
 	SessionSettings.bAllowInvites = true;
 	
 	SessionSettings.Set(SEARCH_KEYWORDS, FSearchName, EOnlineDataAdvertisementType::ViaOnlineService);
@@ -210,7 +212,7 @@ void UEOSGameInstance::OnCreateSessionComplete(FName SessionName, bool bWasSucce
 		return;
 
 	SessionPtr->ClearOnCreateSessionCompleteDelegates(this);
-	GetWorld()->ServerTravel(FString("/Game/Maps/Lobby?listen"), false);
+	GetWorld()->ServerTravel(FString("/Game/Maps/MainMenu?listen"), false);
 	bHasSession = true;
 }
 //--------
@@ -234,13 +236,9 @@ void UEOSGameInstance::OnFriendAcceptInvite(const bool bWasSuccessful, const int
 
 void UEOSGameInstance::OnClosePartyAndJoin(FName SessionName, bool bWasSuccess)
 {
-	UE_LOG(LogTemp, Warning, TEXT("Hello"));
-
 	IOnlineSessionPtr SessionPtr = OnlineSubsystem->GetSessionInterface();
 	if (!SessionPtr)
 		return;
-
-	UE_LOG(LogTemp, Warning, TEXT("join"));
 
 	SessionPtr->ClearOnDestroySessionCompleteDelegates(this);
 	bHasSession = false;
@@ -299,19 +297,19 @@ void UEOSGameInstance::CloseParty()
 	if (!SessionPtr)
 		return;
 
-	SessionPtr->OnDestroySessionCompleteDelegates.AddUObject(this, &UEOSGameInstance::OnPartyCloseComplete);
+	//SessionPtr->OnDestroySessionCompleteDelegates.AddUObject(this, &UEOSGameInstance::OnPartyCloseComplete);
 	SessionPtr->DestroySession(FSessionName);
 }
-void UEOSGameInstance::OnPartyCloseComplete(FName SessionName, bool bWasSuccess)
-{
-	IOnlineSessionPtr SessionPtr = OnlineSubsystem->GetSessionInterface();
-	if (!SessionPtr)
-		return;
-
-	SessionPtr->ClearOnDestroySessionCompleteDelegates(this);
-
-	UGameplayStatics::OpenLevel(GetWorld(), "/Game/Maps/MainMenu", true);
-}
+//void UEOSGameInstance::OnPartyCloseComplete(FName SessionName, bool bWasSuccess)
+//{
+//	IOnlineSessionPtr SessionPtr = OnlineSubsystem->GetSessionInterface();
+//	if (!SessionPtr)
+//		return;
+//
+//	SessionPtr->ClearOnDestroySessionCompleteDelegates(this);
+//
+//	UGameplayStatics::OpenLevel(GetWorld(), "/Game/Maps/MainMenu", true);
+//}
 //--------
 //Find Game
 void UEOSGameInstance::CreateGame()
