@@ -25,9 +25,10 @@ void AGameGameMode::BeginPlay()
 	if (instance != nullptr)
 	{
 		instance->StartGame();
+		TotalPlayerToStart = instance->TotalConnectedPlayer;
 	}
 
-	StartWarmup();
+	StartWaitingConnection();
 }
 
 void AGameGameMode::Tick(float DeltaTime)
@@ -52,9 +53,6 @@ void AGameGameMode::PostLogin(APlayerController* NewPlayer)
 	Super::PostLogin(NewPlayer);
 
 	PC.Add(NewPlayer);
-
-	if (PC.Num() == MAX_PLAYER)
-		StartRound();
 }
 
 void AGameGameMode::Logout(AController* ExitPlayer)
@@ -113,6 +111,11 @@ void AGameGameMode::SpawnPlayer(ETeam team, APlayerController* NewPlayer)
 	
 
 	NewPlayer->Possess(actor);
+
+	if (roundStarted)
+	{
+		((ABase3C*)NewPlayer)->UnFreezeInput();
+	}
 }
 
 void AGameGameMode::FindSpawn(APlayerController* NewPlayer, const ETeam& team, FTransform& Location, TSubclassOf<AActor>& ActorClass)
@@ -237,22 +240,56 @@ void AGameGameMode::ArrestThief(ABase3C* other)
 	playerController->ClientBeingArrest();
 }
 
-void AGameGameMode::StartWarmup()
+void AGameGameMode::StartWaitingConnection()
 {
+	roundStarted = false;
+
 	FOnCustomTimerTick onTick;
 	onTick.BindLambda([this]
+	{
+		for (APlayerController* aPC : PC)
 		{
-			for (APlayerController* aPC : PC)
+			if (!aPC->IsValidLowLevel())
 			{
-				if (!aPC->IsValidLowLevel())
-				{
-					PC.Remove(aPC);
-					continue;
-				}
-
-				(Cast<AGamePlayerController>(aPC))->ClientUpdateCustomTimer("Round Start In ", eventTimer.currentTime);
+				PC.Remove(aPC);
+				continue;
 			}
-		});
+
+			(Cast<AGamePlayerController>(aPC))->ClientUpdateCustomTimer("Waiting for other player ", eventTimer.currentTime);
+		}
+
+		if (PC.Num() == MAX_PLAYER || TotalPlayerToStart == PC.Num())
+		{
+			eventTimer.currentTime = 0;
+			eventTimer.used = false;
+			eventTimer.onFinish.Execute();
+		}
+	});
+
+	FOnCustomTimerFinish onFinish;
+	onFinish.BindUObject(this, &AGameGameMode::StartWarmup);
+	SetCustomTimerCallback(connectionWaiter, onTick, onFinish);
+}
+
+void AGameGameMode::StartWarmup()
+{
+	roundStarted = false;
+
+	FOnCustomTimerTick onTick;
+	onTick.BindLambda([this]
+	{
+		for (APlayerController* aPC : PC)
+		{
+			if (!aPC->IsValidLowLevel())
+			{
+				PC.Remove(aPC);
+				continue;
+			}
+
+			(Cast<AGamePlayerController>(aPC))->ClientUpdateCustomTimer("Round Start In ", eventTimer.currentTime);
+		}
+	});
+
 	FOnCustomTimerFinish onFinish;
 	onFinish.BindUObject(this, &AGameGameMode::StartRound);
 	SetCustomTimerCallback(warmupTimer, onTick, onFinish);
@@ -268,19 +305,20 @@ void AGameGameMode::StartRound()
 {
 	FOnCustomTimerTick onTick;
 	onTick.BindLambda([this]
+	{
+		FString timeRemaining = getRemainingTimeText();
+		for (APlayerController* aPC : PC)
 		{
-			FString timeRemaining = getRemainingTimeText();
-			for (APlayerController* aPC : PC)
+			if (!aPC->IsValidLowLevel())
 			{
-				if (!aPC->IsValidLowLevel())
-				{
-					PC.Remove(aPC);
-					continue;
-				}
-
-				(Cast<AGamePlayerController>(aPC))->ClientUpdateRoundTimeRemaining(timeRemaining);
+				PC.Remove(aPC);
+				continue;
 			}
-		});
+
+			(Cast<AGamePlayerController>(aPC))->ClientUpdateRoundTimeRemaining(timeRemaining);
+		}
+	});
+
 	FOnCustomTimerFinish onFinish;
 	onFinish.BindUObject(this, &AGameGameMode::EndRound);
 	SetCustomTimerCallback(RoundTimer, onTick, onFinish);
@@ -295,6 +333,8 @@ void AGameGameMode::StartRound()
 
 void AGameGameMode::EndRound()
 {
+	roundStarted = false;
+
 	if (TotalRound == MAX_ROUND)
 	{
 		EndGame();
@@ -303,19 +343,20 @@ void AGameGameMode::EndRound()
 
 	FOnCustomTimerTick onTick;
 	onTick.BindLambda([this]
+	{
+		FString timeRemaining = getRemainingTimeText();
+		for (APlayerController* aPC : PC)
 		{
-			FString timeRemaining = getRemainingTimeText();
-			for (APlayerController* aPC : PC)
+			if (!aPC->IsValidLowLevel())
 			{
-				if (!aPC->IsValidLowLevel())
-				{
-					PC.Remove(aPC);
-					continue;
-				}
-
-				(Cast<AGamePlayerController>(aPC))->ClientUpdateCustomTimer("Round End in ", eventTimer.currentTime);
+				PC.Remove(aPC);
+				continue;
 			}
-		});
+
+			(Cast<AGamePlayerController>(aPC))->ClientUpdateCustomTimer("Round End in ", eventTimer.currentTime);
+		}
+	});
+
 	FOnCustomTimerFinish onFinish;
 	onFinish.BindUObject(this, &AGameGameMode::RestartRound);
 	SetCustomTimerCallback(EndTimer, onTick, onFinish);

@@ -787,19 +787,31 @@ USaveGame* UEOSGameInstance::ConvertUintToSaveGame(TArray<uint8> pData)
 void UEOSGameInstance::UploadPlayerData(TArray<uint8> pData)
 {
 	if (pData.IsEmpty())
+	{
+		SaveGameFinish.Broadcast();
 		return;
+	}
 
 	IOnlineIdentityPtr identityPointerRef = OnlineSubsystem->GetIdentityInterface();
 	if (!identityPointerRef)
+	{
+		SaveGameFinish.Broadcast();
 		return;
+	}
 
 	IOnlineUserCloudPtr cloundPointerRef = OnlineSubsystem->GetUserCloudInterface();
 	if (!cloundPointerRef)
+	{
+		SaveGameFinish.Broadcast();
 		return;
+	}
 		
 	TSharedPtr<const FUniqueNetId> userIdRef = identityPointerRef->GetUniquePlayerId(0);
 	if (userIdRef == nullptr)
+	{
+		SaveGameFinish.Broadcast();
 		return;
+	}
 
 	cloundPointerRef->OnWriteUserFileCompleteDelegates.AddUObject(this, &UEOSGameInstance::OnWritePlayerDataCompleted);
 	cloundPointerRef->WriteUserFile(*userIdRef, ServerGameSlot.fileName, pData);
@@ -814,6 +826,7 @@ void UEOSGameInstance::OnWritePlayerDataCompleted(bool bWasSuccessful, const FUn
 	}
 	else
 	{
+		SaveGameFinish.Broadcast();
 		UE_LOG(LogTemp, Warning, TEXT("Faile to save data"));
 	}
 }

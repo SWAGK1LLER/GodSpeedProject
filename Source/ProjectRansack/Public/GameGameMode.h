@@ -36,6 +36,8 @@ class PROJECTRANSACK_API AGameGameMode : public AGameMode
 
 public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	int connectionWaiter = 30;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	int RoundTimer = 10 * MINUTE;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	int warmupTimer = 3;
@@ -50,6 +52,10 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	int ScoreTeamB = 0;
+
+	bool roundStarted = false;
+
+	int TotalPlayerToStart = 1;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	TSubclassOf<AActor> ThiefClass;
@@ -95,6 +101,9 @@ public:
 	void SpawnParticle(class UParticleSystem* particleEffect, const FTransform& position, const float& duration);
 
 	void beginArrestThief(bool pArrest, AThief* pThief, AOfficer* pOfficer);
+
+	UFUNCTION()
+	void StartWaitingConnection();
 
 	UFUNCTION()
 	void StartWarmup();

@@ -447,7 +447,10 @@ void AGamePlayerController::SaveGameFinish()
 {
 	UEOSGameInstance* instance = Cast<UEOSGameInstance>(UGameplayStatics::GetGameInstance(GetWorld()));
 	if (instance == nullptr)
+	{
+		UGameplayStatics::OpenLevel(GetGameInstance(), FName("Game/Maps/MainMenu"));
 		return;
+	}
 
 	instance->SaveGameFinish.RemoveDynamic(this, &AGamePlayerController::SaveGameFinish);
 	UGameplayStatics::OpenLevel(GetGameInstance(), FName("Game/Maps/MainMenu"));

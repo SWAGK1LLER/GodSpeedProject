@@ -51,8 +51,6 @@ void AThief::Tick(float DeltaTime)
 
 	if (beingArrest)
 	{
-		bFreezeInput = true;
-
 		TArray<AActor*> actors;
 		ArrestArea->GetOverlappingActors(actors, AOfficer::StaticClass());
 
@@ -122,7 +120,7 @@ void AThief::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 
 void AThief::Move(const FInputActionValue& Value)
 {
-	if (bFreezeInput)
+	if (bFreezeInput || beingArrest)
 		return;
 
 	// input is a Vector2D
@@ -339,7 +337,7 @@ void AThief::MUlDropInventory_Implementation(FVector location)
 
 void AThief::Interact()
 {
-	if (bFreezeInput)
+	if (bFreezeInput || beingArrest)
 		return;
 
 	if (closeItems.Num() == 0)
