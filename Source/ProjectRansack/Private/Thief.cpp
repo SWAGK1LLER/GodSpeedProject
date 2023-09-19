@@ -235,6 +235,14 @@ void AThief::ChangeStencilOnMovement()
 	}
 }
 
+bool AThief::HasSpaceForItem(AItem* pItem)
+{
+	if (inventory == nullptr)
+		inventory = NewObject<UInventory>();
+
+	return inventory->ValidateSpace(*pItem);
+}
+
 void AThief::SRAddItem_Implementation(AItem* pItem)
 {
 	pItem->MulPlayerLootIt();
@@ -246,7 +254,8 @@ void AThief::MUlAddItem_Implementation(AItem* pItem)
 	if (inventory == nullptr)
 		inventory = NewObject<UInventory>();
 
-	inventory->AddItem(*pItem);
+	if (!inventory->AddItem(*pItem))
+		return;
 
 	AGamePlayerController* PC = Cast<AGamePlayerController>(Controller);
 	if (PC != nullptr)

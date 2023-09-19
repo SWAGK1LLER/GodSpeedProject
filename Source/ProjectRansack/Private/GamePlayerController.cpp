@@ -192,7 +192,7 @@ void AGamePlayerController::ClientUpdateTeamDuffleBagUI_Implementation()
 			return;
 
 		if (thief->inventory != nullptr)
-			TeamDuffleBagUIWidget->UpdateUIBag1(thief->nickName, thief->inventory->items);
+			TeamDuffleBagUIWidget->UpdateUITeamMate1(thief->nickName, thief->inventory->items);
 		else
 			TeamDuffleBagUIWidget->UpdateUIBagName1(thief->nickName);
 	}
@@ -204,7 +204,7 @@ void AGamePlayerController::ClientUpdateTeamDuffleBagUI_Implementation()
 			return;
 
 		if (thief->inventory != nullptr)
-			TeamDuffleBagUIWidget->UpdateUIBag2(thief->nickName, thief->inventory->items);
+			TeamDuffleBagUIWidget->UpdateUITeamMate2(thief->nickName, thief->inventory->items);
 		else
 			TeamDuffleBagUIWidget->UpdateUIBagName2(thief->nickName);
 	}

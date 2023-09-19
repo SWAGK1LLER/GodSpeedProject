@@ -53,7 +53,7 @@ public:
 	bool ValidateSpace(class AItem& pItem);
 	bool ValidateSpace(class AItem& pItem, FPosition& pOut);
 	void AddItem(class AItem& pItem, FPosition& pPos);
-	void AddItem(class AItem& pItem);
+	bool AddItem(class AItem& pItem);
 	void RemoveItem(class AItem& pItem);
 	void ClearInventory();
 };

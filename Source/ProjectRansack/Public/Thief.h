@@ -77,6 +77,8 @@ public:
 	virtual void SRReset_Implementation() override;
 	virtual void MulReset_Implementation(FTransform transform) override;
 
+	bool HasSpaceForItem(class AItem* pItem);
+
 	UFUNCTION(Server, Reliable, BlueprintCallable)
 	void SRAddItem(class AItem* pItem);
 	void SRAddItem_Implementation(class AItem* pItem);

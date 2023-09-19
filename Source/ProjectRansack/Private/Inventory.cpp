@@ -111,13 +111,14 @@ void UInventory::AddItem(AItem& pItem, FPosition& pPos)
 			space[i][j] = &pItem;
 }
 
-void UInventory::AddItem(AItem& pItem)
+bool UInventory::AddItem(AItem& pItem)
 {
 	FPosition pos;
 	if (!ValidateSpace(pItem, pos))
-		return;
+		return false;
 
 	AddItem(pItem, pos);
+	return true;
 }
 
 void UInventory::RemoveItem(AItem& pItem)

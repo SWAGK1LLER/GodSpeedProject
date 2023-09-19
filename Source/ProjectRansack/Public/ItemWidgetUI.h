@@ -30,4 +30,7 @@ public:
 	FString getTextStateOfficer(bool lightOpen);
 
 	FString getTextStateThief(bool hacked, bool lightOpen);
+
+	UFUNCTION(BlueprintImplementableEvent)
+	void ShowNotEnoughSpace();
 };

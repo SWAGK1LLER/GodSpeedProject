@@ -44,6 +44,8 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	int EndTimer = 5;
 
+	int spawnedPlayer = 0;
+
 	CustomTimer eventTimer;
 	int TotalRound = 0;
 

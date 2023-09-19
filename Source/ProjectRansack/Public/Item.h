@@ -6,6 +6,7 @@
 #include "ThiefInteractibleActor.h"
 #include "ItemWidgetUI.h"
 #include "VectorTypes.h"
+#include "Engine/Texture2D.h"
 #include "Item.generated.h"
 
 USTRUCT(BlueprintType)
@@ -26,6 +27,9 @@ class PROJECTRANSACK_API AItem : public AActor, public IThiefInteractibleActor
 	GENERATED_BODY()
 	
 public:	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	UTexture2D* itemUIImg = nullptr;
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	FSize SizeNeeded;
 

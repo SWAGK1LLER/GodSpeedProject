@@ -16,6 +16,8 @@ class PROJECTRANSACK_API UDuffleBagUI : public UUserWidget
 	GENERATED_BODY()
 
 public:
-	UFUNCTION(BlueprintImplementableEvent)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (BindWidget))
+	class UGridPanel* grid = nullptr;
+
 	void UpdateUI(const TArray<FItemLooted>& Items);
 };

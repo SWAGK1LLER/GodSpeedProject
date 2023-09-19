@@ -54,7 +54,7 @@ void ABase3C::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-	if (bFreezeInput)
+	if (bFreezeInput && FreezeDuration != -1)
 	{
 		TimeFreezed += DeltaTime;
 		if (TimeFreezed >= FreezeDuration)

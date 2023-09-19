@@ -111,10 +111,11 @@ void AGameGameMode::SpawnPlayer(ETeam team, APlayerController* NewPlayer)
 	
 
 	NewPlayer->Possess(actor);
+	spawnedPlayer++;
 
 	if (roundStarted)
 	{
-		((ABase3C*)NewPlayer)->UnFreezeInput();
+		((ABase3C*)actor)->UnFreezeInput();
 	}
 }
 
@@ -258,7 +259,7 @@ void AGameGameMode::StartWaitingConnection()
 			(Cast<AGamePlayerController>(aPC))->ClientUpdateCustomTimer("Waiting for other player ", eventTimer.currentTime);
 		}
 
-		if (PC.Num() == MAX_PLAYER || TotalPlayerToStart == PC.Num())
+		if (spawnedPlayer == MAX_PLAYER || TotalPlayerToStart == spawnedPlayer)
 		{
 			eventTimer.currentTime = 0;
 			eventTimer.used = false;
@@ -303,6 +304,8 @@ void AGameGameMode::StartWarmup()
 
 void AGameGameMode::StartRound()
 {
+	roundStarted = true;
+
 	FOnCustomTimerTick onTick;
 	onTick.BindLambda([this]
 	{

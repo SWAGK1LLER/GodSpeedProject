@@ -66,7 +66,13 @@ void AItem::OnTriggerOverlapBegin(UPrimitiveComponent* OverlappedComponent, AAct
     if (PC != nullptr && PC->IsLocalPlayerController())
     {
         AGamePlayerController* playerController = Cast<AGamePlayerController>(PC);
-        playerController->AddInteractibleWidgetUI(this, WidgetClass);
+        UItemWidgetUI* widget = (UItemWidgetUI*)playerController->AddInteractibleWidgetUI(this, WidgetClass);
+
+        //If player has not enough space for item
+        if (!player->HasSpaceForItem(this))
+        {
+            widget->ShowNotEnoughSpace();
+        }
     }
 }
 
@@ -88,12 +94,15 @@ void AItem::OnTriggerOverlapEnd(UPrimitiveComponent* OverlappedComp, AActor* Oth
 
 void AItem::Interact_Implementation(AActor* pActor)
 {
+    AThief* thief = Cast<AThief>(pActor);
+    if (!thief->HasSpaceForItem(this))
+        return;
+
     currentlyInteracting = true;
     currentTime = 0;
     acteurUsingThis = pActor;
 
     //Show progress bar
-    AThief* thief = Cast<AThief>(pActor);
     AGamePlayerController* playerController = Cast<AGamePlayerController>(thief->GetController());
     UItemWidgetUI* widget = Cast<UItemWidgetUI>(playerController->GetWidget(this));
     widget->ActivateProgressBar();
