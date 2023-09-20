@@ -872,6 +872,7 @@ void UEOSGameInstance::OnGetPlayerDataCompleted(bool bWasSuccessful, const FUniq
 		//New account, no file on server
 		ServerGameSlot.saveGame = (UPlayerSaveGame*)(UGameplayStatics::CreateSaveGameObject(UPlayerSaveGame::StaticClass()));
 		SaveGame();
+		LoadSaveGameFinished();
 		LoadSaveGameSuccessful(ServerGameSlot.saveGame->GetPercent(), ServerGameSlot.saveGame->level);
 	}
 }
@@ -907,6 +908,7 @@ void UEOSGameInstance::ReadPlayerData(const FString& FileName)
 
 	ServerGameSlot.saveGame = Cast<UPlayerSaveGame>(ConvertUintToSaveGame(data));
 
+	LoadSaveGameFinished();
 	LoadSaveGameSuccessful(ServerGameSlot.saveGame->GetPercent(), ServerGameSlot.saveGame->level);
 }
 

@@ -131,7 +131,8 @@ public:
 	void SaveGame();
 	UFUNCTION(BlueprintCallable)
 	void LoadSaveGame();
-
+	UFUNCTION(BlueprintImplementableEvent)
+	void LoadSaveGameFinished();
 	UFUNCTION(BlueprintImplementableEvent)
 	void LoadSaveGameSuccessful(float percent, int level);
 
