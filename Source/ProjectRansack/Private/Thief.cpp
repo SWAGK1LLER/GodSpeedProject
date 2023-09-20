@@ -39,10 +39,14 @@ void AThief::BeginPlay()
 	ArrestArea->OnComponentBeginOverlap.AddDynamic(this, &AThief::OnArrestTriggerOverlapBegin);
 	ArrestArea->OnComponentEndOverlap.AddDynamic(this, &AThief::OnArrestTriggerOverlapEnd);
 	HelperClass::deactivateTrigger(ArrestArea);
+	ArrestAreaActivate = false;
 	GetMovementComponent()->GetNavAgentPropertiesRef().bCanCrouch = true;
 
 	ClimbingArea->OnComponentBeginOverlap.AddDynamic(this, &AThief::ClimbTriggerOverlapBegin);
 	ClimbingArea->OnComponentEndOverlap.AddDynamic(this, &AThief::ClimbTriggerOverlapEnd);
+
+	ArrestUISelf = (UArrestUI*)CreateWidget<UUserWidget>(GetWorld(), ArrestOfficerWidgetClass);
+	ArrestUISelf->AddToViewport();
 }
 
 void AThief::Tick(float DeltaTime)
@@ -80,6 +84,16 @@ void AThief::Tick(float DeltaTime)
 			{
 				AGamePlayerController* playerController = Cast<AGamePlayerController>(PC);
 				UArrestUI* ui = (UArrestUI*)playerController->GetWidget(this);
+				if (ui == nullptr)
+				{
+					AOfficer* player = Cast<AOfficer>(actor);
+					if (player == nullptr)
+						continue;
+
+					player->closeThief.Add(this);
+					ui = (UArrestUI*)playerController->AddInteractibleWidgetUI(this, ArrestWidgetClass);
+				}
+				
 				ui->Reset();
 			}
 		}
@@ -167,6 +181,8 @@ void AThief::SetupTableInstance()
 
 void AThief::SRReset_Implementation()
 {
+	ClientShowArrest(false);
+
 	TArray<AActor*> spawnPoint;
 	UGameplayStatics::GetAllActorsOfClassWithTag(GetWorld(), AGamePlayerStart::StaticClass(), TEAM_A_STR, spawnPoint);
 
@@ -179,6 +195,8 @@ void AThief::MulReset_Implementation(FTransform transform)
 {
 	HelperClass::deactivateActor(this);
 	HelperClass::deactivateTrigger(ArrestArea);
+	ArrestAreaActivate = false;
+	beingArrest = false;
 
 	AGamePlayerController* pc = Cast<AGamePlayerController>(GetController());
 	if (pc == nullptr)
@@ -394,12 +412,24 @@ void AThief::SRActivateArrestTrigger_Implementation()
 void AThief::MulActivateArrestTrigger_Implementation()
 {
 	HelperClass::activateTrigger(ArrestArea);
+	ArrestAreaActivate = true;
 }
 
 void AThief::MulSetBeingArrest_Implementation(bool pArrest, AOfficer* pOfficer)
 {
 	beingArrest = pArrest;
+
+	if (!beingArrest && !ArrestAreaActivate)
+		ResetOfficerInArrestArea();
+
 	officerArresting = pOfficer;
+	
+	ClientShowArrest(pArrest);
+}
+
+void AThief::ClientShowArrest_Implementation(bool pArrest)
+{
+	ArrestUISelf->ToggleBeingArrested(pArrest);
 }
 
 void AThief::CheckCanClimb()
@@ -417,6 +447,32 @@ void AThief::UnFreezeInput_Implementation()
 {
 	Super::UnFreezeInput_Implementation();
 	HelperClass::deactivateTrigger(ArrestArea);
+	ArrestAreaActivate = false;
+
+	ResetOfficerInArrestArea(officerArresting);
+}
+
+void AThief::ResetOfficerInArrestArea(AOfficer* pOfficerToSkip)
+{
+	TArray<AActor*> actors;
+	ArrestArea->GetOverlappingActors(actors, AOfficer::StaticClass());
+
+	for (AActor* actor : actors)
+	{
+		if (beingArrest && actor == pOfficerToSkip)
+			continue;
+
+		AOfficer* player = Cast<AOfficer>(actor);
+		player->closeThief.Remove(this);
+		player->ArrestingThief = nullptr;
+
+		AController* PC = player->GetController();
+		if (PC != nullptr && PC->IsLocalPlayerController())
+		{
+			AGamePlayerController* playerController = Cast<AGamePlayerController>(PC);
+			playerController->RemoveInteractibleWidgetUI(this);
+		}
+	}
 }
 
 void AThief::OnArrestTriggerOverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)

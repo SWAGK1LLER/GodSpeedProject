@@ -59,6 +59,8 @@ public:
 
 	int TotalPlayerToStart = 1;
 
+	static int a;
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	TSubclassOf<AActor> ThiefClass;
 	

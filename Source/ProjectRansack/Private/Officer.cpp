@@ -42,7 +42,6 @@ void AOfficer::BeginPlay()
 	SetupNotificationUI();
 }
 
-
 void AOfficer::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);

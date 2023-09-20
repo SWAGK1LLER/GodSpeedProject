@@ -15,10 +15,14 @@
 #include "SecurityCamera.h"
 #include <ExtractionZone.h>
 
-#define FORCE_SPAWN_BOTH_SIDE 0
+#define FORCE_SPAWN_BOTH_SIDE 1
+
+int AGameGameMode::a = 0;
 
 void AGameGameMode::BeginPlay()
 {
+	AGameGameMode::a = 0;
+
 	Super::BeginPlay();
 
 	UEOSGameInstance* instance = Cast<UEOSGameInstance>(UGameplayStatics::GetGameInstance(GetWorld()));
@@ -70,8 +74,7 @@ void AGameGameMode::SpawnPlayer(ETeam team, APlayerController* NewPlayer)
 	if (FORCE_SPAWN_BOTH_SIDE)
 	{
 		team = ETeam::A;
-		static int a = 0;
-		if (a <= 1)
+		if (a < 1)
 		{
 			team = ETeam::B;
 			a++;

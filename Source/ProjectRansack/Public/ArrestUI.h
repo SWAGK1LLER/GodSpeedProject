@@ -26,4 +26,7 @@ public:
 
 	UFUNCTION(BlueprintImplementableEvent)
 	void ShowAlreadyArresting();
+
+	UFUNCTION(BlueprintImplementableEvent)
+	void ToggleBeingArrested(bool isArrested);
 };

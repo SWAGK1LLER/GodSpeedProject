@@ -37,9 +37,10 @@ class PROJECTRANSACK_API AThief : public ABase3C
 public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	class UShapeComponent* ArrestArea = nullptr;
+	bool ArrestAreaActivate = false;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Data, meta = (AllowPrivateAccess = "true"))
-		class UDataTable* thiefDataTable = nullptr;
+	class UDataTable* thiefDataTable = nullptr;
 
 	FThiefTable* thiefTableInstance = nullptr;
 
@@ -56,7 +57,12 @@ public:
 	TSubclassOf<UArrestUI> ArrestWidgetClass;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-		class UShapeComponent* ClimbingArea = nullptr;
+	TSubclassOf<UArrestUI> ArrestOfficerWidgetClass;
+
+	UArrestUI* ArrestUISelf = nullptr;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	class UShapeComponent* ClimbingArea = nullptr;
 
 	bool CanClimb = false;
 
@@ -115,23 +121,29 @@ public:
 	void MulSetBeingArrest(bool pArrest, AOfficer* pOfficer);
 	void MulSetBeingArrest_Implementation(bool pArrest, AOfficer* pOfficer);
 
+	void ResetOfficerInArrestArea(AOfficer* pOfficerToSkip = nullptr);
+
 	void CheckCanClimb();
 
 	UFUNCTION(Server, Reliable, BlueprintCallable)
-		void SRStartClimbing();
+	void SRStartClimbing();
 	void SRStartClimbing_Implementation();
 
 	UFUNCTION(NetMulticast, Reliable, BlueprintCallable)
-		void MulStartClimbing();
+	void MulStartClimbing();
 	void MulStartClimbing_Implementation();
 
 	UFUNCTION(Server, Reliable, BlueprintCallable)
-		void SRStopClimbing();
+	void SRStopClimbing();
 	void SRStopClimbing_Implementation();
 
 	UFUNCTION(NetMulticast, Reliable, BlueprintCallable)
-		void MulStopClimbing();
+	void MulStopClimbing();
 	void MulStopClimbing_Implementation();
+
+	UFUNCTION(Client, Reliable, BlueprintCallable)
+	void ClientShowArrest(bool pArrest);
+	void ClientShowArrest_Implementation(bool pArrest);
 
 	bool ValidateSpaceItem(class AItem& pItem);
 
