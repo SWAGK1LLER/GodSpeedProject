@@ -6,9 +6,14 @@
 #include "GameFramework/SaveGame.h"
 #include "PlayerSaveGame.generated.h"
 
-/**
- * 
- */
+
+UENUM(BlueprintType)
+enum EDefaultCharacter
+{
+	Thief,
+	Officer
+};
+
 UCLASS()
 class PROJECTRANSACK_API UPlayerSaveGame : public USaveGame
 {
@@ -40,6 +45,10 @@ public:
 	int totalExtraction = 0;
 	UPROPERTY(BlueprintReadWrite, Category = "Player Info")
 	int totalHightLoot = 0;
+
+
+	UPROPERTY(BlueprintReadWrite, Category = "Player Info")
+	int defaultCharacter = EDefaultCharacter::Thief;
 
 	UFUNCTION(BlueprintCallable)
 	float GetPercent();
