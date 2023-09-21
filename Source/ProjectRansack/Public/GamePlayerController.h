@@ -121,32 +121,24 @@ public:
 	void SRToggleLights_Implementation(ALightFuseBoxe* actor, bool pOpen);
 
 	UFUNCTION(Server, Reliable, BlueprintCallable)
-	void SRHackLights(ALightFuseBoxe* actor);
-	void SRHackLights_Implementation(ALightFuseBoxe* actor);
-
-	UFUNCTION(Server, Reliable, BlueprintCallable)
-	void SRFixLights(ALightFuseBoxe* actor);
-	void SRFixLights_Implementation(ALightFuseBoxe* actor);
+	void SRToogleHackLights(ALightFuseBoxe* actor, bool isHack);
+	void SRToogleHackLights_Implementation(ALightFuseBoxe* actor, bool isHack);
 
 	UFUNCTION(Server, Reliable, BlueprintCallable)
 	void SRToggleDoor(ADoor* actor, bool pOpen);
 	void SRToggleDoor_Implementation(ADoor* actor, bool pOpen);
 
 	UFUNCTION(Server, Reliable, BlueprintCallable)
-	void SRHackDoor(ADoor* actor);
-	void SRHackDoor_Implementation(ADoor* actor);
+	void SRToogleHackDoor(ADoor* actor, bool isHack);
+	void SRToogleHackDoor_Implementation(ADoor* actor, bool isHack);
 
 	UFUNCTION(Server, Reliable, BlueprintCallable)
 	void SRToggleCameras(class ATerminal* actor, bool pOn);
 	void SRToggleCameras_Implementation(ATerminal* actor, bool pOn);
 
 	UFUNCTION(Server, Reliable, BlueprintCallable)
-	void SRHackTerminal(ATerminal* actor);
-	void SRHackTerminal_Implementation(ATerminal* actor);
-
-	UFUNCTION(Server, Reliable, BlueprintCallable)
-	void SRFixTerminal(ATerminal* actor);
-	void SRFixTerminal_Implementation(ATerminal* actor);
+	void SRToogleHackTerminal(ATerminal* actor, bool isHack);
+	void SRToogleHackTerminal_Implementation(ATerminal* actor, bool isHack);
 
 	UFUNCTION(Server, Reliable, BlueprintCallable)
 	void SRSpawnParticle(class UParticleSystem* particleEffect, const FTransform& position, const float& duration);

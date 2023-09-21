@@ -15,32 +15,29 @@ class PROJECTRANSACK_API ATerminal : public AActor, public IThiefInteractibleAct
 	GENERATED_BODY()
 	
 public:	
-
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	class UStaticMeshComponent* mesh = nullptr;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-		class UStaticMeshComponent* mesh = nullptr;
+	class UShapeComponent* Trigger = nullptr;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-		class UShapeComponent* Trigger = nullptr;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-		TSubclassOf<UTerminalUI> WidgetClass;
+	TSubclassOf<UTerminalUI> WidgetClass;
 	UTerminalUI* Widget = nullptr;
 
-
-	AActor* UsedOwner = nullptr;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-		TArray<AActor*> SecurityCameras;
+	AActor* acteurUsingThis = nullptr;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-		float TimeToInteractThief = 5;
+	TArray<class ASecurityCamera*> SecurityCameras;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-		float TimeToInteractOfficer = 2;
+	float TimeToHackThief = 5;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-		float HackDuration = 2;
+	float TimeToFixOfficer = 2;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	float HackDuration = 2;
 
 	float currentTime = 0;
 	bool currentlyInteracting = false;
@@ -57,31 +54,26 @@ public:
 	virtual void Tick(float DeltaTime) override;
 
 	UFUNCTION()
-		void OnTriggerOverlapBegin(class UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, class UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
+	void OnTriggerOverlapBegin(class UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, class UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
 
 	UFUNCTION()
-		void OnTriggerOverlapEnd(class UPrimitiveComponent* OverlappedComp, AActor* OtherActor, class UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);
+	void OnTriggerOverlapEnd(class UPrimitiveComponent* OverlappedComp, AActor* OtherActor, class UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);
 
 
 	virtual void Interact_Implementation(class AActor* pActor) override;
 	virtual void StopInteract_Implementation(class AActor* pActor) override;
 
 	UFUNCTION(NetMulticast, Reliable, BlueprintCallable)
-		void HackTerminal();
-	void HackTerminal_Implementation();
+	void HackTerminal(bool isHack);
+	void HackTerminal_Implementation(bool isHack);
 
 	UFUNCTION(NetMulticast, Reliable, BlueprintCallable)
-		void FixTerminal();
-	void FixTerminal_Implementation();
-
-	UFUNCTION(NetMulticast, Reliable, BlueprintCallable)
-		void DisableCameras(bool pOpen);
-	void DisableCameras_Implementation(bool pOpen);
+	void ToggleCameras(bool pOpen);
+	void ToggleCameras_Implementation(bool pOpen);
 
 	void UpdateProgressHack(float DeltaTime);
 
 	UFUNCTION(NetMulticast, Reliable, BlueprintCallable)
-		void UpdateUIText();
+	void UpdateUIText();
 	void UpdateUIText_Implementation();
-
 };

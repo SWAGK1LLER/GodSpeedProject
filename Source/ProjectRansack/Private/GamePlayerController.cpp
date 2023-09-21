@@ -267,14 +267,9 @@ UUserWidget* AGamePlayerController::GetWidget(AActor* pItem)
 	return interactibleUI[pItem];
 }
 
-void AGamePlayerController::SRHackLights_Implementation(ALightFuseBoxe* actor)
+void AGamePlayerController::SRToogleHackLights_Implementation(ALightFuseBoxe* actor, bool isHack)
 {
-	actor->HackLights();
-}
-
-void AGamePlayerController::SRFixLights_Implementation(ALightFuseBoxe* actor)
-{
-	actor->FixLights();
+	actor->ToogleHackLights(isHack);
 }
 
 void AGamePlayerController::SRToggleLights_Implementation(ALightFuseBoxe* actor, bool pOpen)
@@ -282,31 +277,24 @@ void AGamePlayerController::SRToggleLights_Implementation(ALightFuseBoxe* actor,
 	actor->ToggleLights(pOpen);
 }
 
-void AGamePlayerController::SRHackDoor_Implementation(ADoor* actor)
+void AGamePlayerController::SRToogleHackDoor_Implementation(ADoor* actor, bool isHack)
 {
-	actor->HackDoor();
-}
-
-void AGamePlayerController::SRToggleCameras_Implementation(ATerminal* actor, bool pOn) //TODO 
-{
-	actor->DisableCameras(pOn);
-}
-
-void AGamePlayerController::SRHackTerminal_Implementation(ATerminal* actor)
-{
-	actor->HackTerminal();
-	actor->UpdateUIText();
-}
-
-void AGamePlayerController::SRFixTerminal_Implementation(ATerminal* actor)
-{
-	actor->FixTerminal();
-	actor->UpdateUIText();
+	actor->ToogleHackDoor(isHack);
 }
 
 void AGamePlayerController::SRToggleDoor_Implementation(ADoor* actor, bool pOpen)
 {
 	actor->ToggleDoor(pOpen);
+}
+
+void AGamePlayerController::SRToggleCameras_Implementation(ATerminal* actor, bool pOn)
+{
+	actor->ToggleCameras(pOn);
+}
+
+void AGamePlayerController::SRToogleHackTerminal_Implementation(ATerminal* actor, bool isHack)
+{
+	actor->HackTerminal(isHack);
 }
 
 void AGamePlayerController::SRFreezeInput_Implementation(float duration, ABase3C* actor)

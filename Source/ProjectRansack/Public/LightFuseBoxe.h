@@ -26,7 +26,7 @@ public:
 	TSubclassOf<ULightFuseBoxUI> WidgetClass;
 	ULightFuseBoxUI* Widget = nullptr;
 
-	class AActor* acteurUsingThis = nullptr;
+	AActor* acteurUsingThis = nullptr;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	TArray<class ALight*> ConnectedLight;
@@ -62,12 +62,8 @@ public:
 	virtual void StopInteract_Implementation(class AActor* pActor) override;
 
 	UFUNCTION(NetMulticast, Reliable, BlueprintCallable)
-	void HackLights();
-	void HackLights_Implementation();
-
-	UFUNCTION(NetMulticast, Reliable, BlueprintCallable)
-	void FixLights();
-	void FixLights_Implementation();
+	void ToogleHackLights(bool isHack);
+	void ToogleHackLights_Implementation(bool isHack);
 
 	UFUNCTION(NetMulticast, Reliable, BlueprintCallable)
 	void ToggleLights(bool pOpen);

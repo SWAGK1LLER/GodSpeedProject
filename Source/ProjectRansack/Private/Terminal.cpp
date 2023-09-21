@@ -1,6 +1,3 @@
-// Fill out your copyright notice in the Description page of Project Settings.
-
-
 #include "Terminal.h"
 #include "Components/StaticMeshComponent.h"
 #include "Components/BoxComponent.h"
@@ -10,10 +7,9 @@
 #include <Officer.h>
 #include "SecurityCamera.h"
 #include <Kismet/GameplayStatics.h>
-// Sets default values
+
 ATerminal::ATerminal()
 {
- 	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 	bReplicates = true;
 
@@ -25,7 +21,6 @@ ATerminal::ATerminal()
 	mesh->SetupAttachment(Trigger);
 }
 
-// Called when the game starts or when spawned
 void ATerminal::BeginPlay()
 {
 	Super::BeginPlay();
@@ -34,7 +29,6 @@ void ATerminal::BeginPlay()
 	Trigger->OnComponentEndOverlap.AddDynamic(this, &ATerminal::OnTriggerOverlapEnd);
 }
 
-// Called every frame
 void ATerminal::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
@@ -44,71 +38,55 @@ void ATerminal::Tick(float DeltaTime)
 
 void ATerminal::OnTriggerOverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
-    AThief* thief = Cast<AThief>(OtherActor);
-    if (thief != nullptr)
+    ABase3C* player = Cast<ABase3C>(OtherActor);
+    if (player == nullptr)
+        return;
+
+    UTerminalUI* widget = nullptr;
+
+    AController* PC = player->GetController();
+    if (PC != nullptr && PC->IsLocalPlayerController())
     {
-        thief->closeItems.Add(this);
+        AGamePlayerController* playerController = Cast<AGamePlayerController>(PC);
+        widget = Cast<UTerminalUI>(playerController->AddInteractibleWidgetUI(this, WidgetClass));
 
-        AController* PC = thief->GetController();
-        if (PC != nullptr && PC->IsLocalPlayerController())
+        AThief* thief = Cast<AThief>(OtherActor);
+        if (thief)
         {
-            AGamePlayerController* playerController = Cast<AGamePlayerController>(PC);
-            UTerminalUI* widget = Cast<UTerminalUI>(playerController->AddInteractibleWidgetUI(this, WidgetClass));
-
+            thief->closeItems.Add(this);
             widget->SetDefaultText(widget->getTextStateThief(TerminalHacked, TerminalOpenState));
         }
-
-        return;
-    }
-
-    AOfficer* officer = Cast<AOfficer>(OtherActor);
-    if (officer != nullptr)
-    {
-        officer->closeItems.Add(this);
-
-        AController* PC = officer->GetController();
-        if (PC != nullptr && PC->IsLocalPlayerController())
+        else
         {
-            AGamePlayerController* playerController = Cast<AGamePlayerController>(PC);
-            UTerminalUI* widget = Cast<UTerminalUI>(playerController->AddInteractibleWidgetUI(this, WidgetClass));
-
+            AOfficer* officer = Cast<AOfficer>(OtherActor);
+            officer->closeItems.Add(this);
             widget->SetDefaultText(widget->getTextStateOfficer(TerminalHacked, TerminalOpenState));
         }
-
-        return;
     }
 }
 
 void ATerminal::OnTriggerOverlapEnd(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
 {
-    AThief* thief = Cast<AThief>(OtherActor);
-    if (thief != nullptr)
-    {
-        thief->closeItems.Remove(this);
-
-        AController* PC = thief->GetController();
-        if (PC != nullptr && PC->IsLocalPlayerController())
-        {
-            AGamePlayerController* playerController = Cast<AGamePlayerController>(PC);
-            playerController->RemoveInteractibleWidgetUI(this);
-        }
-
+    ABase3C* player = Cast<ABase3C>(OtherActor);
+    if (player == nullptr)
         return;
-    }
 
-    AOfficer* officer = Cast<AOfficer>(OtherActor);
-    if (officer != nullptr)
+    AController* PC = player->GetController();
+    if (PC != nullptr && PC->IsLocalPlayerController())
     {
-        officer->closeItems.Remove(this);
+        AGamePlayerController* playerController = Cast<AGamePlayerController>(PC);
+        playerController->RemoveInteractibleWidgetUI(this);
 
-        AController* PC = officer->GetController();
-        if (PC != nullptr && PC->IsLocalPlayerController())
+        AThief* thief = Cast<AThief>(OtherActor);
+        if (thief)
         {
-            AGamePlayerController* playerController = Cast<AGamePlayerController>(PC);
-            playerController->RemoveInteractibleWidgetUI(this);
+            thief->closeItems.Remove(this);
         }
-
-        return;
+        else
+        {
+            AOfficer* officer = Cast<AOfficer>(OtherActor);
+            officer->closeItems.Remove(this);
+        }
     }
 }
 
@@ -138,7 +116,7 @@ void ATerminal::Interact_Implementation(AActor* pActor)
         {
             currentlyInteracting = true;
             currentTime = 0;
-            UsedOwner = pActor;
+            acteurUsingThis = pActor;
 
             //Show progress bar
             AGamePlayerController* playerController = Cast<AGamePlayerController>(thief->GetController());
@@ -156,10 +134,11 @@ void ATerminal::Interact_Implementation(AActor* pActor)
         {
             currentlyInteracting = true;
             currentTime = 0;
-            UsedOwner = pActor;
+            acteurUsingThis = pActor;
 
             //Show progress bar
             AGamePlayerController* playerController = Cast<AGamePlayerController>(officer->GetController());
+
             UTerminalUI* widget = Cast<UTerminalUI>(playerController->GetWidget(this));
             widget->SetDefaultText(widget->getTextStateOfficer(TerminalHacked, !TerminalOpenState));
             widget->ActivateProgressBar();
@@ -186,74 +165,47 @@ void ATerminal::Interact_Implementation(AActor* pActor)
 
 void ATerminal::StopInteract_Implementation(AActor* pActor)
 {
-    AThief* thief = Cast<AThief>(pActor);
-    AOfficer* officer = Cast<AOfficer>(pActor);
-    if (thief != nullptr)
+    if (acteurUsingThis == nullptr)
+        return;
+
+    currentlyInteracting = false;
+    acteurUsingThis = nullptr;
+
+    AGamePlayerController* playerController = Cast<AGamePlayerController>(Cast<ABase3C>(pActor)->GetController());
+    UTerminalUI* widget = Cast<UTerminalUI>(playerController->GetWidget(this));
+
+    if (Cast<AThief>(pActor) != nullptr)
     {
-        if (UsedOwner == nullptr)
-            return;
-
-        currentlyInteracting = false;
-        UsedOwner = nullptr;
-
-        AGamePlayerController* playerController = Cast<AGamePlayerController>(thief->GetController());
-        UTerminalUI* widget = Cast<UTerminalUI>(playerController->GetWidget(this));
         widget->SetDefaultText(widget->getTextStateThief(TerminalHacked, TerminalOpenState));
     }
-    else if (officer)
+    else
     {
-        if (UsedOwner == nullptr)
-            return;
-
-        currentlyInteracting = false;
-        UsedOwner = nullptr;
-
-        AGamePlayerController* playerController = Cast<AGamePlayerController>(officer->GetController());
-        UTerminalUI* widget = Cast<UTerminalUI>(playerController->GetWidget(this));
         widget->SetDefaultText(widget->getTextStateOfficer(TerminalHacked, TerminalOpenState));
     }
 }
 
-void ATerminal::HackTerminal_Implementation()
+void ATerminal::HackTerminal_Implementation(bool isHack)
 {
-    TerminalHacked = true;
+    TerminalHacked = isHack;
+    UpdateUIText();
 }
 
-void ATerminal::FixTerminal_Implementation()
-{
-    TerminalHacked = false;
-}
-
-void ATerminal::DisableCameras_Implementation(bool pOpen)
+void ATerminal::ToggleCameras_Implementation(bool pOpen)
 {
     if (TerminalOpenState == pOpen)
         return;
 
     TerminalOpenState = pOpen;
 
-    if (!pOpen)
+    for (ASecurityCamera* camera : SecurityCameras)
     {
+        if (camera == nullptr)
+            continue;
 
-        for (AActor* Camera : SecurityCameras)
-        {
-            if (Camera == nullptr)
-                continue;
-
-            Cast<ASecurityCamera>(Camera)->frozen = true;
-        }
-
-    }
-    else
-    {
-
-        for (AActor* Camera : SecurityCameras)
-        {
-            if (Camera == nullptr)
-                continue;
-
-            Cast<ASecurityCamera>(Camera)->frozen = false;
-        }
-
+        if (!pOpen)
+            camera->frozen = true;
+        else
+            camera->frozen = false;
     }
 
     UpdateUIText();
@@ -261,119 +213,72 @@ void ATerminal::DisableCameras_Implementation(bool pOpen)
 
 void ATerminal::UpdateProgressHack(float DeltaTime)
 {
-    if (Cast<AOfficer>(UsedOwner))
+    if (currentlyInteracting)
     {
-        if (currentlyInteracting)
+        currentTime += DeltaTime;
+
+        //Update ui progress bar
+        ABase3C* player = Cast<ABase3C>(acteurUsingThis);
+        AGamePlayerController* playerController = Cast<AGamePlayerController>(player->GetController());
+        UTerminalUI* widget = Cast<UTerminalUI>(playerController->GetWidget(this));
+        if (widget == nullptr)
+            return;
+
+        AOfficer* officer = Cast<AOfficer>(acteurUsingThis);
+        if (officer != nullptr)
         {
-            currentTime += DeltaTime;
-
-            //Update ui progress bar
-            AOfficer* officer = Cast<AOfficer>(UsedOwner);
-            AGamePlayerController* playerController = Cast<AGamePlayerController>(officer->GetController());
-            UTerminalUI* widget = Cast<UTerminalUI>(playerController->GetWidget(this));
-            if (widget == nullptr)
-                return;
-
-            widget->setProgressBarValue(HelperClass::mapValue(currentTime, 0, TimeToInteractOfficer, 0, 1));
-        }
-
-        if (currentTime >= TimeToInteractOfficer && currentlyInteracting)
-        {
-            AOfficer* player = Cast<AOfficer>(UsedOwner);
-            if (player != nullptr)
+            if (currentTime >= TimeToFixOfficer)
             {
                 currentlyInteracting = false;
                 currentTime = 0;
-
-                AGamePlayerController* playerController = Cast<AGamePlayerController>(player->GetController());
-
-                UTerminalUI* widget = Cast<UTerminalUI>(playerController->GetWidget(this));
-                if (widget == nullptr)
-                    return;
-
-                playerController->SRFixTerminal(this);
 
                 widget->SetDefaultText(widget->getTextStateOfficer(false, TerminalOpenState));
+
+                playerController->SRToogleHackTerminal(this, false);
+            }
+            else
+            {
+                widget->setProgressBarValue(HelperClass::mapValue(currentTime, 0, TimeToFixOfficer, 0, 1));
             }
         }
-    }
-    else
-    {
-        if (currentlyInteracting)
+        else
         {
-            currentTime += DeltaTime;
-
-            //Update ui progress bar
-            AThief* thief = Cast<AThief>(UsedOwner);
-            AGamePlayerController* playerController = Cast<AGamePlayerController>(thief->GetController());
-            UTerminalUI* widget = Cast<UTerminalUI>(playerController->GetWidget(this));
-            if (widget == nullptr)
-                return;
-
-            widget->setProgressBarValue(HelperClass::mapValue(currentTime, 0, TimeToInteractThief, 0, 1));
-        }
-
-        if (currentTime >= TimeToInteractThief && currentlyInteracting)
-        {
-            AThief* player = Cast<AThief>(UsedOwner);
-            if (player != nullptr)
+            if (currentTime >= TimeToHackThief)
             {
                 currentlyInteracting = false;
                 currentTime = 0;
-
-                AGamePlayerController* playerController = Cast<AGamePlayerController>(player->GetController());
-
-                UTerminalUI* widget = Cast<UTerminalUI>(playerController->GetWidget(this));
-                if (widget == nullptr)
-                    return;
 
                 widget->SetDefaultText(widget->getTextStateThief(true, TerminalOpenState));
 
-                playerController->SRHackTerminal(this);
-
-                UpdateUIText();
+                playerController->SRToogleHackTerminal(this, true);
+            }
+            else
+            {
+                widget->setProgressBarValue(HelperClass::mapValue(currentTime, 0, TimeToHackThief, 0, 1));
             }
         }
     }
-
 }
 
 void ATerminal::UpdateUIText_Implementation()
 {
     TArray<AActor*> actors;
     Trigger->GetOverlappingActors(actors, ABase3C::StaticClass());
-
     for (AActor* actor : actors)
     {
-        AThief* thief = Cast<AThief>(actor);
-        if (thief != nullptr)
-        {
-            AGamePlayerController* playerController = Cast<AGamePlayerController>(thief->GetController());
-            if (playerController != nullptr)
-            {
-                UTerminalUI* widget = Cast<UTerminalUI>(playerController->GetWidget(this));
-                if (widget == nullptr)
-                    return;
+        ABase3C* player = Cast<ABase3C>(actor);
 
-                widget->SetDefaultText(widget->getTextStateThief(TerminalHacked, TerminalOpenState));
-                return;
-            }
-        }
+        AGamePlayerController* playerController = Cast<AGamePlayerController>(player->GetController());
+        if (playerController == nullptr)
+            continue;
 
-        AOfficer* officer = Cast<AOfficer>(actor);
-        if (officer != nullptr)
-        {
-            AGamePlayerController* playerController = Cast<AGamePlayerController>(officer->GetController());
-            if (playerController != nullptr)
-            {
-                UTerminalUI* widget = Cast<UTerminalUI>(playerController->GetWidget(this));
-                if (widget == nullptr)
-                    return;
+        UTerminalUI* widget = Cast<UTerminalUI>(playerController->GetWidget(this));
+        if (widget == nullptr)
+            continue;
 
-                widget->SetDefaultText(widget->getTextStateOfficer(TerminalHacked, TerminalOpenState));
-                return;
-            }
-        }
+        if (Cast<AOfficer>(actor))
+            widget->SetDefaultText(widget->getTextStateOfficer(TerminalHacked, TerminalOpenState));
+        else
+            widget->SetDefaultText(widget->getTextStateThief(TerminalHacked, TerminalOpenState));
     }
 }
-

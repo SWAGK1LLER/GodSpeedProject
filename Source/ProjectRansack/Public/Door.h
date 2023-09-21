@@ -30,10 +30,10 @@ public:
 
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	float TimeToInteract = 5;
+	float TimeToHackThief = 5;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	float HackDuration = 2;
+	float TimeToFixOfficer = 2;
 
 	float currentTime = 0;
 	bool currentlyInteracting = false;
@@ -60,8 +60,8 @@ public:
 	virtual void StopInteract_Implementation(class AActor* pActor) override;
 
 	UFUNCTION(NetMulticast, Reliable, BlueprintCallable)
-	void HackDoor();
-	void HackDoor_Implementation();
+	void ToogleHackDoor(bool isHack);
+	void ToogleHackDoor_Implementation(bool isHack);
 
 	UFUNCTION(NetMulticast, Reliable, BlueprintCallable)
 	void ToggleDoor(bool pOpen);

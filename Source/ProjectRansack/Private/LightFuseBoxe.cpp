@@ -38,71 +38,55 @@ void ALightFuseBoxe::Tick(float DeltaTime)
 
 void ALightFuseBoxe::OnTriggerOverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
-    AThief* thief = Cast<AThief>(OtherActor);
-    if (thief != nullptr)
+    ABase3C* player = Cast<ABase3C>(OtherActor);
+    if (player == nullptr)
+        return;
+
+    ULightFuseBoxUI* widget = nullptr;
+
+    AController* PC = player->GetController();
+    if (PC != nullptr && PC->IsLocalPlayerController())
     {
-        thief->closeItems.Add(this);
+        AGamePlayerController* playerController = Cast<AGamePlayerController>(PC);
+        widget = Cast<ULightFuseBoxUI>(playerController->AddInteractibleWidgetUI(this, WidgetClass));
 
-        AController* PC = thief->GetController();
-        if (PC != nullptr && PC->IsLocalPlayerController())
+        AThief* thief = Cast<AThief>(OtherActor);
+        if (thief)
         {
-            AGamePlayerController* playerController = Cast<AGamePlayerController>(PC);
-            ULightFuseBoxUI* widget = Cast<ULightFuseBoxUI>(playerController->AddInteractibleWidgetUI(this, WidgetClass));
-
+            thief->closeItems.Add(this);
             widget->SetDefaultText(widget->getTextStateThief(FuseBoxHacked, FuseStateOpen));
         }
-
-        return;
-    }
-
-    AOfficer* officer = Cast<AOfficer>(OtherActor);
-    if (officer != nullptr)
-    {
-        officer->closeItems.Add(this);
-
-        AController* PC = officer->GetController();
-        if (PC != nullptr && PC->IsLocalPlayerController())
+        else
         {
-            AGamePlayerController* playerController = Cast<AGamePlayerController>(PC);
-            ULightFuseBoxUI* widget = Cast<ULightFuseBoxUI>(playerController->AddInteractibleWidgetUI(this, WidgetClass));
-
+            AOfficer* officer = Cast<AOfficer>(OtherActor);
+            officer->closeItems.Add(this);
             widget->SetDefaultText(widget->getTextStateOfficer(FuseBoxHacked, FuseStateOpen));
         }
-
-        return;
     }
 }
 
 void ALightFuseBoxe::OnTriggerOverlapEnd(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
 {
-    AThief* thief = Cast<AThief>(OtherActor);
-    if (thief != nullptr)
-    {
-        thief->closeItems.Remove(this);
-
-        AController* PC = thief->GetController();
-        if (PC != nullptr && PC->IsLocalPlayerController())
-        {
-            AGamePlayerController* playerController = Cast<AGamePlayerController>(PC);
-            playerController->RemoveInteractibleWidgetUI(this);
-        }
-
+    ABase3C* player = Cast<ABase3C>(OtherActor);
+    if (player == nullptr)
         return;
-    }
 
-    AOfficer* officer = Cast<AOfficer>(OtherActor);
-    if (officer != nullptr)
+    AController* PC = player->GetController();
+    if (PC != nullptr && PC->IsLocalPlayerController())
     {
-        officer->closeItems.Remove(this);
+        AGamePlayerController* playerController = Cast<AGamePlayerController>(PC);
+        playerController->RemoveInteractibleWidgetUI(this);
 
-        AController* PC = officer->GetController();
-        if (PC != nullptr && PC->IsLocalPlayerController())
+        AThief* thief = Cast<AThief>(OtherActor);
+        if (thief)
         {
-            AGamePlayerController* playerController = Cast<AGamePlayerController>(PC);
-            playerController->RemoveInteractibleWidgetUI(this);
+            thief->closeItems.Remove(this);
         }
-
-        return;
+        else
+        {
+            AOfficer* officer = Cast<AOfficer>(OtherActor);
+            officer->closeItems.Remove(this);
+        }
     }
 }
 
@@ -200,56 +184,10 @@ void ALightFuseBoxe::StopInteract_Implementation(AActor* pActor)
     }
 }
 
-void ALightFuseBoxe::HackLights_Implementation()
+void ALightFuseBoxe::ToogleHackLights_Implementation(bool isHack)
 {
-    FuseBoxHacked = true;
-
-    //Reset message for other player in area
-    TArray<AActor*> actors;
-    Trigger->GetOverlappingActors(actors, ABase3C::StaticClass());
-    for (AActor* actor : actors)
-    {
-        ABase3C* player = Cast<ABase3C>(actor);
-
-        AGamePlayerController* playerController = Cast<AGamePlayerController>(player->GetController());
-        if (playerController == nullptr)
-            continue;
-
-        ULightFuseBoxUI* widget = Cast<ULightFuseBoxUI>(playerController->GetWidget(this));
-        if (widget == nullptr)
-            continue;
-
-        if (Cast<AOfficer>(actor))
-            widget->SetDefaultText(widget->getTextStateOfficer(FuseBoxHacked, FuseStateOpen));
-        else
-            widget->SetDefaultText(widget->getTextStateThief(FuseBoxHacked, FuseStateOpen));
-    }
-}
-
-void ALightFuseBoxe::FixLights_Implementation()
-{
-    FuseBoxHacked = false;
-
-    //Reset message for other player in area
-    TArray<AActor*> actors;
-    Trigger->GetOverlappingActors(actors, ABase3C::StaticClass());
-    for (AActor* actor : actors)
-    {
-        ABase3C* player = Cast<ABase3C>(actor);
-
-        AGamePlayerController* playerController = Cast<AGamePlayerController>(player->GetController());
-        if (playerController == nullptr)
-            continue;
-
-        ULightFuseBoxUI* widget = Cast<ULightFuseBoxUI>(playerController->GetWidget(this));
-        if (widget == nullptr)
-            continue;
-
-        if (Cast<AOfficer>(actor))
-            widget->SetDefaultText(widget->getTextStateOfficer(FuseBoxHacked, FuseStateOpen));
-        else
-            widget->SetDefaultText(widget->getTextStateThief(FuseBoxHacked, FuseStateOpen));
-    }
+    FuseBoxHacked = isHack;
+    UpdateUIText();
 }
 
 void ALightFuseBoxe::ToggleLights_Implementation(bool pOpen)
@@ -296,7 +234,7 @@ void ALightFuseBoxe::UpdateProgressHack(float DeltaTime)
 
                 widget->SetDefaultText(widget->getTextStateOfficer(false, FuseStateOpen));
 
-                playerController->SRFixLights(this);
+                playerController->SRToogleHackLights(this, false);
             }
             else
             {
@@ -312,7 +250,7 @@ void ALightFuseBoxe::UpdateProgressHack(float DeltaTime)
 
                 widget->SetDefaultText(widget->getTextStateThief(true, FuseStateOpen));
 
-                playerController->SRHackLights(this);
+                playerController->SRToogleHackLights(this, true);
             }
             else
             {
@@ -326,37 +264,21 @@ void ALightFuseBoxe::UpdateUIText_Implementation()
 {
     TArray<AActor*> actors;
     Trigger->GetOverlappingActors(actors, ABase3C::StaticClass());
-
     for (AActor* actor : actors)
     {
-        AThief* thief = Cast<AThief>(actor);
-        if (thief != nullptr)
-        {
-            AGamePlayerController* playerController = Cast<AGamePlayerController>(thief->GetController());
-            if (playerController != nullptr)
-            {
-                ULightFuseBoxUI* widget = Cast<ULightFuseBoxUI>(playerController->GetWidget(this));
-                if (widget == nullptr)
-                    return;
+        ABase3C* player = Cast<ABase3C>(actor);
 
-                widget->SetDefaultText(widget->getTextStateThief(FuseBoxHacked, FuseStateOpen));
-                return;
-            }
-        }
+        AGamePlayerController* playerController = Cast<AGamePlayerController>(player->GetController());
+        if (playerController == nullptr)
+            continue;
 
-        AOfficer* officer = Cast<AOfficer>(actor);
-        if (officer != nullptr)
-        {
-            AGamePlayerController* playerController = Cast<AGamePlayerController>(officer->GetController());
-            if (playerController != nullptr)
-            {
-                ULightFuseBoxUI* widget = Cast<ULightFuseBoxUI>(playerController->GetWidget(this));
-                if (widget == nullptr)
-                    return;
+        ULightFuseBoxUI* widget = Cast<ULightFuseBoxUI>(playerController->GetWidget(this));
+        if (widget == nullptr)
+            continue;
 
-                widget->SetDefaultText(widget->getTextStateOfficer(FuseBoxHacked, FuseStateOpen));
-                return;
-            }
-        }
+        if (Cast<AOfficer>(actor))
+            widget->SetDefaultText(widget->getTextStateOfficer(FuseBoxHacked, FuseStateOpen));
+        else
+            widget->SetDefaultText(widget->getTextStateThief(FuseBoxHacked, FuseStateOpen));
     }
 }

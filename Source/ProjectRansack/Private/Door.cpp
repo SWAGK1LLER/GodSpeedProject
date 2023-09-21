@@ -37,71 +37,55 @@ void ADoor::Tick(float DeltaTime)
 
 void ADoor::OnTriggerOverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
-    AThief* thief = Cast<AThief>(OtherActor);
-    if (thief != nullptr)
+    ABase3C* player = Cast<ABase3C>(OtherActor);
+    if (player == nullptr)
+        return;
+
+    UDoorUI* widget = nullptr;
+
+    AController* PC = player->GetController();
+    if (PC != nullptr && PC->IsLocalPlayerController())
     {
-        thief->closeItems.Add(this);
+        AGamePlayerController* playerController = Cast<AGamePlayerController>(PC);
+        widget = Cast<UDoorUI>(playerController->AddInteractibleWidgetUI(this, WidgetClass));
 
-        AController* PC = thief->GetController();
-        if (PC != nullptr && PC->IsLocalPlayerController())
+        AThief* thief = Cast<AThief>(OtherActor);
+        if (thief)
         {
-            AGamePlayerController* playerController = Cast<AGamePlayerController>(PC);
-            UDoorUI* widget = Cast<UDoorUI>(playerController->AddInteractibleWidgetUI(this, WidgetClass));
-
+            thief->closeItems.Add(this);
             widget->SetDefaultText(widget->getTextStateThief(FuseBoxHacked, FuseStateOpen));
         }
-
-        return;
-    }
-
-    AOfficer* officer = Cast<AOfficer>(OtherActor);
-    if (officer != nullptr)
-    {
-        officer->closeItems.Add(this);
-
-        AController* PC = officer->GetController();
-        if (PC != nullptr && PC->IsLocalPlayerController())
+        else
         {
-            AGamePlayerController* playerController = Cast<AGamePlayerController>(PC);
-            UDoorUI* widget = Cast<UDoorUI>(playerController->AddInteractibleWidgetUI(this, WidgetClass));
-
-            widget->SetDefaultText(widget->getTextStateOfficer(FuseStateOpen));
+            AOfficer* officer = Cast<AOfficer>(OtherActor);
+            officer->closeItems.Add(this);
+            widget->SetDefaultText(widget->getTextStateOfficer(FuseBoxHacked, FuseStateOpen));
         }
-
-        return;
     }
 }
 
 void ADoor::OnTriggerOverlapEnd(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
 {
-    AThief* thief = Cast<AThief>(OtherActor);
-    if (thief != nullptr)
-    {
-        thief->closeItems.Remove(this);
-
-        AController* PC = thief->GetController();
-        if (PC != nullptr && PC->IsLocalPlayerController())
-        {
-            AGamePlayerController* playerController = Cast<AGamePlayerController>(PC);
-            playerController->RemoveInteractibleWidgetUI(this);
-        }
-
+    ABase3C* player = Cast<ABase3C>(OtherActor);
+    if (player == nullptr)
         return;
-    }
 
-    AOfficer* officer = Cast<AOfficer>(OtherActor);
-    if (officer != nullptr)
+    AController* PC = player->GetController();
+    if (PC != nullptr && PC->IsLocalPlayerController())
     {
-        officer->closeItems.Remove(this);
+        AGamePlayerController* playerController = Cast<AGamePlayerController>(PC);
+        playerController->RemoveInteractibleWidgetUI(this);
 
-        AController* PC = officer->GetController();
-        if (PC != nullptr && PC->IsLocalPlayerController())
+        AThief* thief = Cast<AThief>(OtherActor);
+        if (thief)
         {
-            AGamePlayerController* playerController = Cast<AGamePlayerController>(PC);
-            playerController->RemoveInteractibleWidgetUI(this);
+            thief->closeItems.Remove(this);
         }
-
-        return;
+        else
+        {
+            AOfficer* officer = Cast<AOfficer>(OtherActor);
+            officer->closeItems.Remove(this);
+        }
     }
 }
 
@@ -145,49 +129,64 @@ void ADoor::Interact_Implementation(AActor* pActor)
     AOfficer* officer = Cast<AOfficer>(pActor);
     if (officer != nullptr)
     {
-        float realtimeSeconds = UGameplayStatics::GetRealTimeSeconds(GetWorld());
+        if (FuseBoxHacked)
+        {
+            currentlyInteracting = true;
+            currentTime = 0;
+            acteurUsingThis = pActor;
 
-        float diff = realtimeSeconds - time;
-        if (diff < 0.10f && time != 0)
-            return;
+            //Show progress bar
+            AGamePlayerController* playerController = Cast<AGamePlayerController>(officer->GetController());
 
-        time = realtimeSeconds;
+            UDoorUI* widget = Cast<UDoorUI>(playerController->GetWidget(this));
+            widget->SetDefaultText(widget->getTextStateOfficer(FuseBoxHacked, !FuseStateOpen));
+            widget->ActivateProgressBar();
+        }
+        else
+        {
+            float realtimeSeconds = UGameplayStatics::GetRealTimeSeconds(GetWorld());
 
-        AGamePlayerController* playerController = Cast<AGamePlayerController>(officer->GetController());
+            float diff = realtimeSeconds - time;
+            if (diff < 0.10f && time != 0)
+                return;
 
-        UDoorUI* widget = Cast<UDoorUI>(playerController->GetWidget(this));
-        widget->SetDefaultText(widget->getTextStateOfficer(!FuseStateOpen));
+            time = realtimeSeconds;
 
-        playerController->SRToggleDoor(this, !FuseStateOpen);
+            AGamePlayerController* playerController = Cast<AGamePlayerController>(officer->GetController());
+
+            UDoorUI* widget = Cast<UDoorUI>(playerController->GetWidget(this));
+            widget->SetDefaultText(widget->getTextStateOfficer(FuseBoxHacked, !FuseStateOpen));
+
+            playerController->SRToggleDoor(this, !FuseStateOpen);
+        }
     }
 }
 
 void ADoor::StopInteract_Implementation(AActor* pActor)
 {
-    AThief* thief = Cast<AThief>(pActor);
-    if (thief != nullptr)
+    if (acteurUsingThis == nullptr)
+        return;
+
+    currentlyInteracting = false;
+    acteurUsingThis = nullptr;
+
+    AGamePlayerController* playerController = Cast<AGamePlayerController>(Cast<ABase3C>(pActor)->GetController());
+    UDoorUI* widget = Cast<UDoorUI>(playerController->GetWidget(this));
+
+    if (Cast<AThief>(pActor) != nullptr)
     {
-        if (acteurUsingThis == nullptr)
-            return;
-
-        currentlyInteracting = false;
-        acteurUsingThis = nullptr;
-
-        AGamePlayerController* playerController = Cast<AGamePlayerController>(thief->GetController());
-        UDoorUI* widget = Cast<UDoorUI>(playerController->GetWidget(this));
         widget->SetDefaultText(widget->getTextStateThief(FuseBoxHacked, FuseStateOpen));
+    }
+    else
+    {
+        widget->SetDefaultText(widget->getTextStateOfficer(FuseBoxHacked, FuseStateOpen));
     }
 }
 
-void ADoor::HackDoor_Implementation()
+void ADoor::ToogleHackDoor_Implementation(bool isHack)
 {
-    FuseBoxHacked = true;
-
-    FTimerHandle Handle;
-    GetWorld()->GetTimerManager().SetTimer(Handle, FTimerDelegate::CreateLambda([&] {
-        FuseBoxHacked = false;
-        UpdateUIText();
-        }), HackDuration, false);
+    FuseBoxHacked = isHack;
+    UpdateUIText();
 }
 
 void ADoor::ToggleDoor_Implementation(bool pOpen)
@@ -212,32 +211,44 @@ void ADoor::UpdateProgressHack(float DeltaTime)
         currentTime += DeltaTime;
 
         //Update ui progress bar
-        AThief* thief = Cast<AThief>(acteurUsingThis);
-        AGamePlayerController* playerController = Cast<AGamePlayerController>(thief->GetController());
+        ABase3C* player = Cast<ABase3C>(acteurUsingThis);
+        AGamePlayerController* playerController = Cast<AGamePlayerController>(player->GetController());
         UDoorUI* widget = Cast<UDoorUI>(playerController->GetWidget(this));
         if (widget == nullptr)
             return;
 
-        widget->setProgressBarValue(HelperClass::mapValue(currentTime, 0, TimeToInteract, 0, 1));
-    }
-
-    if (currentTime >= TimeToInteract && currentlyInteracting)
-    {
-        AThief* player = Cast<AThief>(acteurUsingThis);
-        if (player != nullptr)
+        AOfficer* officer = Cast<AOfficer>(acteurUsingThis);
+        if (officer != nullptr)
         {
-            currentlyInteracting = false;
-            currentTime = 0;
+            if (currentTime >= TimeToFixOfficer)
+            {
+                currentlyInteracting = false;
+                currentTime = 0;
 
-            AGamePlayerController* playerController = Cast<AGamePlayerController>(player->GetController());
+                widget->SetDefaultText(widget->getTextStateOfficer(false, FuseStateOpen));
 
-            UDoorUI* widget = Cast<UDoorUI>(playerController->GetWidget(this));
-            if (widget == nullptr)
-                return;
+                playerController->SRToogleHackDoor(this, false);
+            }
+            else
+            {
+                widget->setProgressBarValue(HelperClass::mapValue(currentTime, 0, TimeToFixOfficer, 0, 1));
+            }
+        }
+        else
+        {
+            if (currentTime >= TimeToHackThief)
+            {
+                currentlyInteracting = false;
+                currentTime = 0;
 
-            widget->SetDefaultText(widget->getTextStateThief(true, FuseStateOpen));
+                widget->SetDefaultText(widget->getTextStateThief(true, FuseStateOpen));
 
-            playerController->SRHackDoor(this);
+                playerController->SRToogleHackDoor(this, true);
+            }
+            else
+            {
+                widget->setProgressBarValue(HelperClass::mapValue(currentTime, 0, TimeToHackThief, 0, 1));
+            }
         }
     }
 }
@@ -246,37 +257,21 @@ void ADoor::UpdateUIText_Implementation()
 {
     TArray<AActor*> actors;
     Trigger->GetOverlappingActors(actors, ABase3C::StaticClass());
-
     for (AActor* actor : actors)
     {
-        AThief* thief = Cast<AThief>(actor);
-        if (thief != nullptr)
-        {
-            AGamePlayerController* playerController = Cast<AGamePlayerController>(thief->GetController());
-            if (playerController != nullptr)
-            {
-                UDoorUI* widget = Cast<UDoorUI>(playerController->GetWidget(this));
-                if (widget == nullptr)
-                    return;
+        ABase3C* player = Cast<ABase3C>(actor);
 
-                widget->SetDefaultText(widget->getTextStateThief(FuseBoxHacked, FuseStateOpen));
-                return;
-            }
-        }
+        AGamePlayerController* playerController = Cast<AGamePlayerController>(player->GetController());
+        if (playerController == nullptr)
+            continue;
 
-        AOfficer* officer = Cast<AOfficer>(actor);
-        if (officer != nullptr)
-        {
-            AGamePlayerController* playerController = Cast<AGamePlayerController>(officer->GetController());
-            if (playerController != nullptr)
-            {
-                UDoorUI* widget = Cast<UDoorUI>(playerController->GetWidget(this));
-                if (widget == nullptr)
-                    return;
+        UDoorUI* widget = Cast<UDoorUI>(playerController->GetWidget(this));
+        if (widget == nullptr)
+            continue;
 
-                widget->SetDefaultText(widget->getTextStateOfficer(FuseStateOpen));
-                return;
-            }
-        }
+        if (Cast<AOfficer>(actor))
+            widget->SetDefaultText(widget->getTextStateOfficer(FuseBoxHacked, FuseStateOpen));
+        else
+            widget->SetDefaultText(widget->getTextStateThief(FuseBoxHacked, FuseStateOpen));
     }
 }
