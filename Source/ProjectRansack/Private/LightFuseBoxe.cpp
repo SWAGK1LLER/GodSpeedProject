@@ -6,6 +6,7 @@
 #include "Engine/Light.h"
 #include "HelperClass.h"
 #include <Officer.h>
+#include <Kismet/GameplayStatics.h>
 
 ALightFuseBoxe::ALightFuseBoxe()
 {
@@ -112,6 +113,14 @@ void ALightFuseBoxe::Interact_Implementation(AActor* pActor)
     {
         if (FuseBoxHacked)
         {
+            float realtimeSeconds = UGameplayStatics::GetRealTimeSeconds(GetWorld());
+
+            float diff = realtimeSeconds - time;
+            if (diff < 0.10f && time != 0)
+                return;
+
+            time = realtimeSeconds;
+
             AGamePlayerController* playerController = Cast<AGamePlayerController>(thief->GetController());
 
             ULightFuseBoxUI* widget = Cast<ULightFuseBoxUI>(playerController->GetWidget(this));
@@ -137,6 +146,14 @@ void ALightFuseBoxe::Interact_Implementation(AActor* pActor)
     AOfficer* officer = Cast<AOfficer>(pActor);
     if (officer != nullptr)
     {
+        float realtimeSeconds = UGameplayStatics::GetRealTimeSeconds(GetWorld());
+
+        float diff = realtimeSeconds - time;
+        if (diff < 0.10f && time != 0)
+            return;
+
+        time = realtimeSeconds;
+
         AGamePlayerController* playerController = Cast<AGamePlayerController>(officer->GetController());
 
         ULightFuseBoxUI* widget = Cast<ULightFuseBoxUI>(playerController->GetWidget(this));

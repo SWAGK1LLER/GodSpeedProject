@@ -41,6 +41,8 @@ public:
 	bool FuseStateOpen = true;
 	bool FuseBoxHacked = false;
 
+	float time = 0;
+
 	ADoor();
 
 	virtual void BeginPlay() override;

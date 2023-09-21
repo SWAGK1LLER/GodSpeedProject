@@ -5,6 +5,7 @@
 #include <GamePlayerController.h>
 #include "HelperClass.h"
 #include <Officer.h>
+#include <Kismet/GameplayStatics.h>
 
 ADoor::ADoor()
 {
@@ -111,6 +112,14 @@ void ADoor::Interact_Implementation(AActor* pActor)
     {
         if (FuseBoxHacked)
         {
+            float realtimeSeconds = UGameplayStatics::GetRealTimeSeconds(GetWorld());
+
+            float diff = realtimeSeconds - time;
+            if (diff < 0.10f && time != 0)
+                return;
+
+            time = realtimeSeconds;
+
             AGamePlayerController* playerController = Cast<AGamePlayerController>(thief->GetController());
 
             UDoorUI* widget = Cast<UDoorUI>(playerController->GetWidget(this));
@@ -136,6 +145,14 @@ void ADoor::Interact_Implementation(AActor* pActor)
     AOfficer* officer = Cast<AOfficer>(pActor);
     if (officer != nullptr)
     {
+        float realtimeSeconds = UGameplayStatics::GetRealTimeSeconds(GetWorld());
+
+        float diff = realtimeSeconds - time;
+        if (diff < 0.10f && time != 0)
+            return;
+
+        time = realtimeSeconds;
+
         AGamePlayerController* playerController = Cast<AGamePlayerController>(officer->GetController());
 
         UDoorUI* widget = Cast<UDoorUI>(playerController->GetWidget(this));
