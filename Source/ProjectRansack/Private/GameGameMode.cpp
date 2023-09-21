@@ -15,7 +15,7 @@
 #include "SecurityCamera.h"
 #include <ExtractionZone.h>
 
-#define FORCE_SPAWN_BOTH_SIDE 0
+#define FORCE_SPAWN_BOTH_SIDE 1
 
 int AGameGameMode::a = 0;
 
