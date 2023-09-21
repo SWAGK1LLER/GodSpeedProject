@@ -48,6 +48,8 @@ public:
 	bool TerminalOpenState = true;
 	bool TerminalHacked = false;
 
+	float time = 0;
+
 	ATerminal();
 
 	virtual void BeginPlay() override;

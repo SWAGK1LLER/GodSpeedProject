@@ -9,6 +9,7 @@
 #include "HelperClass.h"
 #include <Officer.h>
 #include "SecurityCamera.h"
+#include <Kismet/GameplayStatics.h>
 // Sets default values
 ATerminal::ATerminal()
 {
@@ -118,6 +119,14 @@ void ATerminal::Interact_Implementation(AActor* pActor)
     {
         if (TerminalHacked)
         {
+            float realtimeSeconds = UGameplayStatics::GetRealTimeSeconds(GetWorld());
+
+            float diff = realtimeSeconds - time;
+            if (diff < 0.10f && time != 0)
+                return;
+
+            time = realtimeSeconds;
+
             AGamePlayerController* playerController = Cast<AGamePlayerController>(thief->GetController());
 
             UTerminalUI* widget = Cast<UTerminalUI>(playerController->GetWidget(this));
@@ -157,6 +166,14 @@ void ATerminal::Interact_Implementation(AActor* pActor)
         }
         else
         {
+            float realtimeSeconds = UGameplayStatics::GetRealTimeSeconds(GetWorld());
+
+            float diff = realtimeSeconds - time;
+            if (diff < 0.10f && time != 0)
+                return;
+
+            time = realtimeSeconds;
+
             AGamePlayerController* playerController = Cast<AGamePlayerController>(officer->GetController());
 
             UTerminalUI* widget = Cast<UTerminalUI>(playerController->GetWidget(this));
@@ -219,6 +236,9 @@ void ATerminal::DisableCameras_Implementation(bool pOpen)
 
         for (AActor* Camera : SecurityCameras)
         {
+            if (Camera == nullptr)
+                continue;
+
             Cast<ASecurityCamera>(Camera)->frozen = true;
         }
 
@@ -228,6 +248,9 @@ void ATerminal::DisableCameras_Implementation(bool pOpen)
 
         for (AActor* Camera : SecurityCameras)
         {
+            if (Camera == nullptr)
+                continue;
+
             Cast<ASecurityCamera>(Camera)->frozen = false;
         }
 

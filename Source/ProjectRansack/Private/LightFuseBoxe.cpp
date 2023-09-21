@@ -200,6 +200,9 @@ void ALightFuseBoxe::ToggleLights_Implementation(bool pOpen)
 
     for (ALight* light : ConnectedLight)
     {
+        if (light == nullptr)
+            continue;
+
         if (!pOpen)
             HelperClass::deactivateActor(light);
         else
