@@ -125,6 +125,10 @@ public:
 	void SRHackLights_Implementation(ALightFuseBoxe* actor);
 
 	UFUNCTION(Server, Reliable, BlueprintCallable)
+	void SRFixLights(ALightFuseBoxe* actor);
+	void SRFixLights_Implementation(ALightFuseBoxe* actor);
+
+	UFUNCTION(Server, Reliable, BlueprintCallable)
 	void SRToggleDoor(ADoor* actor, bool pOpen);
 	void SRToggleDoor_Implementation(ADoor* actor, bool pOpen);
 
@@ -133,15 +137,15 @@ public:
 	void SRHackDoor_Implementation(ADoor* actor);
 
 	UFUNCTION(Server, Reliable, BlueprintCallable)
-		void SRToggleCameras(class ATerminal* actor, bool pOn);
+	void SRToggleCameras(class ATerminal* actor, bool pOn);
 	void SRToggleCameras_Implementation(ATerminal* actor, bool pOn);
 
 	UFUNCTION(Server, Reliable, BlueprintCallable)
-		void SRHackTerminal(ATerminal* actor);
+	void SRHackTerminal(ATerminal* actor);
 	void SRHackTerminal_Implementation(ATerminal* actor);
 
 	UFUNCTION(Server, Reliable, BlueprintCallable)
-		void SRFixTerminal(ATerminal* actor);
+	void SRFixTerminal(ATerminal* actor);
 	void SRFixTerminal_Implementation(ATerminal* actor);
 
 	UFUNCTION(Server, Reliable, BlueprintCallable)

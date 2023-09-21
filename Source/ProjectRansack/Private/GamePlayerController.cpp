@@ -272,6 +272,11 @@ void AGamePlayerController::SRHackLights_Implementation(ALightFuseBoxe* actor)
 	actor->HackLights();
 }
 
+void AGamePlayerController::SRFixLights_Implementation(ALightFuseBoxe* actor)
+{
+	actor->FixLights();
+}
+
 void AGamePlayerController::SRToggleLights_Implementation(ALightFuseBoxe* actor, bool pOpen)
 {
 	actor->ToggleLights(pOpen);

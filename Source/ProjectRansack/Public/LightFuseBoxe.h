@@ -32,10 +32,10 @@ public:
 	TArray<class ALight*> ConnectedLight;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	float TimeToInteract = 5;
+	float TimeToHackThief = 5;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	float HackDuration = 2;
+	float TimeToFixOfficer = 2;
 
 	float currentTime = 0;
 	bool currentlyInteracting = false;
@@ -64,6 +64,10 @@ public:
 	UFUNCTION(NetMulticast, Reliable, BlueprintCallable)
 	void HackLights();
 	void HackLights_Implementation();
+
+	UFUNCTION(NetMulticast, Reliable, BlueprintCallable)
+	void FixLights();
+	void FixLights_Implementation();
 
 	UFUNCTION(NetMulticast, Reliable, BlueprintCallable)
 	void ToggleLights(bool pOpen);

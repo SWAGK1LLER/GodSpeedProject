@@ -3,8 +3,11 @@
 
 #include "LightFuseBoxUI.h"
 
-FString ULightFuseBoxUI::getTextStateOfficer(bool lightOpen)
+FString ULightFuseBoxUI::getTextStateOfficer(bool hacked, bool lightOpen)
 {
+	if (hacked)
+		return FString("Hold E to fix fuse box");
+
 	if (lightOpen)
 		return FString("Press E to turn off all light");
 	return FString("Press E to turn on all light");
