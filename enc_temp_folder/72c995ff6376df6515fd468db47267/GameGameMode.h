@@ -59,13 +59,7 @@ public:
 
 	int TotalPlayerToStart = 1;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Debug")
-	ETeam debugSpawnedTeam = ETeam::A;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Debug")
-	bool debugEnabled = true;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Debug")
-	bool debugForceSpawnBothSide = false;
-	static int teamCount;
+	static int a;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	TSubclassOf<AActor> ThiefClass;

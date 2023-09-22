@@ -15,11 +15,13 @@
 #include "SecurityCamera.h"
 #include <ExtractionZone.h>
 
-int AGameGameMode::teamCount = 0;
+#define FORCE_SPAWN_BOTH_SIDE 1
+
+int AGameGameMode::a = 0;
 
 void AGameGameMode::BeginPlay()
 {
-	AGameGameMode::teamCount = 0;
+	AGameGameMode::a = 0;
 
 	Super::BeginPlay();
 
@@ -69,20 +71,15 @@ void AGameGameMode::Logout(AController* ExitPlayer)
 
 void AGameGameMode::SpawnPlayer(ETeam team, APlayerController* NewPlayer)
 {
-	if (debugForceSpawnBothSide)
+	if (FORCE_SPAWN_BOTH_SIDE)
 	{
 		team = ETeam::A;
-		if (teamCount < 1)
+		if (a < 1)
 		{
 			team = ETeam::B;
-			teamCount++;
+			a++;
 		}
 	}
-	else if (debugEnabled)
-	{
-		team = debugSpawnedTeam;
-	}
-
 
 	APawn* pawn = NewPlayer->GetPawn();
 	if (pawn != nullptr)
