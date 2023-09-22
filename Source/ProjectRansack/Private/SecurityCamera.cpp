@@ -58,8 +58,8 @@ void ASecurityCamera::Tick(float DeltaTime)
 	Super::Tick(DeltaTime);
 
 	CheckUndetectedThieves();
-
-	CheckAndRotate();
+	if(!hasPinged)
+		CheckAndRotate();
 }
 
 
