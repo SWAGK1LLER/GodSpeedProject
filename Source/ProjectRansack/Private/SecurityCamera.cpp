@@ -91,24 +91,55 @@ void ASecurityCamera::NotifyAllSecurity_Implementation(bool PingOrUnping)
 {
 	AGameGameMode* GameMode = (AGameGameMode*)GetWorld()->GetAuthGameMode();
 
-	for (AActor* Officer : GameMode->TeamB)
+	if (GameMode->TeamB[0])
 	{
-		if (PingOrUnping)
+		if (GameMode->TeamB[0]->IsA(AOfficer::StaticClass()))
 		{
-			Cast<AOfficer>(Officer)->ReceiveCameraPing(cameraNumber);
+			for (AActor* Officer : GameMode->TeamB)
+			{
+				if (PingOrUnping)
+				{
+					Cast<AOfficer>(Officer)->ReceiveCameraPing(cameraNumber);
+				}
+				else
+					Cast<AOfficer>(Officer)->ReceiveCameraUnPing();
+			}
 		}
-		else
-			Cast<AOfficer>(Officer)->ReceiveCameraUnPing();
 	}
+	else if (GameMode->TeamA[0])
+	{
+		if (GameMode->TeamA[0]->IsA(AOfficer::StaticClass()))
+		{
+			for (AActor* Officer : GameMode->TeamA)
+			{
+				if (PingOrUnping)
+				{
+					Cast<AOfficer>(Officer)->ReceiveCameraPing(cameraNumber);
+				}
+				else
+					Cast<AOfficer>(Officer)->ReceiveCameraUnPing();
+			}
+		}
+	}
+
+	
+
 
 	if (PingOrUnping)
 	{
+		if (!hasPinged)
+			PlayAudio();
+
 		hasPinged = true;
-		PlayAudio();
+		spotLight->SetLightColor(tableInstance->ColorPing);
+
 	}
 	else
+	{
+		spotLight->SetLightColor(FLinearColor::White);
 		hasPinged = false;
 		
+	}
 }
 
 
@@ -175,7 +206,9 @@ void ASecurityCamera::CheckUndetectedThieves()
 			if (Hit.GetActor() == Thief)
 			{
 				//GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("Found!"));
-				NotifyAllSecurity(true);
+				if(!hasPinged)
+					NotifyAllSecurity(true);
+
 				hasDetected = true;
 			}
 		}

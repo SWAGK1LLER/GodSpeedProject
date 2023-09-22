@@ -311,7 +311,8 @@ void AOfficer::SetupNotificationUI()
 void AOfficer::ReceiveCameraPing_Implementation(int CameraNumb)
 {
 	//GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("CAMERA PINGED!"));
-	notificationUI->PingOfficer(CameraNumb);
+	if(notificationUI)
+		notificationUI->PingOfficer(CameraNumb);
 }
 
 
