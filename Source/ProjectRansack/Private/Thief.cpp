@@ -125,8 +125,8 @@ void AThief::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 	//Moving
 	if (UEnhancedInputComponent* EnhancedInputComponent = CastChecked<UEnhancedInputComponent>(PlayerInputComponent))
 	{
-		EnhancedInputComponent->BindAction(thiefTableInstance->crouchAction, ETriggerEvent::Started, this, &AThief::StartCrouch);
-		EnhancedInputComponent->BindAction(thiefTableInstance->crouchAction, ETriggerEvent::Completed, this, &AThief::StopCrouch);
+		EnhancedInputComponent->BindAction(thiefTableInstance->crouchAction, ETriggerEvent::Started, this, &AThief::CLStartCrouch);
+		EnhancedInputComponent->BindAction(thiefTableInstance->crouchAction, ETriggerEvent::Completed, this, &AThief::CLStopCrouch);
 
 		EnhancedInputComponent->BindAction(thiefTableInstance->climbAction, ETriggerEvent::Started, this, &AThief::CheckCanClimb);
 	}
@@ -532,17 +532,29 @@ void AThief::ClimbTriggerOverlapEnd(UPrimitiveComponent* OverlappedComp, AActor*
 	}
 }
 
-void AThief::StartCrouch()
+void AThief::CLStartCrouch()
 {
-	//Crouch();
+	AGamePlayerController* PC = Cast<AGamePlayerController>(Controller);
+	if (PC != nullptr)
+		PC->SRStartCrouch(this);
+}
+
+void AThief::CLStopCrouch()
+{
+	AGamePlayerController* PC = Cast<AGamePlayerController>(Controller);
+	if (PC != nullptr)
+		PC->SRStopCrouch(this);
+}
+
+
+void AThief::StartCrouch_Implementation()
+{
 	IsCrouch = true;
 }
 
 
-void AThief::StopCrouch()
+void AThief::StopCrouch_Implementation()
 {
-	//UnCrouch();
-
 	IsCrouch = false;
 }
 

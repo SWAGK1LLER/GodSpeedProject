@@ -170,4 +170,12 @@ public:
 	UFUNCTION(Server, Reliable, BlueprintCallable)
 	void SRBeginArrestThief(AThief* pThief, bool pArrest, AOfficer* pOfficer);
 	void SRBeginArrestThief_Implementation(AThief* pThief, bool pArrest, AOfficer* pOfficer);
+
+	UFUNCTION(Server, Reliable, BlueprintCallable)
+	void SRStartCrouch(AThief* pThief);
+	void SRStartCrouch_Implementation(AThief* pThief);
+
+	UFUNCTION(Server, Reliable, BlueprintCallable)
+	void SRStopCrouch(AThief* pThief);
+	void SRStopCrouch_Implementation(AThief* pThief);
 };
