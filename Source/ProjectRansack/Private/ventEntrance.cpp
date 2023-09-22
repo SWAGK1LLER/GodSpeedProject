@@ -53,11 +53,11 @@ void AventEntrance::TriggerOverlapBegin(UPrimitiveComponent* OverlappedComponent
 
 void AventEntrance::OnTriggerOverlapEnd(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
 {
-	AThief* player = Cast<AThief>(OtherActor);
-	if (player == nullptr)
-		return;
+	//AThief* player = Cast<AThief>(OtherActor);
+	//if (player == nullptr)
+	//	return;
 
-	player->closeItems.Remove(this);
+	//player->closeItems.Remove(this);
 }
 
 void AventEntrance::Interact_Implementation(AActor* pActor)
@@ -78,7 +78,10 @@ void AventEntrance::Interact_Implementation(AActor* pActor)
 			{
 				pActor->SetActorLocation(entranceArea->GetComponentLocation());
 			}
+
+			Cast<AThief>(pActor)->closeItems.Remove(this);
 		}
+		
 	}
 }
 
