@@ -534,13 +534,16 @@ void AThief::ClimbTriggerOverlapEnd(UPrimitiveComponent* OverlappedComp, AActor*
 
 void AThief::StartCrouch()
 {
-	Crouch();
+	//Crouch();
+	IsCrouch = true;
 }
 
 
 void AThief::StopCrouch()
 {
-	UnCrouch();
+	//UnCrouch();
+
+	IsCrouch = false;
 }
 
 FHitResult AThief::ClimbingLineTrace()
