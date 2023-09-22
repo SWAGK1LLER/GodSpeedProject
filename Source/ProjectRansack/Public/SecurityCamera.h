@@ -19,6 +19,9 @@ struct FSecurityCameraDataTable : public FTableRowBase
 
 	UPROPERTY(editAnywhere, BlueprintReadWrite, Category = Stun, meta = (AllowPrivateAccess = "true"))
 		float timeToUnfreeze = 3.0f;
+
+	UPROPERTY(editAnywhere, BlueprintReadWrite, Category = Stun, meta = (AllowPrivateAccess = "true"))
+		FLinearColor ColorPing = FLinearColor::Red;
 };
 
 UCLASS()
