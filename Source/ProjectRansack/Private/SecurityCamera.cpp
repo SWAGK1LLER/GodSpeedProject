@@ -91,7 +91,8 @@ void ASecurityCamera::NotifyAllSecurity_Implementation(bool PingOrUnping)
 {
 	AGameGameMode* GameMode = (AGameGameMode*)GetWorld()->GetAuthGameMode();
 
-	if (GameMode->TeamB[0])
+
+	if (GameMode->TeamB.Num() > 0)
 	{
 		if (GameMode->TeamB[0]->IsA(AOfficer::StaticClass()))
 		{
@@ -106,7 +107,7 @@ void ASecurityCamera::NotifyAllSecurity_Implementation(bool PingOrUnping)
 			}
 		}
 	}
-	else if (GameMode->TeamA[0])
+	else if (GameMode->TeamA.Num() > 0)
 	{
 		if (GameMode->TeamA[0]->IsA(AOfficer::StaticClass()))
 		{
