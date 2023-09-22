@@ -17,48 +17,48 @@ public:
 
 	//Health
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Health, meta = (AllowPrivateAccess = "true"))
-		float currentHealth = 0;
+	float currentHealth = 0;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Health, meta = (AllowPrivateAccess = "true"))
-		float maxHealth = 0;
+	float maxHealth = 0;
 
 	//Movement
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = MovementValues, meta = (AllowPrivateAccess = "true"))
-		float movementSpeed = 1;
+	float movementSpeed = 1;
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = MovementValues, meta = (AllowPrivateAccess = "true"))
-		float sprintSpeed = 1.5f;
+	float sprintSpeed = 1.5f;
 
 	//Camera
 	UPROPERTY(editAnywhere, BlueprintReadWrite, Category = CameraParameters, meta = (AllowPrivateAccess = "true"))
-		float maxPitchBottom = 30;
+	float maxPitchBottom = 30;
 
 	UPROPERTY(editAnywhere, BlueprintReadWrite, Category = CameraParameters, meta = (AllowPrivateAccess = "true"))
-		float maxPitchTop = 30;
+	float maxPitchTop = 30;
 
 	UPROPERTY(editAnywhere, BlueprintReadWrite, Category = CameraParameters, meta = (AllowPrivateAccess = "true"))
-		float aimZoom = 30;
+	float aimZoom = 30;
 	UPROPERTY(editAnywhere, BlueprintReadWrite, Category = CameraParameters, meta = (AllowPrivateAccess = "true"))
-		float aimZoomSpeed = 0.1f;
+	float aimZoomSpeed = 0.1f;
 
 	/* Input */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
-		class UInputMappingContext* inputHandler = nullptr;
+	class UInputMappingContext* inputHandler = nullptr;
 
 	/**Input Action */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
-		class UInputAction* moveAction = nullptr;
+	class UInputAction* moveAction = nullptr;
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
-		class UInputAction* interactAction = nullptr;
+	class UInputAction* interactAction = nullptr;
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
-		class UInputAction* lookAction = nullptr;
+	class UInputAction* lookAction = nullptr;
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
-		class UInputAction* AimAction = nullptr;
+	class UInputAction* AimAction = nullptr;
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
-		class UInputAction* FireAction = nullptr;
+	class UInputAction* FireAction = nullptr;
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
-		class UInputAction* SprintAction = nullptr;
+	class UInputAction* SprintAction = nullptr;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
-		class UInputAction* TabAction = nullptr;
+	class UInputAction* TabAction = nullptr;
 
 };
 

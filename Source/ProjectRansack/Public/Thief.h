@@ -67,7 +67,10 @@ public:
 	bool CanClimb = false;
 
 	UPROPERTY(BlueprintReadWrite, VisibleAnywhere)
-		bool IsClimbing = false;
+	bool IsClimbing = false;
+
+	UPROPERTY(BlueprintReadWrite, VisibleAnywhere)
+	bool IsCrouch = false;
 
 	AThief();
 	virtual void BeginPlay() override;
@@ -166,10 +169,10 @@ public:
 	void OnArrestTriggerOverlapEnd(class UPrimitiveComponent* OverlappedComp, AActor* OtherActor, class UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);
 
 	UFUNCTION()
-		void ClimbTriggerOverlapBegin(class UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, class UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
+	void ClimbTriggerOverlapBegin(class UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, class UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
 
 	UFUNCTION()
-		void ClimbTriggerOverlapEnd(class UPrimitiveComponent* OverlappedComp, AActor* OtherActor, class UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);
+	void ClimbTriggerOverlapEnd(class UPrimitiveComponent* OverlappedComp, AActor* OtherActor, class UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);
 
 
 	void StartCrouch();
