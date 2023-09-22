@@ -12,15 +12,20 @@
 #include "GamePlayerStart.h"
 #include "HelperClass.h"
 #include <EnhancedInputComponent.h>
+#include "CameraCompThief.h"
 #include "GameFramework/PawnMovementComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Kismet/KismetMathLibrary.h"
+
 AThief::AThief()
 {
 	PrimaryActorTick.bCanEverTick = true;
 	bReplicates = true;
 
 	inventory = NewObject<UInventory>();
+
+	cameraComponent = CreateDefaultSubobject<UCameraCompThief>(TEXT("Camera Component"));
+	cameraComponent->SetupCamera(GetMesh());
 
 	ArrestArea = CreateDefaultSubobject<UBoxComponent>(FName("ArrestArea"));
 	ArrestArea->SetGenerateOverlapEvents(true);
@@ -137,35 +142,7 @@ void AThief::Move(const FInputActionValue& Value)
 	if (bFreezeInput || beingArrest)
 		return;
 
-	// input is a Vector2D
-	FVector2D MovementVector = Value.Get<FVector2D>();
-
-	if (Controller != nullptr)
-	{
-		// find out which way is forward
-		const FRotator Rotation = Controller->GetControlRotation();
-		const FRotator YawRotation(0, Rotation.Yaw, 0);
-
-		// get forward vector
-		FVector ForwardDirection = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::X);
-
-		// get right vector 
-		FVector RightDirection = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::Y);
-
-		FVector UpDirection = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::Z);
-
-		// add movement 
-		if (IsClimbing)
-		{
-			AddMovementInput(UpDirection, MovementVector.Y);
-			AddMovementInput(RightDirection, MovementVector.X);
-		}
-		else
-		{
-			AddMovementInput(ForwardDirection, MovementVector.Y);
-			AddMovementInput(RightDirection, MovementVector.X);
-		}
-	}
+	ABase3C::Move(Value);
 }
 
 void AThief::SetupTableInstance()

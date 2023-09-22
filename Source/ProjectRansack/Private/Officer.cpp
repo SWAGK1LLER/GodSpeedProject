@@ -18,10 +18,15 @@
 #include <Kismet/GameplayStatics.h>
 #include <GamePlayerController.h>
 #include <HelperClass.h>
+#include "CameraCompOfficer.h"
 
 AOfficer::AOfficer()
 {
 	bReplicates = true;
+
+	cameraComponent = CreateDefaultSubobject<UCameraCompOfficer>(TEXT("Camera Component"));
+	cameraComponent->SetupCamera(RootComponent);
+
 	flashLight = CreateDefaultSubobject<USpotLightComponent>(TEXT("FlashLight"));
 	flashLight->SetupAttachment((USceneComponent*)cameraComponent->camera);
 

@@ -1,6 +1,3 @@
-// Fill out your copyright notice in the Description page of Project Settings.
-
-
 #include "CameraComp.h"
 #include "Camera/CameraComponent.h"
 #include "GameFramework/SpringArmComponent.h"
@@ -8,13 +5,12 @@
 #include "EnhancedInputSubsystems.h"
 #include "GameFramework/Character.h"
 #include "Base3C.h"
-// Sets default values for this component's properties
+
 UCameraComp::UCameraComp()
 {
 	PrimaryComponentTick.bCanEverTick = true;
 
 	camera = CreateDefaultSubobject<UCameraComponent>(TEXT("Camera"));
-	camera->bUsePawnControlRotation = true; 
 }
 
 void UCameraComp::SetupCamera(USceneComponent* root)
@@ -59,4 +55,3 @@ void UCameraComp::setFov(float newFov)
 {
 	camera->SetFieldOfView(newFov);
 }
-

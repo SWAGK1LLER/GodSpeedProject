@@ -22,9 +22,6 @@ ABase3C::ABase3C()
 	PrimaryActorTick.bCanEverTick = true;
 	bReplicates = true;
 
-	cameraComponent = CreateDefaultSubobject<UCameraComp>(TEXT("Camera Component"));
-	cameraComponent->SetupCamera(RootComponent);
-	
 	currentState = CharacterState::Gun;
 
 	StunWeapon = CreateDefaultSubobject<UStunWeapon>(TEXT("StunWeapon"));
@@ -46,7 +43,6 @@ void ABase3C::BeginPlay()
 
 	BindInputHandler();
 	SendDataToComponents();
-
 }
 
 // Called every frame
