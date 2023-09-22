@@ -74,10 +74,8 @@ void ASecurityCamera::CheckDataTable()
 
 void ASecurityCamera::OnTriggerOverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
-	GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("SECURITY CAMERA WORKING 1!"));
 	if (Cast<AThief>(OtherActor))
 	{
-		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("SECURITY CAMERA WORKING 2!"));
 		UndetectedThieves.Add(OtherActor);
 	}
 }
