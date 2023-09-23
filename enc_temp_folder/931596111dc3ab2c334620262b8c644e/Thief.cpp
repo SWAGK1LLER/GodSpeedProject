@@ -130,8 +130,8 @@ void AThief::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 	//Moving
 	if (UEnhancedInputComponent* EnhancedInputComponent = CastChecked<UEnhancedInputComponent>(PlayerInputComponent))
 	{
-		EnhancedInputComponent->BindAction(thiefTableInstance->crouchAction, ETriggerEvent::Started, this, &AThief::crouch);
-		EnhancedInputComponent->BindAction(thiefTableInstance->crouchAction, ETriggerEvent::Completed, this, &AThief::unCrouch);
+		EnhancedInputComponent->BindAction(thiefTableInstance->crouchAction, ETriggerEvent::Started, this, &AThief::CLStartCrouch);
+		EnhancedInputComponent->BindAction(thiefTableInstance->crouchAction, ETriggerEvent::Completed, this, &AThief::CLStopCrouch);
 
 		EnhancedInputComponent->BindAction(thiefTableInstance->climbAction, ETriggerEvent::Started, this, &AThief::CheckCanClimb);
 	}
@@ -452,16 +452,6 @@ void AThief::ResetOfficerInArrestArea(AOfficer* pOfficerToSkip)
 	}
 }
 
-void AThief::crouch()
-{
-	Crouch();
-}
-
-void AThief::unCrouch()
-{
-	UnCrouch();
-}
-
 void AThief::OnArrestTriggerOverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
 	AOfficer* player = Cast<AOfficer>(OtherActor);
@@ -517,6 +507,32 @@ void AThief::ClimbTriggerOverlapEnd(UPrimitiveComponent* OverlappedComp, AActor*
 		CanClimb = false;
 		SRStopClimbing();
 	}
+}
+
+void AThief::CLStartCrouch()
+{
+	AGamePlayerController* PC = Cast<AGamePlayerController>(Controller);
+	if (PC != nullptr)
+		PC->SRStartCrouch(this);
+}
+
+void AThief::CLStopCrouch()
+{
+	AGamePlayerController* PC = Cast<AGamePlayerController>(Controller);
+	if (PC != nullptr)
+		PC->SRStopCrouch(this);
+}
+
+
+void AThief::StartCrouch_Implementation()
+{
+	IsCrouch = true;
+}
+
+
+void AThief::StopCrouch_Implementation()
+{
+	IsCrouch = false;
 }
 
 FHitResult AThief::ClimbingLineTrace()

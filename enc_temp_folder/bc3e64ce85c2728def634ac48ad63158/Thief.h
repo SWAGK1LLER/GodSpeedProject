@@ -162,9 +162,6 @@ public:
 
 	virtual void UnFreezeInput_Implementation() override;
 
-	void crouch();
-	void unCrouch();
-
 	UFUNCTION()
 	void OnArrestTriggerOverlapBegin(class UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, class UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
 
@@ -176,6 +173,17 @@ public:
 
 	UFUNCTION()
 	void ClimbTriggerOverlapEnd(class UPrimitiveComponent* OverlappedComp, AActor* OtherActor, class UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);
+
+	UFUNCTION(NetMulticast, Reliable, BlueprintCallable)
+	void StartCrouch();
+	void StartCrouch_Implementation();
+
+	UFUNCTION(NetMulticast, Reliable, BlueprintCallable)
+	void StopCrouch();
+	void StopCrouch_Implementation();
+
+	void CLStartCrouch();
+	void CLStopCrouch();
 
 	FHitResult ClimbingLineTrace();
 };

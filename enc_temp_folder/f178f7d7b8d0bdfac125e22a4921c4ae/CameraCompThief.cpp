@@ -40,7 +40,7 @@ void UCameraCompThief::TickComponent(float DeltaTime, enum ELevelTick TickType, 
 	if (ShouldTurn)
 	{
 		ACharacter* Character = CastChecked<ACharacter>(GetOwner());
-		Character->SetActorRotation(FMath::Lerp(Character->GetActorRotation(), finalRotation, SnapSpeed));
+		Character->SetActorRotation(FMath::Lerp(Character->GetActorRotation(), finalRotation, 0.09f));
 
 		if (Character->GetActorRotation() == finalRotation)
 			ShouldTurn = false;
@@ -76,7 +76,7 @@ void UCameraCompThief::RotatePlayer(ACharacter* Character)
 	CameraForwardVector.Normalize();
 	ToPlayerCharacter.Normalize();
 
-	if (FVector::DotProduct(CameraForwardVector, ToPlayerCharacter) < SnapThreshold)
+	if (FVector::DotProduct(CameraForwardVector, ToPlayerCharacter) < 0.5f)
 	{
 		ShouldTurn = true;
 

@@ -17,12 +17,6 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
 	USpringArmComponent* CameraBoom = nullptr;
 
-	UPROPERTY(BlueprintReadWrite, VisibleAnywhere)
-	float SnapSpeed = 0.4f;
-
-	UPROPERTY(BlueprintReadWrite, VisibleAnywhere)
-	float SnapThreshold = 0.65f;
-
 	USceneComponent* rootMesh = nullptr;
 
 	UCameraCompThief();

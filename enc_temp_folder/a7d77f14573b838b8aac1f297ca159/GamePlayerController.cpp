@@ -456,3 +456,13 @@ void AGamePlayerController::SRBeginArrestThief_Implementation(AThief* pThief, bo
 	if (gameMode != nullptr)
 		gameMode->beginArrestThief(pArrest, pThief, pOfficer);
 }
+
+void AGamePlayerController::SRStartCrouch_Implementation(AThief* pThief)
+{
+	pThief->StartCrouch();
+}
+
+void AGamePlayerController::SRStopCrouch_Implementation(AThief* pThief)
+{
+	pThief->StopCrouch();
+}
