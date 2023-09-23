@@ -37,9 +37,20 @@ void UCameraCompThief::TickComponent(float DeltaTime, enum ELevelTick TickType, 
 {
 	UCameraComp::TickComponent(DeltaTime, TickType, ThisTickFunction);
 
+	ACharacter* Character = CastChecked<ACharacter>(GetOwner());
+
+	speed = Character->GetCharacterMovement()->Velocity.Size2D();
+	
+	if (speed > 3.0f && Character->GetCharacterMovement()->GetLastInputVector() != FVector(0, 0, 0))
+	{
+		Character->bUseControllerRotationYaw = true;
+		ShouldTurn = false;
+	}
+	else
+		Character->bUseControllerRotationYaw = false;
+	
 	if (ShouldTurn)
 	{
-		ACharacter* Character = CastChecked<ACharacter>(GetOwner());
 		Character->SetActorRotation(FMath::Lerp(Character->GetActorRotation(), finalRotation, SnapSpeed));
 
 		if (Character->GetActorRotation() == finalRotation)

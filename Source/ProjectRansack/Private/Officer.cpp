@@ -36,7 +36,7 @@ AOfficer::AOfficer()
 void AOfficer::BeginPlay()
 {
 	Super::BeginPlay();
-	if (!CheckTableInstance())
+	if (!CreateTableInstance())
 		return;
 
 	CreateTimeline();
@@ -45,26 +45,6 @@ void AOfficer::BeginPlay()
 	sensorGadgetOfficer->ToggleEnable(false);
 	GetMesh()->SetOwnerNoSee(true); 
 	SetupNotificationUI();
-}
-
-void AOfficer::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
-{
-	Super::SetupPlayerInputComponent(PlayerInputComponent);
-
-	if (!CheckTableInstance())
-		return;
-
-	if (UEnhancedInputComponent* EnhancedInputComponent = CastChecked<UEnhancedInputComponent>(PlayerInputComponent))
-	{
-		EnhancedInputComponent->BindAction(officerTableInstance->MotionVisionAction, ETriggerEvent::Started, this, &AOfficer::HandleMotionVision);
-		EnhancedInputComponent->BindAction(officerTableInstance->FlashlightAction, ETriggerEvent::Started, this, &AOfficer::ToggleFlashight);
-		EnhancedInputComponent->BindAction(officerTableInstance->SensorGadgetAction, ETriggerEvent::Started, this, &AOfficer::SensorGadgetAction);
-	}
-}
-
-void AOfficer::SendDataToComponents()
-{
-	sensorGadgetOfficer->fetchData(officerTableInstance->Range, officerTableInstance->RevealTime, officerTableInstance->MaxAmountOfSensors);
 }
 
 void AOfficer::Tick(float DeltaTime)
@@ -108,9 +88,54 @@ void AOfficer::Tick(float DeltaTime)
 			cameraComponent->camera->GetForwardVector());
 }
 
-void AOfficer::MulReset_Implementation(FTransform transform)
+void AOfficer::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
-	Super::MulReset_Implementation(transform);
+	Super::SetupPlayerInputComponent(PlayerInputComponent);
+
+	if (!CreateTableInstance())
+		return;
+
+	if (UEnhancedInputComponent* EnhancedInputComponent = CastChecked<UEnhancedInputComponent>(PlayerInputComponent))
+	{
+		EnhancedInputComponent->BindAction(officerTableInstance->MotionVisionAction, ETriggerEvent::Started, this, &AOfficer::HandleMotionVision);
+		EnhancedInputComponent->BindAction(officerTableInstance->FlashlightAction, ETriggerEvent::Started, this, &AOfficer::ToggleFlashight);
+		EnhancedInputComponent->BindAction(officerTableInstance->SensorGadgetAction, ETriggerEvent::Started, this, &AOfficer::SensorGadgetAction);
+	}
+}
+
+void AOfficer::SendDataToComponents()
+{
+	ABase3C::SendDataToComponents();
+	sensorGadgetOfficer->fetchData(officerTableInstance->Range, officerTableInstance->RevealTime, officerTableInstance->MaxAmountOfSensors);
+}
+
+void AOfficer::CreateTimeline() //Timeline is used for the motion vision to change between states
+{
+	if (officerTableInstance->MotionVisionFloatCurve)
+	{
+		FOnTimelineFloat TimelineProgress;
+		FOnTimelineEventStatic onTimelineFinishedCallback;
+		TimelineProgress.BindUFunction(this, FName("TimelineProgress"));
+		MotionVisionTimeline.AddInterpFloat(officerTableInstance->MotionVisionFloatCurve, TimelineProgress);
+		MotionVisionTimeline.SetLooping(false);
+		onTimelineFinishedCallback.BindUFunction(this, FName("TimelineFinished"));
+		MotionVisionTimeline.SetTimelineFinishedFunc(onTimelineFinishedCallback);
+	}
+}
+
+bool AOfficer::CreateTableInstance()
+{
+	ABase3C::CreateTableInstance();
+
+	if (officerTableInstance)
+		return true;
+
+	if (!officerDataTable)
+		return false;
+
+	officerTableInstance = officerDataTable->FindRow<FOfficerTable>(FName(TEXT("Officer")), "");
+
+	return officerTableInstance != nullptr;
 }
 
 void AOfficer::TimelineProgress(float value)
@@ -121,6 +146,11 @@ void AOfficer::TimelineProgress(float value)
 void AOfficer::TimelineFinished()
 {
 	MotionTimelineRunning = false;
+}
+
+void AOfficer::MulReset_Implementation(FTransform transform)
+{
+	Super::MulReset_Implementation(transform);
 }
 
 void AOfficer::ChangeStencilOnMovement() //Reveals enemies when motion vision is active
@@ -146,36 +176,6 @@ void AOfficer::ChangeStencilOnMovement() //Reveals enemies when motion vision is
 void AOfficer::SetOfficerSensorScalor_Implementation(int newValue) //TODO Destroy officerSensor variable
 {
 	UKismetMaterialLibrary::SetScalarParameterValue(GetWorld(), officerTableInstance->MotionVisionMPC, "OfficerSensor", newValue);
-}
-
-void AOfficer::CreateTimeline() //Timeline is used for the motion vision to change between states
-{
-
-	if (officerTableInstance->MotionVisionFloatCurve)
-	{
-		FOnTimelineFloat TimelineProgress;
-		FOnTimelineEventStatic onTimelineFinishedCallback;
-		TimelineProgress.BindUFunction(this, FName("TimelineProgress"));
-		MotionVisionTimeline.AddInterpFloat(officerTableInstance->MotionVisionFloatCurve, TimelineProgress);
-		MotionVisionTimeline.SetLooping(false);
-		onTimelineFinishedCallback.BindUFunction(this, FName("TimelineFinished"));
-		MotionVisionTimeline.SetTimelineFinishedFunc(onTimelineFinishedCallback);
-	}
-}
-
-
-
-bool AOfficer::CheckTableInstance()
-{
-	if (officerTableInstance)
-		return true;
-
-	if (!officerDataTable)
-		return false;
-
-	officerTableInstance = officerDataTable->FindRow<FOfficerTable>(FName(TEXT("Officer")), "");
-
-	return officerTableInstance != nullptr;
 }
 
 void AOfficer::HandleMotionVision() //Reacts to the input of MotionVision

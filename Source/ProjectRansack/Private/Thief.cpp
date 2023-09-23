@@ -16,10 +16,10 @@
 #include "GameFramework/PawnMovementComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Kismet/KismetMathLibrary.h"
+#include <Kismet/KismetMaterialLibrary.h>
 
 AThief::AThief()
 {
-	PrimaryActorTick.bCanEverTick = true;
 	bReplicates = true;
 
 	inventory = NewObject<UInventory>();
@@ -39,8 +39,12 @@ AThief::AThief()
 void AThief::BeginPlay()
 {
 	Super::BeginPlay();
+	if (!CreateTableInstance())
+		return;
 
-	SetupTableInstance();
+	CreateTimeline();
+	SendDataToComponents();
+
 	ArrestArea->OnComponentBeginOverlap.AddDynamic(this, &AThief::OnArrestTriggerOverlapBegin);
 	ArrestArea->OnComponentEndOverlap.AddDynamic(this, &AThief::OnArrestTriggerOverlapEnd);
 	HelperClass::deactivateTrigger(ArrestArea);
@@ -57,6 +61,9 @@ void AThief::BeginPlay()
 void AThief::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+
+	NightVisionTimeline.TickTimeline(DeltaTime);
+	ChangeStencilOnMovement();
 
 	if (beingArrest)
 	{
@@ -117,7 +124,6 @@ void AThief::Tick(float DeltaTime)
 			SetActorRotation(CurrentRotation);
 		}
 	}
-	ChangeStencilOnMovement();
 }
 
 void AThief::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
@@ -125,15 +131,72 @@ void AThief::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
 
-	SetupTableInstance();
+	CreateTableInstance();
 
 	//Moving
 	if (UEnhancedInputComponent* EnhancedInputComponent = CastChecked<UEnhancedInputComponent>(PlayerInputComponent))
 	{
 		EnhancedInputComponent->BindAction(thiefTableInstance->crouchAction, ETriggerEvent::Started, this, &AThief::crouch);
 		EnhancedInputComponent->BindAction(thiefTableInstance->crouchAction, ETriggerEvent::Completed, this, &AThief::unCrouch);
-
+		EnhancedInputComponent->BindAction(thiefTableInstance->NightVisionAction, ETriggerEvent::Started, this, &AThief::HandleNightVision);
 		EnhancedInputComponent->BindAction(thiefTableInstance->climbAction, ETriggerEvent::Started, this, &AThief::CheckCanClimb);
+	}
+}
+
+void AThief::CreateTimeline() //Timeline is used for the Night vision to change between states
+{
+	if (thiefTableInstance->NightVisionFloatCurve)
+	{
+		FOnTimelineFloat TimelineProgress;
+		FOnTimelineEventStatic onTimelineFinishedCallback;
+		TimelineProgress.BindUFunction(this, FName("TimelineProgress2"));
+		NightVisionTimeline.AddInterpFloat(thiefTableInstance->NightVisionFloatCurve, TimelineProgress);
+		NightVisionTimeline.SetLooping(false);
+		onTimelineFinishedCallback.BindUFunction(this, FName("TimelineFinished2"));
+		NightVisionTimeline.SetTimelineFinishedFunc(onTimelineFinishedCallback);
+	}
+}
+
+bool AThief::CreateTableInstance()
+{
+	ABase3C::CreateTableInstance();
+
+	if (thiefTableInstance)
+		return true;
+
+	if (!thiefDataTable)
+		return false;
+
+	thiefTableInstance = thiefDataTable->FindRow<FThiefTable>(FName(TEXT("Thief")), "");
+	return true;
+}
+
+void AThief::TimelineProgress2(float value)
+{
+	UKismetMaterialLibrary::SetScalarParameterValue(GetWorld(), thiefTableInstance->NightVisionMPC, "Alpha", value);
+}
+
+void AThief::TimelineFinished2()
+{
+	NightTimelineRunning = false;
+}
+
+void AThief::HandleNightVision() //Reacts to the input of MotionVision
+{
+	if (NightTimelineRunning)
+		return;
+
+	NightTimelineRunning = true;
+
+	if (!NightSensorActive)
+	{
+		NightVisionTimeline.PlayFromStart();
+		NightSensorActive = true;
+	}
+	else
+	{
+		NightVisionTimeline.ReverseFromEnd();
+		NightSensorActive = false;
 	}
 }
 
@@ -143,17 +206,6 @@ void AThief::Move(const FInputActionValue& Value)
 		return;
 
 	ABase3C::Move(Value);
-}
-
-void AThief::SetupTableInstance()
-{
-	if (thiefTableInstance)
-		return;
-
-	if (!thiefDataTable)
-		return;
-
-	thiefTableInstance = thiefDataTable->FindRow<FThiefTable>(FName(TEXT("Thief")), "");
 }
 
 void AThief::SRReset_Implementation()

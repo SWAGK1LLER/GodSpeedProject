@@ -1,6 +1,3 @@
-// Fill out your copyright notice in the Description page of Project Settings.
-
-
 #include "Base3C.h"
 #include "Camera/CameraComponent.h"
 #include "GameFramework/SpringArmComponent.h"
@@ -13,13 +10,9 @@
 #include <EOSGameInstance.h>
 #include <HelperClass.h>
 
-
-
-// Sets default values
 ABase3C::ABase3C()
 {
- 	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
-	PrimaryActorTick.bCanEverTick = true;
+ 	PrimaryActorTick.bCanEverTick = true;
 	bReplicates = true;
 
 	currentState = CharacterState::Gun;
@@ -27,7 +20,6 @@ ABase3C::ABase3C()
 	StunWeapon = CreateDefaultSubobject<UStunWeapon>(TEXT("StunWeapon"));
 }
 
-// Called when the game starts or when spawned
 void ABase3C::BeginPlay()
 {
 	Super::BeginPlay();
@@ -35,7 +27,7 @@ void ABase3C::BeginPlay()
 	SpawnTransform = GetActorTransform();
 	playTime = UGameplayStatics::GetRealTimeSeconds((GetWorld()));
 
-	if(!CheckTableInstance())
+	if(!CreateTableInstance())
 		return;
 
 	normalWalkSpeed = GetCharacterMovement()->MaxWalkSpeed;
@@ -45,7 +37,6 @@ void ABase3C::BeginPlay()
 	SendDataToComponents();
 }
 
-// Called every frame
 void ABase3C::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
@@ -101,7 +92,7 @@ void ABase3C::EndPlay(const EEndPlayReason::Type EndPlayReason)
 	gameInstance->unregisterPlayerToGameSession(playerController);
 }
 
-bool ABase3C::CheckTableInstance()
+bool ABase3C::CreateTableInstance()
 {
 	if (tableInstance)
 		return true;
@@ -116,7 +107,7 @@ bool ABase3C::CheckTableInstance()
 
 void ABase3C::SendDataToComponents()
 {
-	if (!CheckTableInstance())
+	if (!CreateTableInstance())
 		return;
 
 	cameraComponent->fetchData(tableInstance->maxPitchBottom, tableInstance->maxPitchTop);
@@ -168,7 +159,7 @@ void ABase3C::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
 	
-	if(!CheckTableInstance())
+	if(!CreateTableInstance())
 		return;
 
 	//Moving
@@ -304,7 +295,7 @@ void ABase3C::StopTab()
 void ABase3C::BindInputHandler()
 {
 	if (tableInstance == nullptr)
-		if (!CheckTableInstance())
+		if (!CreateTableInstance())
 			return;
 
 

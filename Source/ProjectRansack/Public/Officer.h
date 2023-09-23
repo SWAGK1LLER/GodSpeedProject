@@ -23,10 +23,13 @@ GENERATED_BODY()
 public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = MotionVision, meta = (AllowPrivateAccess = "true"))
 	class UInputAction* MotionVisionAction = nullptr;
+	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = MotionVision, meta = (AllowPrivateAccess = "true"))
 	UCurveFloat* MotionVisionFloatCurve = nullptr;
+	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = MotionVision, meta = (AllowPrivateAccess = "true"))
 	class UMaterialParameterCollection* MotionVisionMPC = nullptr;
+	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = MotionVision, meta = (AllowPrivateAccess = "true"))
 	int MotionSensorStencilBufNumber = 0;
 
@@ -93,11 +96,15 @@ public:
 	bool flashLightOn = false;
 
 	bool usingSensorGadget = false;
-	// Called to bind functionality to input
+
 	AOfficer();
+	virtual void BeginPlay() override;
+	virtual void Tick(float DeltaTime) override;
 
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
+	bool CreateTableInstance() override;
+	
 	void SendDataToComponents();
 
 	void CreateTimeline();
@@ -108,19 +115,12 @@ public:
 	UFUNCTION()
 	void TimelineFinished();
 
+	virtual void MulReset_Implementation(FTransform transform) override;
+
 	void ChangeStencilOnMovement();
 
 	UFUNCTION(Client, Reliable)
 	void SetOfficerSensorScalor(int newValue);
-
-	// Called when the game starts or when spawned
-	virtual void BeginPlay() override;
-
-	virtual void Tick(float DeltaTime) override;
-
-	virtual void MulReset_Implementation(FTransform transform) override;
-
-	bool CheckTableInstance();
 
 	void HandleMotionVision();
 

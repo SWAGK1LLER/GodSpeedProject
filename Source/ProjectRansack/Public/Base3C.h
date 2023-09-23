@@ -14,16 +14,10 @@ struct FBase3CTable : public FTableRowBase
 {
 GENERATED_BODY()
 public:
-
-	//Health
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Health, meta = (AllowPrivateAccess = "true"))
-	float currentHealth = 0;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Health, meta = (AllowPrivateAccess = "true"))
-	float maxHealth = 0;
-
 	//Movement
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = MovementValues, meta = (AllowPrivateAccess = "true"))
 	float movementSpeed = 1;
+	
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = MovementValues, meta = (AllowPrivateAccess = "true"))
 	float sprintSpeed = 1.5f;
 
@@ -36,30 +30,33 @@ public:
 
 	UPROPERTY(editAnywhere, BlueprintReadWrite, Category = CameraParameters, meta = (AllowPrivateAccess = "true"))
 	float aimZoom = 30;
+	
 	UPROPERTY(editAnywhere, BlueprintReadWrite, Category = CameraParameters, meta = (AllowPrivateAccess = "true"))
 	float aimZoomSpeed = 0.1f;
 
-	/* Input */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
 	class UInputMappingContext* inputHandler = nullptr;
 
-	/**Input Action */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
 	class UInputAction* moveAction = nullptr;
+	
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
 	class UInputAction* interactAction = nullptr;
+	
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
 	class UInputAction* lookAction = nullptr;
+	
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
 	class UInputAction* AimAction = nullptr;
+	
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
 	class UInputAction* FireAction = nullptr;
+	
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
 	class UInputAction* SprintAction = nullptr;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
 	class UInputAction* TabAction = nullptr;
-
 };
 
 UENUM()
@@ -113,16 +110,15 @@ public:
 
 	ABase3C();
 
-	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
-	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
 	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
 
-	bool CheckTableInstance();
-	void SendDataToComponents();
+	virtual bool CreateTableInstance();
+	virtual void SendDataToComponents();
+	virtual void CreateTimeline() {};
 
 	UFUNCTION(Client, Reliable, BlueprintCallable)
 	void SetClientUI();

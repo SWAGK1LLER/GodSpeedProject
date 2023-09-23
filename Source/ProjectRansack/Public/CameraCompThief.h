@@ -13,6 +13,7 @@ class PROJECTRANSACK_API UCameraCompThief : public UCameraComp
 public:
 	FRotator finalRotation;
 	bool ShouldTurn = false;
+	float speed = 0;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
 	USpringArmComponent* CameraBoom = nullptr;

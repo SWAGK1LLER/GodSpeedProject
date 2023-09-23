@@ -16,17 +16,26 @@ struct FThiefTable : public FTableRowBase
 {
 	GENERATED_BODY()
 public:
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-		int costOnArrest = 400;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = MotionVision, meta = (AllowPrivateAccess = "true"))
+	class UInputAction* NightVisionAction = nullptr;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = MotionVision, meta = (AllowPrivateAccess = "true"))
+	UCurveFloat* NightVisionFloatCurve = nullptr;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = MotionVision, meta = (AllowPrivateAccess = "true"))
+	class UMaterialParameterCollection* NightVisionMPC = nullptr;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-		int respawnTime = 10;
+	int costOnArrest = 400;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	int respawnTime = 10;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
-		class UInputAction* crouchAction = nullptr;
+	class UInputAction* crouchAction = nullptr;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
-		class UInputAction* climbAction = nullptr;
+	class UInputAction* climbAction = nullptr;
 };
 
 UCLASS()
@@ -35,20 +44,25 @@ class PROJECTRANSACK_API AThief : public ABase3C
 	GENERATED_BODY()
 
 public:
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	class UShapeComponent* ArrestArea = nullptr;
-	bool ArrestAreaActivate = false;
+	TArray<IThiefInteractibleActor*> closeItems;
+	IThiefInteractibleActor* ItemUsing = nullptr;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Data, meta = (AllowPrivateAccess = "true"))
 	class UDataTable* thiefDataTable = nullptr;
 
 	FThiefTable* thiefTableInstance = nullptr;
 
+	FTimeline NightVisionTimeline;
+
+	bool NightTimelineRunning = false;
+	bool NightSensorActive = false;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	class UShapeComponent* ArrestArea = nullptr;
+	bool ArrestAreaActivate = false;
+
 	bool beingArrest = false;
 	AOfficer* officerArresting = nullptr;
-
-	TArray<IThiefInteractibleActor*> closeItems;
-	IThiefInteractibleActor* ItemUsing = nullptr;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	UInventory* inventory = nullptr;
@@ -69,22 +83,28 @@ public:
 	UPROPERTY(BlueprintReadWrite, VisibleAnywhere)
 	bool IsClimbing = false;
 
-	UPROPERTY(BlueprintReadWrite, VisibleAnywhere)
-	bool IsCrouch = false;
-
 	AThief();
 	virtual void BeginPlay() override;
 	virtual void Tick(float DeltaTime) override;
 
-	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
+
+	bool CreateTableInstance() override;
+
+	void CreateTimeline();
+
+	UFUNCTION()
+	void TimelineProgress2(float value);
+
+	UFUNCTION()
+	void TimelineFinished2();
 
 	virtual void Move(const FInputActionValue& Value) override;
 
-	void SetupTableInstance();
-
 	virtual void SRReset_Implementation() override;
 	virtual void MulReset_Implementation(FTransform transform) override;
+
+	void HandleNightVision();
 
 	bool HasSpaceForItem(class AItem* pItem);
 
