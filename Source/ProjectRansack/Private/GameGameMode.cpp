@@ -334,6 +334,12 @@ void AGameGameMode::StartRound()
 
 	for (APlayerController* aPC : PC)
 	{
+		if (aPC == nullptr)
+			continue;
+
+		if (aPC->GetPawn() == nullptr)
+			continue;
+
 		((ABase3C*)aPC->GetPawn())->UnFreezeInput();
 	}
 
