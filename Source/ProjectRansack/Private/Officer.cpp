@@ -153,7 +153,7 @@ void AOfficer::MulReset_Implementation(FTransform transform)
 
 void AOfficer::ChangeStencilOnMovement() //Reveals enemies when motion vision is active
 {
-	if (Revealed)
+	/*if (Revealed)
 	{
 		return;
 	}
@@ -168,7 +168,7 @@ void AOfficer::ChangeStencilOnMovement() //Reveals enemies when motion vision is
 	{
 		if (GetMesh())
 			GetMesh()->SetCustomDepthStencilValue(0);
-	}
+	}*/
 }
 
 void AOfficer::SetOfficerSensorScalor_Implementation(int newValue) //TODO Destroy officerSensor variable

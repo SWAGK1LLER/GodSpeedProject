@@ -18,6 +18,7 @@
 #include "LightFuseBoxe.h"
 #include <Door.h>
 #include "Terminal.h"
+#include "SensorGadget.h"
 
 void AGamePlayerController::BeginPlay()
 {
@@ -455,4 +456,17 @@ void AGamePlayerController::SRBeginArrestThief_Implementation(AThief* pThief, bo
 
 	if (gameMode != nullptr)
 		gameMode->beginArrestThief(pArrest, pThief, pOfficer);
+}
+
+void AGamePlayerController::SendPingRequest_Implementation(ASensorGadget* sensor, AThief* thief)
+{
+	AGameGameMode* gameMode = Cast<AGameGameMode>(UGameplayStatics::GetGameMode(GetWorld()));
+
+	if (gameMode != nullptr)
+		gameMode->PingThiefToAllOfficer(sensor, thief);
+}
+
+void AGamePlayerController::PingPlayerToSensor_Implementation(ASensorGadget* sensor, AThief* thief)
+{
+	sensor->PingPlayer(thief, Cast<AOfficer>(GetPawn()));
 }

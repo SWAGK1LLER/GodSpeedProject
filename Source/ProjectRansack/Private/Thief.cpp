@@ -270,16 +270,11 @@ bool AThief::ValidateSpaceItem(AItem& pItem)
 
 void AThief::ChangeStencilOnMovement()
 {
-	if (GetVelocity().Length() > 0)
-	{
-		if (GetMesh())
-			GetMesh()->SetCustomDepthStencilValue(2); //TODO Implement datatable for thief and add a value for stencil buffer
-	}
-	else
-	{
-		if (GetMesh())
-			GetMesh()->SetCustomDepthStencilValue(0);
-	}
+	if (Revealed)
+		return;
+
+	if (GetMesh())
+		GetMesh()->SetCustomDepthStencilValue(GetVelocity().Length() > 0 ? 2 : 0);
 }
 
 bool AThief::HasSpaceForItem(AItem* pItem)

@@ -145,4 +145,6 @@ public:
 	void ArrestThief(ABase3C* other);
 
 	void SetCustomTimerCallback(float time, const FOnCustomTimerTick& onTick, const FOnCustomTimerFinish& onFinish);
+
+	void PingThiefToAllOfficer(class ASensorGadget* sensor, class AThief* thief);
 };

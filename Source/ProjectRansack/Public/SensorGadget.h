@@ -25,8 +25,6 @@ public:
 
 	TArray<class AThief*> spottedPlayer;
 
-	bool pinged = false;
-
 	float revealTime = 0.0f;
 
 	ASensorGadget();
@@ -40,7 +38,7 @@ public:
 
 	void CalculateMiddleMesh();
 
-	void PingPlayer(AActor* pPlayerToPing);
+	void PingPlayer(class AThief* pPlayerToPing, class AOfficer* pOfficer);
 
 	UFUNCTION(NetMulticast, Reliable)
 	void MULSetOfficer(class AOfficer* pOwner);

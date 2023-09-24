@@ -170,4 +170,12 @@ public:
 	UFUNCTION(Server, Reliable, BlueprintCallable)
 	void SRBeginArrestThief(AThief* pThief, bool pArrest, AOfficer* pOfficer);
 	void SRBeginArrestThief_Implementation(AThief* pThief, bool pArrest, AOfficer* pOfficer);
+
+	UFUNCTION(Server, Reliable, BlueprintCallable)
+	void SendPingRequest(class ASensorGadget* sensor, class AThief* thief);
+	void SendPingRequest_Implementation(class ASensorGadget* sensor, class AThief* thief);
+
+	UFUNCTION(Client, Reliable, BlueprintCallable)
+	void PingPlayerToSensor(class ASensorGadget* sensor, class AThief* thief);
+	void PingPlayerToSensor_Implementation(class ASensorGadget* sensor, class AThief* thief);
 };

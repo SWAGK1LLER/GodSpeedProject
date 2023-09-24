@@ -431,3 +431,16 @@ void AGameGameMode::beginArrestThief(bool pArrest, AThief* pThief, AOfficer* pOf
 {
 	pThief->MulSetBeingArrest(pArrest, pOfficer);
 }
+
+void AGameGameMode::PingThiefToAllOfficer(class ASensorGadget* sensor, class AThief* thief)
+{
+	for (APlayerController* aPC : PC)
+	{
+		AGamePlayerController* playerController = Cast<AGamePlayerController>(aPC);
+		AOfficer* officer = Cast<AOfficer>(playerController->GetPawn());
+		if (officer == nullptr)
+			continue;
+
+		playerController->PingPlayerToSensor(sensor, thief);
+	}
+}

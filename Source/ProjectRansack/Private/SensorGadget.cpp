@@ -2,6 +2,7 @@
 #include "Components/StaticMeshComponent.h"
 #include "Thief.h"
 #include "Components/BoxComponent.h"
+#include <GamePlayerController.h>
 
 ASensorGadget::ASensorGadget()
 {
@@ -28,14 +29,11 @@ void ASensorGadget::BeginPlay()
 
 void ASensorGadget::OnOverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
-	if (OtherActor->IsA(ABase3C::StaticClass()) && placedActor != OtherActor && !pinged)
-	{
-		if (!placedActor)
-			return;
+	AThief* thief = Cast<AThief>(OtherActor);
+	if (thief == nullptr)
+		return;
 
-		PingPlayer(OtherActor);
-		Cast<AOfficer>(placedActor)->SetOfficerSensorScalor(1); //Need to set this for the material
-	}
+	Cast<AGamePlayerController>(thief->GetController())->SendPingRequest(this, thief);
 }
 
 void ASensorGadget::MULSetOfficer_Implementation(AOfficer* pOwner)
@@ -48,24 +46,25 @@ void ASensorGadget::SetRevealTime(float pRevealTime)
 	revealTime = pRevealTime;
 }
 
-void ASensorGadget::PingPlayer(AActor* pPlayerToPing)
+void ASensorGadget::PingPlayer(AThief* pPlayerToPing, AOfficer* pOfficer)
 {
-	AThief* thief = Cast<AThief>(pPlayerToPing);
-	if (thief != nullptr)
+	if (pPlayerToPing != nullptr)
 	{
-		if (spottedPlayer.Contains(thief))
+		if (spottedPlayer.Contains(pPlayerToPing))
 			return;
 
-		thief->ChangeStencilFromServer(2);
-		spottedPlayer.Add(thief);
+		pOfficer->SetOfficerSensorScalor(1);
+
+		pPlayerToPing->ChangeStencilFromServer(2);
+		spottedPlayer.Add(pPlayerToPing);
 
 		FTimerHandle Handle;
-		GetWorld()->GetTimerManager().SetTimer(Handle, FTimerDelegate::CreateLambda([this, thief] {
-			thief->ChangeStencilFromServer(0);
-			spottedPlayer.Remove(thief);
+		GetWorld()->GetTimerManager().SetTimer(Handle, FTimerDelegate::CreateLambda([this, pPlayerToPing, pOfficer] {
+			pPlayerToPing->ChangeStencilFromServer(0);
+			spottedPlayer.Remove(pPlayerToPing);
 
 			if (spottedPlayer.Num() == 0)
-				Cast<AOfficer>(placedActor)->SetOfficerSensorScalor(0);
+				pOfficer->SetOfficerSensorScalor(0);
 
 		}), revealTime, false);
 	}
