@@ -82,10 +82,8 @@ void AOfficer::Tick(float DeltaTime)
 		}
 	}
 
-
 	if (usingSensorGadget)
-		sensorGadgetOfficer->CalculateFirstPosition(this, cameraComponent->camera->GetComponentLocation(),
-			cameraComponent->camera->GetForwardVector());
+		sensorGadgetOfficer->updatePosing(cameraComponent->camera->GetComponentLocation(), cameraComponent->camera->GetForwardVector());
 }
 
 void AOfficer::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
@@ -233,7 +231,7 @@ void AOfficer::StartFire()
 	Super::StartFire();
 	if (currentState == CharacterState::SensorGadget)
 	{
-		sensorGadgetOfficer->TryPlace();
+		sensorGadgetOfficer->Place();
 	}
 }
 

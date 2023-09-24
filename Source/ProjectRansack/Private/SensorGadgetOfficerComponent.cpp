@@ -1,18 +1,11 @@
-// Fill out your copyright notice in the Description page of Project Settings.
-
-
 #include "SensorGadgetOfficerComponent.h"
 #include "Materials/Material.h"
 #include "SensorGadget.h"
 
-// Sets default values for this component's properties
 USensorGadgetOfficerComponent::USensorGadgetOfficerComponent()
 {
-	// Set this component to be initialized when the game starts, and to be ticked every frame.  You can turn these features
-	// off to improve performance if you don't need them.
 	PrimaryComponentTick.bCanEverTick = true;
 	
-
 	sensorGadgetOfficerMesh1 = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("SensorGadgetMesh1"));
 
 	sensorGadgetOfficerMesh2 = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("SensorGadgetMesh2"));
@@ -31,6 +24,14 @@ void USensorGadgetOfficerComponent::fetchData(float pRange, float pRevealTime, u
 	maxSensors = pMaxSensors;
 }
 
+void USensorGadgetOfficerComponent::updatePosing(FVector CamLocation, FVector CamForward)
+{
+	bool state = ValidFirstPosition(CamLocation, CamForward);
+	state = state && ValidSecondPosition(sensorGadgetOfficerMesh1->GetComponentLocation(), MeshNormal);
+
+	ChangeMaterial(state);
+}
+
 void USensorGadgetOfficerComponent::ToggleEnable(bool Enabled)
 {
 	if (!sensorGadgetOfficerMesh1 || !sensorGadgetOfficerMesh2)
@@ -40,94 +41,90 @@ void USensorGadgetOfficerComponent::ToggleEnable(bool Enabled)
 	sensorGadgetOfficerMesh2->SetVisibility(Enabled);
 }
 
-void USensorGadgetOfficerComponent::CalculateFirstPosition(AActor* IgnoredSelf, FVector CamLocation, FVector CamForward)
+bool USensorGadgetOfficerComponent::ValidFirstPosition(FVector CamLocation, FVector CamForward)
 {
 	FHitResult Hit(ForceInit);
 	FVector Start = CamLocation;
-	FVector End = Start + CamForward * 1000;
+	FVector End = Start + CamForward * viewReach;
 	FCollisionQueryParams CollisionParams;
 
-	CollisionParams.AddIgnoredActor(IgnoredSelf);
-
-	//DrawDebugLine(GetWorld(), Start, End, FColor::Green, true, 2.f, false, 4.f);
+	CollisionParams.AddIgnoredActor(GetOwner());
 
 	GetWorld()->LineTraceSingleByChannel(Hit, Start, End, ECC_WorldDynamic, CollisionParams);
 
 	if (Hit.IsValidBlockingHit())
 	{
-		if (Hit.GetComponent() == sensorGadgetOfficerMesh1)
-			return;
+		if (Hit.GetComponent() == sensorGadgetOfficerMesh1 || Hit.GetActor()->IsA(ABase3C::StaticClass()))
+			return false;
 
 		if (Cast<ASensorGadget>(Hit.GetActor()) != nullptr)
-		{
-			ChangeMaterial(false);
-			return;
-		}
+			return false;
 
 		ToggleEnable(true);
-		FVector Point = Hit.ImpactPoint + (Hit.ImpactNormal * 0.01f);
-		FVector Normal = Hit.ImpactNormal;
 
-		FRotator Rotation = FRotationMatrix::MakeFromX(Normal).Rotator();
+		MeshNormal = Hit.ImpactNormal;
+		FRotator Rotation = FRotationMatrix::MakeFromX(MeshNormal).Rotator();
 		FRotator Offset = FRotator(90, 180, 0);
 		Rotation += Offset;
-		sensorGadgetOfficerMesh1->SetWorldLocation(Point);
+
+		FVector Location = Hit.Location + (MeshNormal * 5);
+
+		sensorGadgetOfficerMesh1->SetWorldLocation(Location);
 		sensorGadgetOfficerMesh1->SetWorldRotation(Rotation);
 
-		firstLocation = Point;
+		firstLocation = Location;
 		firstRotation = Rotation;
 
-		CalculateSecondPosition(Point, Hit.ImpactNormal, IgnoredSelf);
+		return true;
 	}
-	else
-	{
-		ToggleEnable(false);
-		CanPlace = false;
-	}
+
+	ToggleEnable(false);
+	CanPlace = false;
+
+	return false;
 }
 
-void USensorGadgetOfficerComponent::CalculateSecondPosition(FVector FirstLocation, FVector ForwardVector, AActor* IgnoredSelf)
+bool USensorGadgetOfficerComponent::ValidSecondPosition(FVector FirstLocation, FVector ForwardVector)
 {
 	FHitResult Hit(ForceInit);
 	FVector Start = FirstLocation;
 	FVector End = Start + ForwardVector * range;
 	FCollisionQueryParams CollisionParams;
-	CollisionParams.AddIgnoredActor(IgnoredSelf);
+	CollisionParams.AddIgnoredActor(GetOwner());
 
 	GetWorld()->LineTraceSingleByChannel(Hit, Start, End, ECC_WorldDynamic, CollisionParams);
 
 	if (Hit.IsValidBlockingHit())
 	{
-		if (Hit.GetComponent() == sensorGadgetOfficerMesh2 )//|| Hit.GetActor()->IsA(ABase3C::StaticClass()))
-			return;
+		if (Hit.GetComponent() == sensorGadgetOfficerMesh2 || Hit.GetActor()->IsA(ABase3C::StaticClass()))
+			return  false;
 
-		FVector Point = Hit.ImpactPoint + (Hit.ImpactNormal * 0.01f);
 		FVector Normal = Hit.ImpactNormal;
-
 		FRotator Rotation = FRotationMatrix::MakeFromX(Normal).Rotator();
 		FRotator Offset = FRotator(90, 180, 0);
 		Rotation += Offset;
-		sensorGadgetOfficerMesh2->SetWorldLocation(Point);
-		sensorGadgetOfficerMesh2->SetWorldRotation(Rotation);
-		ChangeMaterial(true);
 
-		secondLocation = Point;
+		FVector Location = Hit.Location + (Normal * 5);
+
+		sensorGadgetOfficerMesh2->SetWorldLocation(Location);
+		sensorGadgetOfficerMesh2->SetWorldRotation(Rotation);
+		
+		secondLocation = Location;
 		secondRotation = Rotation;
 
-		return;
-		
+		return true;
 	}
 
 	sensorGadgetOfficerMesh2->SetVisibility(false);
-	ChangeMaterial(false);
+	return false;
 }
 
 void USensorGadgetOfficerComponent::ChangeMaterial(bool approved)
 {
 	if (approved)
 	{
-		sensorGadgetOfficerMesh1->SetMaterial(0,ApproveMaterial);
-		sensorGadgetOfficerMesh2->SetMaterial(0,ApproveMaterial);
+		sensorGadgetOfficerMesh1->SetMaterial(0, ApproveMaterial);
+		sensorGadgetOfficerMesh2->SetMaterial(0, ApproveMaterial);
 		CanPlace = true;
 	}
 	else
@@ -138,25 +135,19 @@ void USensorGadgetOfficerComponent::ChangeMaterial(bool approved)
 	}
 }
 
-void USensorGadgetOfficerComponent::TryPlace()
+void USensorGadgetOfficerComponent::Place()
 {
 	if (!CanPlace || sensorsUsed >= maxSensors)
 		return;
 
-	
-
-	FVector Location = (sensorGadgetOfficerMesh1->GetComponentLocation() + sensorGadgetOfficerMesh2->GetComponentLocation()) / 2;
-	FRotator Rotation = sensorGadgetOfficerMesh1->GetComponentRotation();
-	FRotator Offset = FRotator(90, 0, 0);
-	Rotation += Offset;
 	sensorsUsed++;
 
-	ServerSpawnSensor(firstLocation, firstRotation, secondLocation, secondRotation, GetOwner());
+	ServerSpawnSensor(firstLocation, firstRotation, secondLocation, secondRotation, Cast<AOfficer>(GetOwner()));
 
 	CanPlace = false;
 }
 
-void USensorGadgetOfficerComponent::ServerSpawnSensor_Implementation(FVector pfirstLocation, FRotator pfirstRotation, FVector psecondLocation, FRotator psecondRotation, AActor* pOwner)
+void USensorGadgetOfficerComponent::ServerSpawnSensor_Implementation(FVector pfirstLocation, FRotator pfirstRotation, FVector psecondLocation, FRotator psecondRotation, AOfficer* pOwner)
 {
 	FActorSpawnParameters SpawnInfo;
 	ASensorGadget* Sensor = Cast<ASensorGadget>(GetWorld()->SpawnActor<AActor>(ActorTospawn, pfirstLocation, pfirstRotation, SpawnInfo));
@@ -167,6 +158,6 @@ void USensorGadgetOfficerComponent::ServerSpawnSensor_Implementation(FVector pfi
 	Sensor->sensorGadgetMesh2->SetWorldRotation(psecondRotation);
 
 	Sensor->CalculateMiddleMesh();
-	Sensor->SetOfficerOwner(pOwner);
+	Sensor->MULSetOfficer(pOwner);
 	Sensor->SetRevealTime(revealTime);
 }
