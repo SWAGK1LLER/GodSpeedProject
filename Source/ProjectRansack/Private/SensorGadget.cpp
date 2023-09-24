@@ -60,7 +60,7 @@ void ASensorGadget::PingPlayer(AActor* pPlayerToPing)
 		spottedPlayer.Add(thief);
 
 		FTimerHandle Handle;
-		GetWorld()->GetTimerManager().SetTimer(Handle, FTimerDelegate::CreateLambda([&] {
+		GetWorld()->GetTimerManager().SetTimer(Handle, FTimerDelegate::CreateLambda([this, thief] {
 			thief->ChangeStencilFromServer(0);
 			spottedPlayer.Remove(thief);
 
