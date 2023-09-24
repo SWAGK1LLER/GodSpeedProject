@@ -53,7 +53,7 @@ void ASensorGadget::PingPlayer(AActor* pPlayerToPing)
 	AThief* thief = Cast<AThief>(pPlayerToPing);
 	if (thief != nullptr)
 	{
-		if (!spottedPlayer.Contains(thief))
+		if (spottedPlayer.Contains(thief))
 			return;
 
 		thief->ChangeStencilFromServer(2);
