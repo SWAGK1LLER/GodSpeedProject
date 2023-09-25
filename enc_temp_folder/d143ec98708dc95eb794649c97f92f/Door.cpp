@@ -249,7 +249,7 @@ void ADoor::HandleDoorAnimation()
 {
     if (animationRunning)
     {
-        if (!FuseStateOpen)
+        if (FuseStateOpen)
             doorTimeLine.Play();
         else
             doorTimeLine.Reverse();

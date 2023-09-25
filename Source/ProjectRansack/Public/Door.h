@@ -10,6 +10,13 @@
 #include "Components/TimelineComponent.h"
 #include "Door.generated.h"
 
+UENUM(BlueprintType)
+enum class ESlidingAxis : uint8
+{
+	X,
+	Y,
+	Z
+};
 
 UCLASS()
 class PROJECTRANSACK_API ADoor : public AActor, public IThiefInteractibleActor, public IOfficerInteractibleActor
@@ -27,10 +34,14 @@ public:
 	TSubclassOf<UDoorUI> WidgetClass;
 	UDoorUI* Widget = nullptr;
 
-	FTimeline doorTimeLine;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = MotionVision, meta = (AllowPrivateAccess = "true"))
+	ESlidingAxis slidingAxis = ESlidingAxis::X;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = MotionVision, meta = (AllowPrivateAccess = "true"))
 	UCurveFloat* doorAnimation = nullptr;
+
+	FTimeline doorTimeLine;
+	FVector startingLocation;
 
 	bool animationRunning = false;
 
