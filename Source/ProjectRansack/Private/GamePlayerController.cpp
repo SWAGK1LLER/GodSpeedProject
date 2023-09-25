@@ -283,9 +283,9 @@ void AGamePlayerController::SRToogleHackDoor_Implementation(ADoor* actor, bool i
 	actor->ToogleHackDoor(isHack);
 }
 
-void AGamePlayerController::SRToggleDoor_Implementation(ADoor* actor, bool pOpen)
+void AGamePlayerController::SRToggleDoor_Implementation(ADoor* actor, bool pOpen, bool manully)
 {
-	actor->ToggleDoor(pOpen);
+	actor->ToggleDoor(pOpen, manully);
 }
 
 void AGamePlayerController::SRToggleCameras_Implementation(ATerminal* actor, bool pOn)

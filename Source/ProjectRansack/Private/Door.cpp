@@ -26,12 +26,24 @@ void ADoor::BeginPlay()
 
     Trigger->OnComponentBeginOverlap.AddDynamic(this, &ADoor::OnTriggerOverlapBegin);
     Trigger->OnComponentEndOverlap.AddDynamic(this, &ADoor::OnTriggerOverlapEnd);
+
+
+    //Set Door animation
+    FOnTimelineFloat TimelineProgress;
+    FOnTimelineEventStatic onTimelineFinishedCallback;
+    TimelineProgress.BindUFunction(this, FName("TimelineProgress"));
+    doorTimeLine.AddInterpFloat(doorAnimation, TimelineProgress);
+    doorTimeLine.SetLooping(false);
+
+    onTimelineFinishedCallback.BindUFunction(this, FName("TimelineFinished"));
+    doorTimeLine.SetTimelineFinishedFunc(onTimelineFinishedCallback);
 }
 
 void ADoor::Tick(float DeltaTime)
 {
     Super::Tick(DeltaTime);
 
+    doorTimeLine.TickTimeline(DeltaTime);
     UpdateProgressHack(DeltaTime);
 }
 
@@ -60,6 +72,11 @@ void ADoor::OnTriggerOverlapBegin(UPrimitiveComponent* OverlappedComponent, AAct
             AOfficer* officer = Cast<AOfficer>(OtherActor);
             officer->closeItems.Add(this);
             widget->SetDefaultText(widget->getTextStateOfficer(FuseBoxHacked, FuseStateOpen));
+
+            if (!FuseBoxHacked && FuseStateOpen && !manullyOpen)
+            {
+                StartInteract(officer);
+            }
         }
     }
 }
@@ -85,11 +102,45 @@ void ADoor::OnTriggerOverlapEnd(UPrimitiveComponent* OverlappedComp, AActor* Oth
         {
             AOfficer* officer = Cast<AOfficer>(OtherActor);
             officer->closeItems.Remove(this);
+
+            TArray<AActor*> actors;
+            Trigger->GetOverlappingActors(actors, AOfficer::StaticClass());
+
+            if (actors.Num() == 0 && !FuseBoxHacked && !FuseStateOpen && !manullyOpen)
+            {
+                StartInteract(officer, false);
+            }
         }
     }
 }
 
 void ADoor::Interact_Implementation(AActor* pActor)
+{
+    StartInteract(pActor, true);
+}
+
+void ADoor::StopInteract_Implementation(AActor* pActor)
+{
+    if (acteurUsingThis == nullptr)
+        return;
+
+    currentlyInteracting = false;
+    acteurUsingThis = nullptr;
+
+    AGamePlayerController* playerController = Cast<AGamePlayerController>(Cast<ABase3C>(pActor)->GetController());
+    UDoorUI* widget = Cast<UDoorUI>(playerController->GetWidget(this));
+
+    if (Cast<AThief>(pActor) != nullptr)
+    {
+        widget->SetDefaultText(widget->getTextStateThief(FuseBoxHacked, FuseStateOpen));
+    }
+    else
+    {
+        widget->SetDefaultText(widget->getTextStateOfficer(FuseBoxHacked, FuseStateOpen));
+    }
+}
+
+void ADoor::StartInteract(AActor* pActor, bool pManullyOpen)
 {
     AThief* thief = Cast<AThief>(pActor);
     if (thief != nullptr)
@@ -109,7 +160,7 @@ void ADoor::Interact_Implementation(AActor* pActor)
             UDoorUI* widget = Cast<UDoorUI>(playerController->GetWidget(this));
             widget->SetDefaultText(widget->getTextStateThief(FuseBoxHacked, !FuseStateOpen));
 
-            playerController->SRToggleDoor(this, !FuseStateOpen);
+            playerController->SRToggleDoor(this, !FuseStateOpen, false);
         }
         else
         {
@@ -155,31 +206,11 @@ void ADoor::Interact_Implementation(AActor* pActor)
             AGamePlayerController* playerController = Cast<AGamePlayerController>(officer->GetController());
 
             UDoorUI* widget = Cast<UDoorUI>(playerController->GetWidget(this));
-            widget->SetDefaultText(widget->getTextStateOfficer(FuseBoxHacked, !FuseStateOpen));
+            if (widget != nullptr)
+                widget->SetDefaultText(widget->getTextStateOfficer(FuseBoxHacked, !FuseStateOpen));
 
-            playerController->SRToggleDoor(this, !FuseStateOpen);
+            playerController->SRToggleDoor(this, !FuseStateOpen, pManullyOpen);
         }
-    }
-}
-
-void ADoor::StopInteract_Implementation(AActor* pActor)
-{
-    if (acteurUsingThis == nullptr)
-        return;
-
-    currentlyInteracting = false;
-    acteurUsingThis = nullptr;
-
-    AGamePlayerController* playerController = Cast<AGamePlayerController>(Cast<ABase3C>(pActor)->GetController());
-    UDoorUI* widget = Cast<UDoorUI>(playerController->GetWidget(this));
-
-    if (Cast<AThief>(pActor) != nullptr)
-    {
-        widget->SetDefaultText(widget->getTextStateThief(FuseBoxHacked, FuseStateOpen));
-    }
-    else
-    {
-        widget->SetDefaultText(widget->getTextStateOfficer(FuseBoxHacked, FuseStateOpen));
     }
 }
 
@@ -189,17 +220,50 @@ void ADoor::ToogleHackDoor_Implementation(bool isHack)
     UpdateUIText();
 }
 
-void ADoor::ToggleDoor_Implementation(bool pOpen)
+void ADoor::TimelineProgress(float value)
 {
+    FVector CurrentLocation = mesh->GetComponentLocation();
+
+    FVector NewLocation;
+    if (FuseStateOpen)
+        NewLocation = CurrentLocation + FVector(value, 0, 0);
+    else
+        NewLocation = CurrentLocation - FVector(value, 0, 0);
+
+    mesh->SetWorldLocation(NewLocation);
+}
+
+void ADoor::TimelineFinished()
+{
+    animationRunning = false;
+}
+
+void ADoor::HandleDoorAnimation()
+{
+    animationRunning = true;
+
+    if (FuseStateOpen)
+        doorTimeLine.PlayFromStart();
+    else
+        doorTimeLine.ReverseFromEnd();
+}
+
+void ADoor::ToggleDoor_Implementation(bool pOpen, bool pManully)
+{
+    if (animationRunning)
+        return;
+
     if (FuseStateOpen == pOpen)
         return;
 
+    if (!pOpen)
+        manullyOpen = pManully;
+    else
+        manullyOpen = false;
+
     FuseStateOpen = pOpen;
 
-    //TODO - waiting for door animation open/close or visual effect needed
-    //Temporary action
-    mesh->SetVisibility(pOpen);
-
+    HandleDoorAnimation();
 
     UpdateUIText();
 }

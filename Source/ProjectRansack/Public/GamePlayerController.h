@@ -125,8 +125,8 @@ public:
 	void SRToogleHackLights_Implementation(ALightFuseBoxe* actor, bool isHack);
 
 	UFUNCTION(Server, Reliable, BlueprintCallable)
-	void SRToggleDoor(ADoor* actor, bool pOpen);
-	void SRToggleDoor_Implementation(ADoor* actor, bool pOpen);
+	void SRToggleDoor(ADoor* actor, bool pOpen, bool manully);
+	void SRToggleDoor_Implementation(ADoor* actor, bool pOpen, bool manully);
 
 	UFUNCTION(Server, Reliable, BlueprintCallable)
 	void SRToogleHackDoor(ADoor* actor, bool isHack);

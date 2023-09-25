@@ -7,6 +7,7 @@
 #include "ThiefInteractibleActor.h"
 #include "OfficerInteractibleActor.h"
 #include <DoorUI.h>
+#include "Components/TimelineComponent.h"
 #include "Door.generated.h"
 
 
@@ -26,8 +27,14 @@ public:
 	TSubclassOf<UDoorUI> WidgetClass;
 	UDoorUI* Widget = nullptr;
 
-	class AActor* acteurUsingThis = nullptr;
+	FTimeline doorTimeLine;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = MotionVision, meta = (AllowPrivateAccess = "true"))
+	UCurveFloat* doorAnimation = nullptr;
+
+	bool animationRunning = false;
+
+	class AActor* acteurUsingThis = nullptr;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	float TimeToHackThief = 5;
@@ -37,6 +44,7 @@ public:
 
 	float currentTime = 0;
 	bool currentlyInteracting = false;
+	bool manullyOpen = false;
 
 	bool FuseStateOpen = true;
 	bool FuseBoxHacked = false;
@@ -59,13 +67,15 @@ public:
 	virtual void Interact_Implementation(class AActor* pActor) override;
 	virtual void StopInteract_Implementation(class AActor* pActor) override;
 
+	void StartInteract(class AActor* pActor, bool pManullyOpen = false);
+
 	UFUNCTION(NetMulticast, Reliable, BlueprintCallable)
 	void ToogleHackDoor(bool isHack);
 	void ToogleHackDoor_Implementation(bool isHack);
 
 	UFUNCTION(NetMulticast, Reliable, BlueprintCallable)
-	void ToggleDoor(bool pOpen);
-	void ToggleDoor_Implementation(bool pOpen);
+	void ToggleDoor(bool pOpen, bool manully);
+	void ToggleDoor_Implementation(bool pOpen, bool manully);
 
 	void UpdateProgressHack(float DeltaTime);
 
@@ -73,4 +83,11 @@ public:
 	void UpdateUIText();
 	void UpdateUIText_Implementation();
 
+	UFUNCTION()
+	void TimelineProgress(float value);
+
+	UFUNCTION()
+	void TimelineFinished();
+
+	void HandleDoorAnimation();
 };
