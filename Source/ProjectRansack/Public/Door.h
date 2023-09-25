@@ -6,7 +6,6 @@
 #include "GameFramework/Actor.h"
 #include "ThiefInteractibleActor.h"
 #include "OfficerInteractibleActor.h"
-#include <DoorUI.h>
 #include "Components/TimelineComponent.h"
 #include "Door.generated.h"
 
@@ -30,10 +29,6 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	class UShapeComponent* Trigger = nullptr;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	TSubclassOf<UDoorUI> WidgetClass;
-	UDoorUI* Widget = nullptr;
-
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = MotionVision, meta = (AllowPrivateAccess = "true"))
 	ESlidingAxis slidingAxis = ESlidingAxis::X;
 
@@ -47,18 +42,12 @@ public:
 
 	class AActor* acteurUsingThis = nullptr;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	float TimeToHackThief = 5;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	float TimeToFixOfficer = 2;
-
 	float currentTime = 0;
 	bool currentlyInteracting = false;
 	bool manullyOpen = false;
 
 	bool FuseStateOpen = true;
-	bool FuseBoxHacked = false;
+	//bool FuseBoxHacked = false;
 
 	float time = 0;
 
@@ -68,31 +57,23 @@ public:
 
 	virtual void Tick(float DeltaTime) override;
 
+	UFUNCTION()
+	virtual void OnTriggerOverlapBegin(class UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, class UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
 
 	UFUNCTION()
-	void OnTriggerOverlapBegin(class UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, class UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
-
-	UFUNCTION()
-	void OnTriggerOverlapEnd(class UPrimitiveComponent* OverlappedComp, AActor* OtherActor, class UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);
+	virtual void OnTriggerOverlapEnd(class UPrimitiveComponent* OverlappedComp, AActor* OtherActor, class UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);
 
 	virtual void Interact_Implementation(class AActor* pActor) override;
-	virtual void StopInteract_Implementation(class AActor* pActor) override;
 
-	void StartInteract(class AActor* pActor, bool pManullyOpen = false);
-
-	UFUNCTION(NetMulticast, Reliable, BlueprintCallable)
-	void ToogleHackDoor(bool isHack);
-	void ToogleHackDoor_Implementation(bool isHack);
+	virtual void StartInteract(class AActor* pActor, bool pManullyOpen = false);
 
 	UFUNCTION(NetMulticast, Reliable, BlueprintCallable)
 	void ToggleDoor(bool pOpen, bool manully);
 	void ToggleDoor_Implementation(bool pOpen, bool manully);
 
-	void UpdateProgressHack(float DeltaTime);
-
 	UFUNCTION(NetMulticast, Reliable, BlueprintCallable)
-	void UpdateUIText();
-	void UpdateUIText_Implementation();
+	virtual void UpdateUIText();
+	virtual void UpdateUIText_Implementation();
 
 	UFUNCTION()
 	void TimelineProgress(float value);

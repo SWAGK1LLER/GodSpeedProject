@@ -108,6 +108,8 @@ public:
 
 	bool Revealed = false;
 
+	bool HasMagnetCard = false;
+
 	ABase3C();
 
 	virtual void BeginPlay() override;
@@ -122,7 +124,7 @@ public:
 
 	UFUNCTION(Client, Reliable, BlueprintCallable)
 	void SetClientUI();
-	void SetClientUI_Implementation();
+	virtual void SetClientUI_Implementation();
 
 	UFUNCTION(Server, Reliable, BlueprintCallable)
 	void SetClientNickname(const FString& pNickName);

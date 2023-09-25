@@ -53,9 +53,6 @@ void AThief::BeginPlay()
 
 	ClimbingArea->OnComponentBeginOverlap.AddDynamic(this, &AThief::ClimbTriggerOverlapBegin);
 	ClimbingArea->OnComponentEndOverlap.AddDynamic(this, &AThief::ClimbTriggerOverlapEnd);
-
-	ArrestUISelf = (UArrestUI*)CreateWidget<UUserWidget>(GetWorld(), ArrestOfficerWidgetClass);
-	ArrestUISelf->AddToViewport();
 }
 
 void AThief::Tick(float DeltaTime)
@@ -226,12 +223,14 @@ void AThief::MulReset_Implementation(FTransform transform)
 	HelperClass::deactivateTrigger(ArrestArea);
 	ArrestAreaActivate = false;
 	beingArrest = false;
+	HasMagnetCard = false;
 
 	AGamePlayerController* pc = Cast<AGamePlayerController>(GetController());
 	if (pc == nullptr)
 		return;
 
 	pc->ClientFinishArrest(thiefTableInstance->respawnTime);
+	CopyMagnetCardUI(false);
 
 	FTimerHandle Handle;
 	GetWorld()->GetTimerManager().SetTimer(Handle, FTimerDelegate::CreateLambda([=] {
@@ -391,6 +390,18 @@ void AThief::Interact()
 	if (bFreezeInput || beingArrest)
 		return;
 
+	if (closeOfficer.Num() != 0)
+	{
+		/*AGamePlayerController* playerController = Cast<AGamePlayerController>(GetController());
+		if (playerController == nullptr)
+			return;
+
+		playerController->SRBeginArrestThief((AThief*)ArrestingThief, true, this);*/
+
+		MUlCopyMagnetCard();
+		return;
+	}
+
 	if (closeItems.Num() == 0)
 		return;
 
@@ -453,6 +464,9 @@ void AThief::MulSetBeingArrest_Implementation(bool pArrest, AOfficer* pOfficer)
 
 void AThief::ClientShowArrest_Implementation(bool pArrest)
 {
+	if (ArrestUISelf == nullptr)
+		return;
+
 	ArrestUISelf->ToggleBeingArrested(pArrest);
 }
 
@@ -507,6 +521,21 @@ void AThief::crouch()
 void AThief::unCrouch()
 {
 	UnCrouch();
+}
+
+void AThief::MUlCopyMagnetCard_Implementation()
+{
+	HasMagnetCard = true;
+	AGamePlayerController* pc = Cast<AGamePlayerController>(GetController());
+	if (pc == nullptr)
+		return;
+
+	CopyMagnetCardUI(true);
+}
+
+void AThief::CopyMagnetCardUI_Implementation(bool state)
+{
+	WidgetUI->ToggleMagnetCard(state);
 }
 
 void AThief::OnArrestTriggerOverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
@@ -581,4 +610,12 @@ FHitResult AThief::ClimbingLineTrace()
 	GetWorld()->LineTraceSingleByChannel(OutHit, Start, End, ECC_Visibility, CollisionParams);
 
 	return OutHit;
+}
+
+void AThief::SetClientUI_Implementation()
+{
+	Super::SetClientUI_Implementation();
+
+	ArrestUISelf = (UArrestUI*)CreateWidget<UUserWidget>(GetWorld(), ArrestOfficerWidgetClass);
+	ArrestUISelf->AddToViewport();
 }

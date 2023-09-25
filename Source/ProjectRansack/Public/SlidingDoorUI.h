@@ -1,16 +1,11 @@
-// Fill out your copyright notice in the Description page of Project Settings.
-
 #pragma once
 
 #include "CoreMinimal.h"
 #include "Blueprint/UserWidget.h"
-#include "DoorUI.generated.h"
+#include "SlidingDoorUI.generated.h"
 
-/**
- * 
- */
 UCLASS()
-class PROJECTRANSACK_API UDoorUI : public UUserWidget
+class PROJECTRANSACK_API USlidingDoorUI : public UUserWidget
 {
 	GENERATED_BODY()
 

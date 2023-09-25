@@ -1,9 +1,6 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+#include "SlidingDoorUI.h"
 
-
-#include "DoorUI.h"
-
-FString UDoorUI::getTextStateOfficer(bool hacked, bool doorOpen)
+FString USlidingDoorUI::getTextStateOfficer(bool hacked, bool doorOpen)
 {
 	if (hacked)
 		return FString("Hold E to fix the door");
@@ -13,7 +10,7 @@ FString UDoorUI::getTextStateOfficer(bool hacked, bool doorOpen)
 	return FString("Press E to close door");
 }
 
-FString UDoorUI::getTextStateThief(bool hacked, bool doorOpen)
+FString USlidingDoorUI::getTextStateThief(bool hacked, bool doorOpen)
 {
 	if (!hacked)
 		return FString("Hold E to hack door");

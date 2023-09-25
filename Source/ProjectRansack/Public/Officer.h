@@ -1,5 +1,3 @@
-// Fill out your copyright notice in the Description page of Project Settings.
-
 #pragma once
 
 #include "CoreMinimal.h"
@@ -8,12 +6,9 @@
 #include "Components/TimelineComponent.h"
 #include "OfficerNotificationUI.h"
 #include "OfficerInteractibleActor.h"
+#include <StunOfficerUI.h>
 #include "Officer.generated.h"
 
-
-/**
- * 
- */
 class UCurveFloat;
 
 USTRUCT(BlueprintType)
@@ -81,6 +76,13 @@ public:
 	ABase3C* ArrestingThief = nullptr;
 	TArray<ABase3C*> closeThief;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	TSubclassOf<UStunOfficerUI> StunOfficerWidgetClass;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	class UShapeComponent* StunArea = nullptr;
+	bool StunAreaActivate = false;
+
 	UPROPERTY(editAnywhere, BlueprintReadWrite, Category = Light, meta = (AllowPrivateAccess = "true"))
 	class USpotLightComponent* flashLight;
 
@@ -133,6 +135,16 @@ public:
 	virtual void Interact() override;
 	virtual void StopInteract() override;
 
+	void ClientFreezeInput_Implementation(float duration) override;
+	virtual void UnFreezeInput_Implementation() override;
+
+	UFUNCTION(Server, Reliable, BlueprintCallable)
+	void SRActivateArrestTrigger();
+	void SRActivateArrestTrigger_Implementation();
+
+	UFUNCTION(NetMulticast, Reliable, BlueprintCallable)
+	void MulActivateArrestTrigger();
+	void MulActivateArrestTrigger_Implementation();
 
 	void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const;
 
@@ -147,6 +159,11 @@ public:
 	UFUNCTION(Client, Reliable)
 	void ReceiveCameraUnPing();
 
-
 	void SetupNotificationUI();
+
+	UFUNCTION()
+	void OnStunTriggerOverlapBegin(class UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, class UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
+
+	UFUNCTION()
+	void OnStunTriggerOverlapEnd(class UPrimitiveComponent* OverlappedComp, AActor* OtherActor, class UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);
 };

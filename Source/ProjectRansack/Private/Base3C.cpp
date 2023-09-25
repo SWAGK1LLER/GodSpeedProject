@@ -1,4 +1,5 @@
 #include "Base3C.h"
+#include "Thief.h"
 #include "Camera/CameraComponent.h"
 #include "GameFramework/SpringArmComponent.h"
 #include "EnhancedInputComponent.h"
@@ -328,6 +329,9 @@ void ABase3C::SetClientUI_Implementation()
 
 	WidgetUI = CreateWidget<UPlayerUI>(GetWorld(), WidgetClass);
 	WidgetUI->AddToViewport();
+
+	if (IsA(AThief::StaticClass()))
+		WidgetUI->ToggleMagnetCard(false);
 }
 
 void ABase3C::TryGeneratingOverlapEvent()

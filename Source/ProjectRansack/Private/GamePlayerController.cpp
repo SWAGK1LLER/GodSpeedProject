@@ -17,6 +17,7 @@
 #include <Officer.h>
 #include "LightFuseBoxe.h"
 #include <Door.h>
+#include "SlidingDoor.h"
 #include "Terminal.h"
 #include "SensorGadget.h"
 
@@ -278,7 +279,7 @@ void AGamePlayerController::SRToggleLights_Implementation(ALightFuseBoxe* actor,
 	actor->ToggleLights(pOpen);
 }
 
-void AGamePlayerController::SRToogleHackDoor_Implementation(ADoor* actor, bool isHack)
+void AGamePlayerController::SRToogleHackDoor_Implementation(ASlidingDoor* actor, bool isHack)
 {
 	actor->ToogleHackDoor(isHack);
 }

@@ -1,6 +1,3 @@
-// Fill out your copyright notice in the Description page of Project Settings.
-
-
 #include "Officer.h"
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
@@ -19,6 +16,7 @@
 #include <GamePlayerController.h>
 #include <HelperClass.h>
 #include "CameraCompOfficer.h"
+#include <Components/BoxComponent.h>
 
 AOfficer::AOfficer()
 {
@@ -31,6 +29,12 @@ AOfficer::AOfficer()
 	flashLight->SetupAttachment((USceneComponent*)cameraComponent->camera);
 
 	sensorGadgetOfficer = CreateDefaultSubobject<USensorGadgetOfficerComponent>(TEXT("Sensor Gadget Component"));
+
+	HasMagnetCard = true;
+
+	StunArea = CreateDefaultSubobject<UBoxComponent>(FName("StunArea"));
+	StunArea->SetGenerateOverlapEvents(true);
+	StunArea->SetupAttachment(RootComponent);
 }
 
 void AOfficer::BeginPlay()
@@ -45,6 +49,11 @@ void AOfficer::BeginPlay()
 	sensorGadgetOfficer->ToggleEnable(false);
 	GetMesh()->SetOwnerNoSee(true); 
 	SetupNotificationUI();
+
+	StunArea->OnComponentBeginOverlap.AddDynamic(this, &AOfficer::OnStunTriggerOverlapBegin);
+	StunArea->OnComponentEndOverlap.AddDynamic(this, &AOfficer::OnStunTriggerOverlapEnd);
+	HelperClass::deactivateTrigger(StunArea);
+	StunAreaActivate = false;
 }
 
 void AOfficer::Tick(float DeltaTime)
@@ -322,4 +331,60 @@ void AOfficer::ReceiveCameraPing_Implementation(int CameraNumb)
 void AOfficer::ReceiveCameraUnPing_Implementation()
 {
 	notificationUI->Reset();
+}
+
+void AOfficer::OnStunTriggerOverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
+{
+	AThief* player = Cast<AThief>(OtherActor);
+	if (player == nullptr)
+		return;
+
+	player->closeOfficer.Add(this);
+
+	AController* PC = player->GetController();
+	if (PC != nullptr && PC->IsLocalPlayerController())
+	{
+		AGamePlayerController* playerController = Cast<AGamePlayerController>(PC);
+		playerController->AddInteractibleWidgetUI(this, StunOfficerWidgetClass);
+	}
+}
+
+void AOfficer::OnStunTriggerOverlapEnd(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
+{
+	AThief* player = Cast<AThief>(OtherActor);
+	if (player == nullptr)
+		return;
+
+	player->closeOfficer.Remove(this);
+
+	AController* PC = player->GetController();
+	if (PC != nullptr && PC->IsLocalPlayerController())
+	{
+		AGamePlayerController* playerController = Cast<AGamePlayerController>(PC);
+		playerController->RemoveInteractibleWidgetUI(this);
+	}
+}
+
+void AOfficer::ClientFreezeInput_Implementation(float duration)
+{
+	Super::ClientFreezeInput_Implementation(duration);
+	SRActivateArrestTrigger();
+}
+
+void AOfficer::SRActivateArrestTrigger_Implementation()
+{
+	MulActivateArrestTrigger();
+}
+
+void AOfficer::MulActivateArrestTrigger_Implementation()
+{
+	HelperClass::activateTrigger(StunArea);
+	StunAreaActivate = true;
+}
+
+void AOfficer::UnFreezeInput_Implementation()
+{
+	Super::UnFreezeInput_Implementation();
+	HelperClass::deactivateTrigger(StunArea);
+	StunAreaActivate = false;
 }

@@ -63,6 +63,7 @@ public:
 
 	bool beingArrest = false;
 	AOfficer* officerArresting = nullptr;
+	TArray<ABase3C*> closeOfficer;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	UInventory* inventory = nullptr;
@@ -88,6 +89,8 @@ public:
 	virtual void Tick(float DeltaTime) override;
 
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
+
+	virtual void SetClientUI_Implementation() override;
 
 	bool CreateTableInstance() override;
 
@@ -184,6 +187,14 @@ public:
 
 	void crouch();
 	void unCrouch();
+
+	UFUNCTION(NetMulticast, Reliable, BlueprintCallable)
+	void MUlCopyMagnetCard();
+	void MUlCopyMagnetCard_Implementation();
+
+	UFUNCTION(Client, Reliable, BlueprintCallable)
+	void CopyMagnetCardUI(bool state);
+	void CopyMagnetCardUI_Implementation(bool state);
 
 	UFUNCTION()
 	void OnArrestTriggerOverlapBegin(class UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, class UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);

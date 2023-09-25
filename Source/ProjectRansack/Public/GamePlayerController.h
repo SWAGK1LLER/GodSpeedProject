@@ -1,5 +1,3 @@
-// Fill out your copyright notice in the Description page of Project Settings.
-
 #pragma once
 
 #include "CoreMinimal.h"
@@ -10,9 +8,6 @@
 #include "Blueprint/UserWidget.h"
 #include "GamePlayerController.generated.h"
 
-/**
- * 
- */
 UCLASS()
 class PROJECTRANSACK_API AGamePlayerController : public APlayerController
 {
@@ -129,8 +124,8 @@ public:
 	void SRToggleDoor_Implementation(ADoor* actor, bool pOpen, bool manully);
 
 	UFUNCTION(Server, Reliable, BlueprintCallable)
-	void SRToogleHackDoor(ADoor* actor, bool isHack);
-	void SRToogleHackDoor_Implementation(ADoor* actor, bool isHack);
+	void SRToogleHackDoor(class ASlidingDoor* actor, bool isHack);
+	void SRToogleHackDoor_Implementation(class ASlidingDoor* actor, bool isHack);
 
 	UFUNCTION(Server, Reliable, BlueprintCallable)
 	void SRToggleCameras(class ATerminal* actor, bool pOn);

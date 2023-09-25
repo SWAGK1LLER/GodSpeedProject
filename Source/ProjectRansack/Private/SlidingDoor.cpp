@@ -1,4 +1,5 @@
-#include "Door.h"
+#include "SlidingDoor.h"
+
 #include "Components/StaticMeshComponent.h"
 #include "Components/BoxComponent.h"
 #include "Thief.h"
@@ -7,61 +8,30 @@
 #include <Officer.h>
 #include <Kismet/GameplayStatics.h>
 
-ADoor::ADoor()
+ASlidingDoor::ASlidingDoor()
 {
-    PrimaryActorTick.bCanEverTick = true;
-    bReplicates = true;
-
-    RootComponent = Trigger = CreateDefaultSubobject<UBoxComponent>(FName("Trigger"));
-    Trigger->SetGenerateOverlapEvents(true);
-
-
-    mesh = CreateDefaultSubobject<UStaticMeshComponent>(FName("Mesh"));
-    mesh->SetupAttachment(Trigger);
 }
 
-void ADoor::BeginPlay()
-{
-    Super::BeginPlay();
-
-    Trigger->OnComponentBeginOverlap.AddDynamic(this, &ADoor::OnTriggerOverlapBegin);
-    Trigger->OnComponentEndOverlap.AddDynamic(this, &ADoor::OnTriggerOverlapEnd);
-
-
-    //Set Door animation
-    FOnTimelineFloat TimelineProgress;
-    FOnTimelineEventStatic onTimelineFinishedCallback;
-    TimelineProgress.BindUFunction(this, FName("TimelineProgress"));
-    doorTimeLine.AddInterpFloat(doorAnimation, TimelineProgress);
-    doorTimeLine.SetLooping(false);
-
-    onTimelineFinishedCallback.BindUFunction(this, FName("TimelineFinished"));
-    doorTimeLine.SetTimelineFinishedFunc(onTimelineFinishedCallback);
-
-    startingLocation = mesh->GetComponentLocation();
-}
-
-void ADoor::Tick(float DeltaTime)
+void ASlidingDoor::Tick(float DeltaTime)
 {
     Super::Tick(DeltaTime);
 
-    doorTimeLine.TickTimeline(DeltaTime);
     UpdateProgressHack(DeltaTime);
 }
 
-void ADoor::OnTriggerOverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
+void ASlidingDoor::OnTriggerOverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
     ABase3C* player = Cast<ABase3C>(OtherActor);
     if (player == nullptr)
         return;
 
-    UDoorUI* widget = nullptr;
+    USlidingDoorUI* widget = nullptr;
 
     AController* PC = player->GetController();
     if (PC != nullptr && PC->IsLocalPlayerController())
     {
         AGamePlayerController* playerController = Cast<AGamePlayerController>(PC);
-        widget = Cast<UDoorUI>(playerController->AddInteractibleWidgetUI(this, WidgetClass));
+        widget = Cast<USlidingDoorUI>(playerController->AddInteractibleWidgetUI(this, WidgetClass));
 
         AThief* thief = Cast<AThief>(OtherActor);
         if (thief)
@@ -83,7 +53,7 @@ void ADoor::OnTriggerOverlapBegin(UPrimitiveComponent* OverlappedComponent, AAct
     }
 }
 
-void ADoor::OnTriggerOverlapEnd(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
+void ASlidingDoor::OnTriggerOverlapEnd(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
 {
     ABase3C* player = Cast<ABase3C>(OtherActor);
     if (player == nullptr)
@@ -116,12 +86,7 @@ void ADoor::OnTriggerOverlapEnd(UPrimitiveComponent* OverlappedComp, AActor* Oth
     }
 }
 
-void ADoor::Interact_Implementation(AActor* pActor)
-{
-    StartInteract(pActor, true);
-}
-
-void ADoor::StopInteract_Implementation(AActor* pActor)
+void ASlidingDoor::StopInteract_Implementation(AActor* pActor)
 {
     if (acteurUsingThis == nullptr)
         return;
@@ -130,7 +95,7 @@ void ADoor::StopInteract_Implementation(AActor* pActor)
     acteurUsingThis = nullptr;
 
     AGamePlayerController* playerController = Cast<AGamePlayerController>(Cast<ABase3C>(pActor)->GetController());
-    UDoorUI* widget = Cast<UDoorUI>(playerController->GetWidget(this));
+    USlidingDoorUI* widget = Cast<USlidingDoorUI>(playerController->GetWidget(this));
 
     if (Cast<AThief>(pActor) != nullptr)
     {
@@ -142,7 +107,7 @@ void ADoor::StopInteract_Implementation(AActor* pActor)
     }
 }
 
-void ADoor::StartInteract(AActor* pActor, bool pManullyOpen)
+void ASlidingDoor::StartInteract(AActor* pActor, bool pManullyOpen)
 {
     AThief* thief = Cast<AThief>(pActor);
     if (thief != nullptr)
@@ -159,7 +124,7 @@ void ADoor::StartInteract(AActor* pActor, bool pManullyOpen)
 
             AGamePlayerController* playerController = Cast<AGamePlayerController>(thief->GetController());
 
-            UDoorUI* widget = Cast<UDoorUI>(playerController->GetWidget(this));
+            USlidingDoorUI* widget = Cast<USlidingDoorUI>(playerController->GetWidget(this));
             widget->SetDefaultText(widget->getTextStateThief(FuseBoxHacked, !FuseStateOpen));
 
             playerController->SRToggleDoor(this, !FuseStateOpen, false);
@@ -172,7 +137,7 @@ void ADoor::StartInteract(AActor* pActor, bool pManullyOpen)
 
             //Show progress bar
             AGamePlayerController* playerController = Cast<AGamePlayerController>(thief->GetController());
-            UDoorUI* widget = Cast<UDoorUI>(playerController->GetWidget(this));
+            USlidingDoorUI* widget = Cast<USlidingDoorUI>(playerController->GetWidget(this));
             widget->ActivateProgressBar();
         }
 
@@ -191,7 +156,7 @@ void ADoor::StartInteract(AActor* pActor, bool pManullyOpen)
             //Show progress bar
             AGamePlayerController* playerController = Cast<AGamePlayerController>(officer->GetController());
 
-            UDoorUI* widget = Cast<UDoorUI>(playerController->GetWidget(this));
+            USlidingDoorUI* widget = Cast<USlidingDoorUI>(playerController->GetWidget(this));
             widget->SetDefaultText(widget->getTextStateOfficer(FuseBoxHacked, !FuseStateOpen));
             widget->ActivateProgressBar();
         }
@@ -207,7 +172,7 @@ void ADoor::StartInteract(AActor* pActor, bool pManullyOpen)
 
             AGamePlayerController* playerController = Cast<AGamePlayerController>(officer->GetController());
 
-            UDoorUI* widget = Cast<UDoorUI>(playerController->GetWidget(this));
+            USlidingDoorUI* widget = Cast<USlidingDoorUI>(playerController->GetWidget(this));
             if (widget != nullptr)
                 widget->SetDefaultText(widget->getTextStateOfficer(FuseBoxHacked, !FuseStateOpen));
 
@@ -216,73 +181,13 @@ void ADoor::StartInteract(AActor* pActor, bool pManullyOpen)
     }
 }
 
-void ADoor::ToogleHackDoor_Implementation(bool isHack)
+void ASlidingDoor::ToogleHackDoor_Implementation(bool isHack)
 {
     FuseBoxHacked = isHack;
     UpdateUIText();
 }
 
-void ADoor::TimelineProgress(float value)
-{
-    FVector translationAnim;
-    switch (slidingAxis)
-    {
-    case ESlidingAxis::X: translationAnim = FVector(value, 0, 0);
-        break;
-    case ESlidingAxis::Y: translationAnim = FVector(0, value, 0);
-        break;
-    case ESlidingAxis::Z: translationAnim = FVector(0, 0, value);
-        break;
-    default:
-        break;
-    }
-
-    mesh->SetWorldLocation(startingLocation + translationAnim);
-}
-
-void ADoor::TimelineFinished()
-{
-    animationRunning = false;
-}
-
-void ADoor::HandleDoorAnimation()
-{
-    if (animationRunning)
-    {
-        if (FuseStateOpen)
-            doorTimeLine.Play();
-        else
-            doorTimeLine.Reverse();
-    }
-    else
-    {
-        animationRunning = true;
-
-        if (!FuseStateOpen)
-            doorTimeLine.PlayFromStart();
-        else
-            doorTimeLine.ReverseFromEnd();
-    }
-}
-
-void ADoor::ToggleDoor_Implementation(bool pOpen, bool pManully)
-{
-    if (FuseStateOpen == pOpen)
-        return;
-
-    if (!pOpen)
-        manullyOpen = pManully;
-    else
-        manullyOpen = false;
-
-    FuseStateOpen = pOpen;
-
-    HandleDoorAnimation();
-
-    UpdateUIText();
-}
-
-void ADoor::UpdateProgressHack(float DeltaTime)
+void ASlidingDoor::UpdateProgressHack(float DeltaTime)
 {
     if (currentlyInteracting)
     {
@@ -291,7 +196,7 @@ void ADoor::UpdateProgressHack(float DeltaTime)
         //Update ui progress bar
         ABase3C* player = Cast<ABase3C>(acteurUsingThis);
         AGamePlayerController* playerController = Cast<AGamePlayerController>(player->GetController());
-        UDoorUI* widget = Cast<UDoorUI>(playerController->GetWidget(this));
+        USlidingDoorUI* widget = Cast<USlidingDoorUI>(playerController->GetWidget(this));
         if (widget == nullptr)
             return;
 
@@ -331,7 +236,7 @@ void ADoor::UpdateProgressHack(float DeltaTime)
     }
 }
 
-void ADoor::UpdateUIText_Implementation()
+void ASlidingDoor::UpdateUIText_Implementation()
 {
     TArray<AActor*> actors;
     Trigger->GetOverlappingActors(actors, ABase3C::StaticClass());
@@ -343,7 +248,7 @@ void ADoor::UpdateUIText_Implementation()
         if (playerController == nullptr)
             continue;
 
-        UDoorUI* widget = Cast<UDoorUI>(playerController->GetWidget(this));
+        USlidingDoorUI* widget = Cast<USlidingDoorUI>(playerController->GetWidget(this));
         if (widget == nullptr)
             continue;
 
