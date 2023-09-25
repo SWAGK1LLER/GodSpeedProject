@@ -10,6 +10,7 @@
 #include "GameFramework/CharacterMovementComponent.h"
 #include <EOSGameInstance.h>
 #include <HelperClass.h>
+#include "DamageIndicatorComp.h"
 
 ABase3C::ABase3C()
 {
@@ -19,6 +20,8 @@ ABase3C::ABase3C()
 	currentState = CharacterState::Gun;
 
 	StunWeapon = CreateDefaultSubobject<UStunWeapon>(TEXT("StunWeapon"));
+
+	damageIndicator = CreateDefaultSubobject<UDamageIndicatorComp>(TEXT("DamageIndicator"));
 }
 
 void ABase3C::BeginPlay()
@@ -125,7 +128,7 @@ void ABase3C::MulticastSetClientNickname_Implementation(const FString& pNickName
 	nickName = pNickName;
 }
 
-void ABase3C::ClientFreezeInput_Implementation(float duration)
+void ABase3C::ClientFreezeInput_Implementation(float duration, AActor* pActor)
 {
 	/*if (bFreezeInput)
 		return;*/
@@ -135,6 +138,8 @@ void ABase3C::ClientFreezeInput_Implementation(float duration)
 	TimeFreezed = 0;
 	StopInteract();
 	StopAim();
+
+	damageIndicator->ShowDamage(pActor);
 }
 
 void ABase3C::UnFreezeInput_Implementation()

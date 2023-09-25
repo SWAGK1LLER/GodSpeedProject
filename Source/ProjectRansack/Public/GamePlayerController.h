@@ -99,8 +99,8 @@ public:
 
 
 	UFUNCTION(Server, Reliable, BlueprintCallable)
-	void SRFreezeInput(float duration, ABase3C* actor);
-	void SRFreezeInput_Implementation(float duration, ABase3C* actor);
+	void SRFreezeInput(float duration, ABase3C* actor, AActor* pActor);
+	void SRFreezeInput_Implementation(float duration, ABase3C* actor, AActor* pActor);
 
 	UFUNCTION(Server, Reliable, BlueprintCallable)
 	void CameraFreezeInput(AActor* actor);

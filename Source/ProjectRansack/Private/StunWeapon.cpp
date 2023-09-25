@@ -108,7 +108,7 @@ bool UStunWeapon::CheckHittableActor(AActor* pActorToCheck)
 void UStunWeapon::HitEntity(AGamePlayerController* PlayerController, AActor* pActorToHit)
 {
     if (Cast<ABase3C>(pActorToHit))
-        PlayerController->SRFreezeInput(StunDuration, Cast<ABase3C>(pActorToHit));
+        PlayerController->SRFreezeInput(StunDuration, Cast<ABase3C>(pActorToHit), GetOwner());
     else if(Cast<ASecurityCamera>(pActorToHit))
         PlayerController->CameraFreezeInput(pActorToHit);
 }

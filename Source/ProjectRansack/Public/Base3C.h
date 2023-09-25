@@ -81,6 +81,9 @@ public:
 	class UCameraComp* cameraComponent = nullptr;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
+	class UDamageIndicatorComp* damageIndicator = nullptr;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
 	class UStunWeapon* StunWeapon = nullptr;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
@@ -135,8 +138,8 @@ public:
 	void MulticastSetClientNickname_Implementation(const FString& pNickName);
 
 	UFUNCTION(NetMulticast, Reliable, BlueprintCallable)
-	void ClientFreezeInput(float duration);
-	virtual void ClientFreezeInput_Implementation(float duration);
+	void ClientFreezeInput(float duration, AActor* pActor);
+	virtual void ClientFreezeInput_Implementation(float duration, AActor* pActor);
 
 	UFUNCTION(NetMulticast, Reliable, BlueprintCallable)
 	void UnFreezeInput();
@@ -170,19 +173,19 @@ public:
 	void Fire();
 
 	UFUNCTION(Server, Reliable, BlueprintCallable)
-		void SRStartSprinting();
+	void SRStartSprinting();
 	void SRStartSprinting_Implementation();
 
 	UFUNCTION(NetMulticast, Reliable, BlueprintCallable)
-		void MulStartSprinting();
+	void MulStartSprinting();
 	void MulStartSprinting_Implementation();
 
 	UFUNCTION(Server, Reliable, BlueprintCallable)
-		void SRStopSprinting();
+	void SRStopSprinting();
 	void SRStopSprinting_Implementation();
 
 	UFUNCTION(NetMulticast, Reliable, BlueprintCallable)
-		void MulStopSprinting();
+	void MulStopSprinting();
 	void MulStopSprinting_Implementation();
 
 	void Sprint();

@@ -228,9 +228,9 @@ void AGameGameMode::RemoveToScore(int pValue, int& pScore)
 		(Cast<AGamePlayerController>(aPC))->ClientUpdateScore(ScoreTeamA, ScoreTeamB);
 }
 
-void AGameGameMode::FreezeInput(float duration, ABase3C* actor)
+void AGameGameMode::FreezeInput(float duration, ABase3C* actor, AActor* pActor)
 {
-	actor->ClientFreezeInput(duration);
+	actor->ClientFreezeInput(duration, pActor);
 }
 
 void AGameGameMode::FreezeCamera(AActor* actor)

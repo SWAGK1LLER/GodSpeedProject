@@ -365,9 +365,9 @@ void AOfficer::OnStunTriggerOverlapEnd(UPrimitiveComponent* OverlappedComp, AAct
 	}
 }
 
-void AOfficer::ClientFreezeInput_Implementation(float duration)
+void AOfficer::ClientFreezeInput_Implementation(float duration, AActor* pActor)
 {
-	Super::ClientFreezeInput_Implementation(duration);
+	Super::ClientFreezeInput_Implementation(duration, pActor);
 	SRActivateArrestTrigger();
 }
 
