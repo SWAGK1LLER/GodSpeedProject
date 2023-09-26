@@ -14,14 +14,14 @@ class PROJECTRANSACK_API UTerminalUI : public UUserWidget
 {
 public:
 	GENERATED_BODY()
-		UFUNCTION(BlueprintImplementableEvent)
-		void SetDefaultText(const FString& msg);
+	UFUNCTION(BlueprintImplementableEvent)
+	void SetDefaultText(const FString& msg);
 
 	UFUNCTION(BlueprintImplementableEvent)
-		void ActivateProgressBar();
+	void ActivateProgressBar();
 
 	UFUNCTION(BlueprintImplementableEvent)
-		void setProgressBarValue(float percentage);
+	void setProgressBarValue(float percentage);
 
 	FString getTextStateOfficer(bool hacked, bool CamerasOff);
 
