@@ -400,13 +400,13 @@ void AThief::Interact()
 		AOfficer* officer = Cast<AOfficer>(base3c);
 		if (officer->HasMagnetCard)
 		{
-			//MUlStealMagnetCard(Cast<AOfficer>(closeOfficer[0]));
-
 			AController* PC = GetController();
 			if (PC != nullptr && PC->IsLocalPlayerController())
 			{
 				AGamePlayerController* playerController = Cast<AGamePlayerController>(PC);
 				playerController->stealMagnetCard(this, officer);
+
+				Cast<UStunOfficerUI>(playerController->interactibleUI[officer])->NoCardToSteal();
 			}
 
 			return;

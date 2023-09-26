@@ -345,7 +345,10 @@ void AOfficer::OnStunTriggerOverlapBegin(UPrimitiveComponent* OverlappedComponen
 	if (PC != nullptr && PC->IsLocalPlayerController())
 	{
 		AGamePlayerController* playerController = Cast<AGamePlayerController>(PC);
-		playerController->AddInteractibleWidgetUI(this, StunOfficerWidgetClass);
+		UStunOfficerUI* ui = (UStunOfficerUI*)playerController->AddInteractibleWidgetUI(this, StunOfficerWidgetClass);
+
+		if (!HasMagnetCard || player->HasMagnetCard)
+			ui->NoCardToSteal();
 	}
 }
 
