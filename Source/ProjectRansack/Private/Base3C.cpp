@@ -139,7 +139,8 @@ void ABase3C::ClientFreezeInput_Implementation(float duration, AActor* pActor)
 	StopInteract();
 	StopAim();
 
-	damageIndicator->ShowDamage(pActor);
+	if (GetController() != nullptr)
+		damageIndicator->ShowDamage(pActor);
 }
 
 void ABase3C::UnFreezeInput_Implementation()
