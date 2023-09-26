@@ -15,6 +15,13 @@ void UDamageIndicatorComp::BeginPlay()
 void UDamageIndicatorComp::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
+
+	/*testTime += DeltaTime;
+	if (testTime > DisappearTime)
+	{
+		testTime = 0;
+		ShowDamage(GetOwner());
+	}*/
 }
 
 void UDamageIndicatorComp::ShowDamage(AActor* DamageActor)
