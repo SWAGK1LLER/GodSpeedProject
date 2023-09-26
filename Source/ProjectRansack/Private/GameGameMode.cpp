@@ -444,3 +444,8 @@ void AGameGameMode::PingThiefToAllOfficer(class ASensorGadget* sensor, class ATh
 		playerController->PingPlayerToSensor(sensor, thief);
 	}
 }
+
+void AGameGameMode::stealMagnetCard(class AThief* thief, class AOfficer* officer)
+{
+	thief->MUlStealMagnetCard(officer);
+}

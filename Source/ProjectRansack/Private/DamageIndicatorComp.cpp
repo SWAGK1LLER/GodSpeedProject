@@ -43,7 +43,7 @@ void UDamageIndicatorComp::ShowDamage(AActor* DamageActor)
 	
 	float length = (myLocation - DamageLocation).Length();
 
-	bool smallerThanNearDistance = length < NearDamageDistance;
+	bool smallerThanNearDistance = length > NearDamageDistance;
 
 	UTexture2D* texture = smallerThanNearDistance ? DistanceIndicator : NearIndicator;
 

@@ -350,3 +350,9 @@ void ABase3C::TryGeneratingOverlapEvent()
 	location.X--;
 	SetActorLocation(location);
 }
+
+void ABase3C::ToggleMagnetCardUI_Implementation(bool visible)
+{
+	if (WidgetUI != nullptr)
+		WidgetUI->ToggleMagnetCard(visible);
+}

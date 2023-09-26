@@ -223,14 +223,19 @@ void AThief::MulReset_Implementation(FTransform transform)
 	HelperClass::deactivateTrigger(ArrestArea);
 	ArrestAreaActivate = false;
 	beingArrest = false;
-	HasMagnetCard = false;
+	
+	if (HasMagnetCard)
+	{
+		HasMagnetCard = false;
+		stolenOfficerCard->ToggleMagnetCard(true);
+	}
 
 	AGamePlayerController* pc = Cast<AGamePlayerController>(GetController());
 	if (pc == nullptr)
 		return;
 
 	pc->ClientFinishArrest(thiefTableInstance->respawnTime);
-	CopyMagnetCardUI(false);
+	ToggleMagnetCardUI(false);
 
 	FTimerHandle Handle;
 	GetWorld()->GetTimerManager().SetTimer(Handle, FTimerDelegate::CreateLambda([=] {
@@ -390,16 +395,22 @@ void AThief::Interact()
 	if (bFreezeInput || beingArrest)
 		return;
 
-	if (closeOfficer.Num() != 0)
+	for (ABase3C* base3c : closeOfficer)
 	{
-		/*AGamePlayerController* playerController = Cast<AGamePlayerController>(GetController());
-		if (playerController == nullptr)
+		AOfficer* officer = Cast<AOfficer>(base3c);
+		if (officer->HasMagnetCard)
+		{
+			//MUlStealMagnetCard(Cast<AOfficer>(closeOfficer[0]));
+
+			AController* PC = GetController();
+			if (PC != nullptr && PC->IsLocalPlayerController())
+			{
+				AGamePlayerController* playerController = Cast<AGamePlayerController>(PC);
+				playerController->stealMagnetCard(this, officer);
+			}
+
 			return;
-
-		playerController->SRBeginArrestThief((AThief*)ArrestingThief, true, this);*/
-
-		MUlCopyMagnetCard();
-		return;
+		}
 	}
 
 	if (closeItems.Num() == 0)
@@ -523,19 +534,21 @@ void AThief::unCrouch()
 	UnCrouch();
 }
 
-void AThief::MUlCopyMagnetCard_Implementation()
+void AThief::MUlStealMagnetCard_Implementation(AOfficer* officer)
 {
+	if (stolenOfficerCard != nullptr)
+		return;
+
 	HasMagnetCard = true;
+	stolenOfficerCard = officer;
+
+	officer->ToggleMagnetCard(false);
+
 	AGamePlayerController* pc = Cast<AGamePlayerController>(GetController());
 	if (pc == nullptr)
 		return;
 
-	CopyMagnetCardUI(true);
-}
-
-void AThief::CopyMagnetCardUI_Implementation(bool state)
-{
-	WidgetUI->ToggleMagnetCard(state);
+	ToggleMagnetCardUI(true);
 }
 
 void AThief::OnArrestTriggerOverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)

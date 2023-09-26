@@ -6,12 +6,10 @@
 #include <Thief.h>
 #include "GameGameMode.generated.h"
 
-
 #define MINUTE 60
 #define SECOND 60
 #define MAX_PLAYER 6
 #define MAX_ROUND 2
-
 
 DECLARE_DELEGATE(FOnCustomTimerFinish);
 DECLARE_DELEGATE(FOnCustomTimerTick);
@@ -24,9 +22,6 @@ struct CustomTimer
 	bool used = false;
 };
 
-/**
- * 
- */
 UCLASS()
 class PROJECTRANSACK_API AGameGameMode : public AGameMode
 {
@@ -145,4 +140,6 @@ public:
 	void SetCustomTimerCallback(float time, const FOnCustomTimerTick& onTick, const FOnCustomTimerFinish& onFinish);
 
 	void PingThiefToAllOfficer(class ASensorGadget* sensor, class AThief* thief);
+
+	void stealMagnetCard(class AThief* thief, class AOfficer* officer);
 };

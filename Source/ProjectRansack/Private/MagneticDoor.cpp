@@ -28,20 +28,17 @@ void AMagneticDoor::OnTriggerOverlapBegin(UPrimitiveComponent* OverlappedCompone
         if (thief)
         {
             thief->closeItems.Add(this);
-            widget->SetDefaultText(widget->getTextStateThief(thief->HasMagnetCard, FuseStateOpen));
-
-            if (thief->HasMagnetCard && FuseStateOpen)
-                StartInteract(thief);
+            widget->SetDefaultText(widget->getTextState(thief->HasMagnetCard, FuseStateOpen));
         }
         else
         {
             AOfficer* officer = Cast<AOfficer>(OtherActor);
             officer->closeItems.Add(this);
-            widget->SetDefaultText(widget->getTextStateOfficer(FuseStateOpen));
-
-            if (FuseStateOpen)
-                StartInteract(officer);
+            widget->SetDefaultText(widget->getTextState(officer->HasMagnetCard, FuseStateOpen));
         }
+
+        if (Cast<ABase3C>(OtherActor)->HasMagnetCard && FuseStateOpen)
+            StartInteract(OtherActor);
     }
 }
 
@@ -71,11 +68,8 @@ void AMagneticDoor::OnTriggerOverlapEnd(UPrimitiveComponent* OverlappedComp, AAc
         bool stillHaveSomeone = false;
         for (AActor* actor : actors)
         {
-            if (actor->IsA(AOfficer::StaticClass()))
-                return;
-
-            AThief* athief = Cast<AThief>(actor);
-            if (athief != nullptr && athief->HasMagnetCard)
+            ABase3C* base = Cast<ABase3C>(actor);
+            if (base->HasMagnetCard)
                 return;
         }
 
@@ -121,9 +115,6 @@ void AMagneticDoor::UpdateUIText_Implementation()
         if (widget == nullptr)
             continue;
 
-        if (Cast<AOfficer>(actor))
-            widget->SetDefaultText(widget->getTextStateOfficer(FuseStateOpen));
-        else
-            widget->SetDefaultText(widget->getTextStateThief(Cast<AThief>(actor)->HasMagnetCard, FuseStateOpen));
+        widget->SetDefaultText(widget->getTextState(player->HasMagnetCard, FuseStateOpen));
     }
 }

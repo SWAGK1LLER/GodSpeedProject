@@ -205,4 +205,8 @@ public:
 	UCameraComp* GetCameraComponent();
 
 	void TryGeneratingOverlapEvent();
+
+	UFUNCTION(Client, Reliable, BlueprintCallable)
+	void ToggleMagnetCardUI(bool visible);
+	void ToggleMagnetCardUI_Implementation(bool visible);
 };

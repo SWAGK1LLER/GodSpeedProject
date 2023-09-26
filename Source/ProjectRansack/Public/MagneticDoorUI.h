@@ -13,7 +13,5 @@ public:
 	UFUNCTION(BlueprintImplementableEvent)
 	void SetDefaultText(const FString& msg);
 
-	FString getTextStateOfficer(bool doorOpen);
-
-	FString getTextStateThief(bool HasCard, bool doorOpen);
+	FString getTextState(bool HasCard, bool doorOpen);
 };

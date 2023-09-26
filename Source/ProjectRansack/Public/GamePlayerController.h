@@ -173,4 +173,8 @@ public:
 	UFUNCTION(Client, Reliable, BlueprintCallable)
 	void PingPlayerToSensor(class ASensorGadget* sensor, class AThief* thief);
 	void PingPlayerToSensor_Implementation(class ASensorGadget* sensor, class AThief* thief);
+
+	UFUNCTION(Server, Reliable, BlueprintCallable)
+	void stealMagnetCard(class AThief* thief, class AOfficer* officer);
+	void stealMagnetCard_Implementation(class AThief* thief, class AOfficer* officer);
 };

@@ -368,15 +368,15 @@ void AOfficer::OnStunTriggerOverlapEnd(UPrimitiveComponent* OverlappedComp, AAct
 void AOfficer::ClientFreezeInput_Implementation(float duration, AActor* pActor)
 {
 	Super::ClientFreezeInput_Implementation(duration, pActor);
-	SRActivateArrestTrigger();
+	SRActivateStunTrigger();
 }
 
-void AOfficer::SRActivateArrestTrigger_Implementation()
+void AOfficer::SRActivateStunTrigger_Implementation()
 {
-	MulActivateArrestTrigger();
+	MulActivateStunTrigger();
 }
 
-void AOfficer::MulActivateArrestTrigger_Implementation()
+void AOfficer::MulActivateStunTrigger_Implementation()
 {
 	HelperClass::activateTrigger(StunArea);
 	StunAreaActivate = true;
@@ -387,4 +387,15 @@ void AOfficer::UnFreezeInput_Implementation()
 	Super::UnFreezeInput_Implementation();
 	HelperClass::deactivateTrigger(StunArea);
 	StunAreaActivate = false;
+}
+
+void AOfficer::ToggleMagnetCard_Implementation(bool possess)
+{
+	HasMagnetCard = possess;
+	ToggleMagnetCardIU();
+}
+
+void AOfficer::ToggleMagnetCardIU_Implementation()
+{
+	ToggleMagnetCardUI(HasMagnetCard);
 }

@@ -84,6 +84,8 @@ public:
 	UPROPERTY(BlueprintReadWrite, VisibleAnywhere)
 	bool IsClimbing = false;
 
+	class AOfficer* stolenOfficerCard = nullptr;
+
 	AThief();
 	virtual void BeginPlay() override;
 	virtual void Tick(float DeltaTime) override;
@@ -189,12 +191,8 @@ public:
 	void unCrouch();
 
 	UFUNCTION(NetMulticast, Reliable, BlueprintCallable)
-	void MUlCopyMagnetCard();
-	void MUlCopyMagnetCard_Implementation();
-
-	UFUNCTION(Client, Reliable, BlueprintCallable)
-	void CopyMagnetCardUI(bool state);
-	void CopyMagnetCardUI_Implementation(bool state);
+	void MUlStealMagnetCard(class AOfficer* officer);
+	void MUlStealMagnetCard_Implementation(class AOfficer* officer);
 
 	UFUNCTION()
 	void OnArrestTriggerOverlapBegin(class UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, class UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);

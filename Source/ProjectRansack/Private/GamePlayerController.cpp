@@ -471,3 +471,11 @@ void AGamePlayerController::PingPlayerToSensor_Implementation(ASensorGadget* sen
 {
 	sensor->PingPlayer(thief, Cast<AOfficer>(GetPawn()));
 }
+
+void AGamePlayerController::stealMagnetCard_Implementation(AThief* thief, AOfficer* officer)
+{
+	AGameGameMode* gameMode = Cast<AGameGameMode>(UGameplayStatics::GetGameMode(GetWorld()));
+
+	if (gameMode != nullptr)
+		gameMode->stealMagnetCard(thief, officer);
+}

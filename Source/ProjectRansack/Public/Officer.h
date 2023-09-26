@@ -89,9 +89,8 @@ public:
 	UPROPERTY(editAnywhere, BlueprintReadWrite, Category = SensorGadget, meta = (AllowPrivateAccess = "true"), replicated)
 	class USensorGadgetOfficerComponent* sensorGadgetOfficer;
 
-
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-		TSubclassOf<UOfficerNotificationUI> notificationWidgetClass;
+	TSubclassOf<UOfficerNotificationUI> notificationWidgetClass;
 
 	UOfficerNotificationUI* notificationUI = nullptr;
 
@@ -139,12 +138,16 @@ public:
 	virtual void UnFreezeInput_Implementation() override;
 
 	UFUNCTION(Server, Reliable, BlueprintCallable)
-	void SRActivateArrestTrigger();
-	void SRActivateArrestTrigger_Implementation();
+	void SRActivateStunTrigger();
+	void SRActivateStunTrigger_Implementation();
 
 	UFUNCTION(NetMulticast, Reliable, BlueprintCallable)
-	void MulActivateArrestTrigger();
-	void MulActivateArrestTrigger_Implementation();
+	void MulActivateStunTrigger();
+	void MulActivateStunTrigger_Implementation();
+
+	UFUNCTION(NetMulticast, Reliable, BlueprintCallable)
+	void ToggleMagnetCard(bool possess);
+	void ToggleMagnetCard_Implementation(bool possess);
 
 	void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const;
 
@@ -155,6 +158,11 @@ public:
 
 	UFUNCTION(Client, Reliable)
 	void ReceiveCameraPing(int CameraNumb);
+	void ReceiveCameraPing_Implementation(int CameraNumb);
+
+	UFUNCTION(Client, Reliable)
+	void ToggleMagnetCardIU();
+	void ToggleMagnetCardIU_Implementation();
 
 	UFUNCTION(Client, Reliable)
 	void ReceiveCameraUnPing();
