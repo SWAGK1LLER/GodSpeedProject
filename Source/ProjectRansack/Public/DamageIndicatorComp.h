@@ -56,9 +56,6 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 	FVector2D NearIndicatorSpriteSize = FVector2D(500, 500);
 
-
-	float testTime = 0;
-
 	UDamageIndicatorComp();
 
 	virtual void BeginPlay() override;
