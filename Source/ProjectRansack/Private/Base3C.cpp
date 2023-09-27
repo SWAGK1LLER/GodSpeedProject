@@ -183,8 +183,7 @@ void ABase3C::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 		EnhancedInputComponent->BindAction(tableInstance->AimAction, ETriggerEvent::Started, this, &ABase3C::StartAim);
 		EnhancedInputComponent->BindAction(tableInstance->AimAction, ETriggerEvent::Completed, this, &ABase3C::StopAim);
 
-		EnhancedInputComponent->BindAction(tableInstance->FireAction, ETriggerEvent::Started, this, &ABase3C::StartFire);
-		EnhancedInputComponent->BindAction(tableInstance->FireAction, ETriggerEvent::Triggered, this, &ABase3C::Fire);
+		EnhancedInputComponent->BindAction(tableInstance->FireAction, ETriggerEvent::Started, this, &ABase3C::Fire);
 
 		EnhancedInputComponent->BindAction(tableInstance->SprintAction, ETriggerEvent::Started, this, &ABase3C::SRStartSprinting);
 		EnhancedInputComponent->BindAction(tableInstance->SprintAction, ETriggerEvent::Completed, this, &ABase3C::SRStopSprinting);
@@ -260,13 +259,16 @@ void ABase3C::Fire()
 	if (isPaused)
 		return;
 
-	if (bFreezeInput || currentState != CharacterState::Gun)
+	if (bFreezeInput)
 		return;
 
-	StunWeapon->Fire();
+	if (currentState == CharacterState::Gun)
+	{
+		StunWeapon->Fire();
 
-	//Ugly hack to trigger overlap event if actor is already in trigger volume
-	TryGeneratingOverlapEvent();
+		//Ugly hack to trigger overlap event if actor is already in trigger volume
+		TryGeneratingOverlapEvent();
+	}
 }
 
 void ABase3C::SRStartSprinting_Implementation()

@@ -170,9 +170,7 @@ public:
 
 	void StopAim();
 
-	virtual void StartFire() {};
-
-	void Fire();
+	virtual void Fire();
 
 	UFUNCTION(Server, Reliable, BlueprintCallable)
 	void SRStartSprinting();

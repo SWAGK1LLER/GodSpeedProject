@@ -34,11 +34,8 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = MotionVision, meta = (AllowPrivateAccess = "true"))
 	class UInputAction* SensorGadgetAction = nullptr;
 
-	//CAMERAS
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
-	class UInputAction* RightAction = nullptr;
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
-	class UInputAction* LeftAction = nullptr;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = MotionVision, meta = (AllowPrivateAccess = "true"))
+	class UInputAction* StunBatonAction = nullptr;
 
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = SensorGadget, meta = (AllowPrivateAccess = "true"))
@@ -132,7 +129,9 @@ public:
 
 	void SensorGadgetAction();
 
-	virtual void StartFire() override;
+	void ToggleEquipStunBaton();
+
+	virtual void Fire() override;
 
 	virtual void Interact() override;
 	virtual void StopInteract() override;
@@ -157,7 +156,6 @@ public:
 	UFUNCTION(Server, Reliable, BlueprintCallable)
 	void ArrestThief(ABase3C* other);
 	void ArrestThief_Implementation(ABase3C* other);
-
 
 	UFUNCTION(Client, Reliable)
 	void ReceiveCameraPing(int CameraNumb);

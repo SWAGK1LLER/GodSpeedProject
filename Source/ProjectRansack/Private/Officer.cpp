@@ -111,6 +111,7 @@ void AOfficer::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 		EnhancedInputComponent->BindAction(officerTableInstance->MotionVisionAction, ETriggerEvent::Started, this, &AOfficer::HandleMotionVision);
 		EnhancedInputComponent->BindAction(officerTableInstance->FlashlightAction, ETriggerEvent::Started, this, &AOfficer::ToggleFlashight);
 		EnhancedInputComponent->BindAction(officerTableInstance->SensorGadgetAction, ETriggerEvent::Started, this, &AOfficer::SensorGadgetAction);
+		EnhancedInputComponent->BindAction(officerTableInstance->StunBatonAction, ETriggerEvent::Started, this, &AOfficer::ToggleEquipStunBaton);
 	}
 }
 
@@ -226,7 +227,6 @@ void AOfficer::ToggleFlashight()
 		flashLight->SetIntensity(5000.f); 
 		flashLightOn = true;
 	}
-		
 }
 
 void AOfficer::SensorGadgetAction() //Reacts to the input of SensorGadget
@@ -245,18 +245,40 @@ void AOfficer::SensorGadgetAction() //Reacts to the input of SensorGadget
 	currentState = CharacterState::SensorGadget;
 	sensorGadgetOfficer->ToggleEnable(true);
 	usingSensorGadget = true;
-	
 }
 
-void AOfficer::StartFire()
+void AOfficer::ToggleEquipStunBaton()
 {
 	if (isPaused)
 		return;
 
-	Super::StartFire();
-	if (currentState == CharacterState::SensorGadget)
+	if (currentState == CharacterState::Baton)
 	{
+		currentState = CharacterState::Gun;
+		return;
+	}
+
+	currentState = CharacterState::Baton;
+}
+
+void AOfficer::Fire()
+{
+	if (isPaused)
+		return;
+
+	if (bFreezeInput)
+		return;
+
+	if (currentState == CharacterState::SensorGadget)
 		sensorGadgetOfficer->Place();
+	else if (currentState == CharacterState::Baton)
+		StunStick->Fire();
+	else if (currentState == CharacterState::Gun)
+	{
+		StunWeapon->Fire();
+		
+		//Ugly hack to trigger overlap event if actor is already in trigger volume
+		TryGeneratingOverlapEvent();
 	}
 }
 
