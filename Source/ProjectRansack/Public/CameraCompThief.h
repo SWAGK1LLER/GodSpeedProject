@@ -34,4 +34,12 @@ public:
 	void SetupCamera(USceneComponent* root) override;
 
 	void RotatePlayer(class ACharacter* Character);
+
+	UFUNCTION(NetMulticast, Reliable, BlueprintCallable)
+	void MUlSetLerpRot(FRotator rot);
+	void MUlSetLerpRot_Implementation(FRotator rot);
+
+	UFUNCTION(NetMulticast, Reliable, BlueprintCallable)
+	void MUlSetRot(FRotator rot);
+	void MUlSetRot_Implementation(FRotator rot);
 };

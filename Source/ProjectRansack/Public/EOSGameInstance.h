@@ -1,5 +1,3 @@
-// Fill out your copyright notice in the Description page of Project Settings.
-
 #pragma once
 
 #include "CoreMinimal.h"
@@ -61,7 +59,7 @@ public:
 	//------------
 	//Create Party
 	UFUNCTION(BlueprintCallable)
-	void CreateParty(bool pTravel = true);
+	bool CreateParty(bool pTravel = true);
 	void OnCreateSessionComplete(FName SessionName, bool bWasSuccess);
 	//------------
 	//Party Initation
@@ -112,6 +110,9 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void CloseGame();
 	void OnGameCloseComplete(FName SessionName, bool bWasSuccess);
+	UFUNCTION(BlueprintCallable)
+	void QuitMatch();
+	void OnQuitMatchComplete(FName SessionName, bool bWasSuccess);
 	//------------
 	//start Game
 	UFUNCTION(BlueprintCallable)

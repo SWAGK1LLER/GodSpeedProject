@@ -187,6 +187,9 @@ void AOfficer::SetOfficerSensorScalor_Implementation(int newValue) //TODO Destro
 
 void AOfficer::HandleMotionVision() //Reacts to the input of MotionVision
 {
+	if (isPaused)
+		return;
+
 	if (MotionTimelineRunning)
 		return;
 
@@ -206,6 +209,9 @@ void AOfficer::HandleMotionVision() //Reacts to the input of MotionVision
 
 void AOfficer::ToggleFlashight()
 {
+	if (isPaused)
+		return;
+
 	if (flashLightOn)
 	{
 		flashLight->SetIntensity(0.f);
@@ -221,6 +227,9 @@ void AOfficer::ToggleFlashight()
 
 void AOfficer::SensorGadgetAction() //Reacts to the input of SensorGadget
 {
+	if (isPaused)
+		return;
+
 	if (currentState == CharacterState::SensorGadget)
 	{
 		currentState = CharacterState::Gun;
@@ -237,6 +246,9 @@ void AOfficer::SensorGadgetAction() //Reacts to the input of SensorGadget
 
 void AOfficer::StartFire()
 {
+	if (isPaused)
+		return;
+
 	Super::StartFire();
 	if (currentState == CharacterState::SensorGadget)
 	{
@@ -246,6 +258,9 @@ void AOfficer::StartFire()
 
 void AOfficer::Interact()
 {
+	if (isPaused)
+		return;
+
 	if (bFreezeInput)
 		return;
 
@@ -322,7 +337,6 @@ void AOfficer::SetupNotificationUI()
 
 void AOfficer::ReceiveCameraPing_Implementation(int CameraNumb)
 {
-	//GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("CAMERA PINGED!"));
 	if(notificationUI)
 		notificationUI->PingOfficer(CameraNumb);
 }

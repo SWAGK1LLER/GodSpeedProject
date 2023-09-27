@@ -6,6 +6,7 @@
 #include "EnumTeam.h"
 #include "RespawnUI.h"
 #include "Blueprint/UserWidget.h"
+#include <GamePauseMenu.h>
 #include "GamePlayerController.generated.h"
 
 UCLASS()
@@ -14,6 +15,12 @@ class PROJECTRANSACK_API AGamePlayerController : public APlayerController
 	GENERATED_BODY()
 
 public:
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	TSubclassOf<UGamePauseMenu> PauseMenuClass;
+	UGamePauseMenu* PauseUI = nullptr;
+	bool isPaused = false;
+	float time = 0;
+
 	UPROPERTY(EditAnywhere, Category = "widget")
 	TSubclassOf<class UDuffleBagUI> DuffleBagUIClass;
 	class UDuffleBagUI* DuffleBagUIWidget = nullptr;
@@ -177,4 +184,17 @@ public:
 	UFUNCTION(Server, Reliable, BlueprintCallable)
 	void stealMagnetCard(class AThief* thief, class AOfficer* officer);
 	void stealMagnetCard_Implementation(class AThief* thief, class AOfficer* officer);
+
+	UFUNCTION(BlueprintCallable)
+	void TogglePauseMenu();
+
+	void CenterViewportCursor();
+
+	UFUNCTION(Server, Reliable, BlueprintCallable)
+	void MUlSetLerpRot(class UCameraCompThief* comp, FRotator rot);
+	void MUlSetLerpRot_Implementation(class UCameraCompThief* comp, FRotator rot);
+
+	UFUNCTION(Server, Reliable, BlueprintCallable)
+	void MUlSetRot(class UCameraCompThief* comp, FRotator rot);
+	void MUlSetRot_Implementation(class UCameraCompThief* comp, FRotator rot);
 };

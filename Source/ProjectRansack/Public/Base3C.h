@@ -1,5 +1,3 @@
-// Fill out your copyright notice in the Description page of Project Settings.
-
 #pragma once
 
 #include "CoreMinimal.h"
@@ -57,6 +55,9 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
 	class UInputAction* TabAction = nullptr;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
+	class UInputAction* PauseAction = nullptr;
 };
 
 UENUM()
@@ -66,13 +67,14 @@ enum CharacterState
 	SensorGadget	UMETA(DisplayName = "SensorGadget"),
 };
 
-
 UCLASS()
 class PROJECTRANSACK_API ABase3C : public ACharacter
 {
 	GENERATED_BODY()
 
 public:
+	bool isPaused = false;
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	TSubclassOf<UPlayerUI> WidgetClass;
 	UPlayerUI* WidgetUI = nullptr;
@@ -153,7 +155,6 @@ public:
 	virtual void MulReset(FTransform transform);
 	virtual void MulReset_Implementation(FTransform transform);
 
-
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
@@ -209,4 +210,6 @@ public:
 	UFUNCTION(Client, Reliable, BlueprintCallable)
 	void ToggleMagnetCardUI(bool visible);
 	void ToggleMagnetCardUI_Implementation(bool visible);
+
+	void TogglePauseMenu();
 };

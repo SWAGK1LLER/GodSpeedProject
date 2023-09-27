@@ -1,6 +1,3 @@
-// Fill out your copyright notice in the Description page of Project Settings.
-
-
 #include "GamePlayerController.h"
 #include <Base3C.h>
 #include "EOSGameInstance.h"
@@ -20,6 +17,7 @@
 #include "SlidingDoor.h"
 #include "Terminal.h"
 #include "SensorGadget.h"
+#include "CameraCompThief.h"
 
 void AGamePlayerController::BeginPlay()
 {
@@ -76,7 +74,6 @@ void AGamePlayerController::PawnIsPossess(APawn* InPawn)
 		return;
 	}
 		
-
 	SetUpUI(thief);
 	SRGetTeamData();
 	SRUpdatePlayerName();
@@ -84,6 +81,9 @@ void AGamePlayerController::PawnIsPossess(APawn* InPawn)
 
 void AGamePlayerController::SetUpUI_Implementation(APawn* InPawn)
 {
+	PauseUI = (UGamePauseMenu*)CreateWidget<UGamePauseMenu>(GetWorld(), PauseMenuClass);
+	PauseUI->AddToViewport(10000);
+
 	AThief* thief = Cast<AThief>(InPawn);
 	if (thief == nullptr)
 		return;
@@ -478,4 +478,61 @@ void AGamePlayerController::stealMagnetCard_Implementation(AThief* thief, AOffic
 
 	if (gameMode != nullptr)
 		gameMode->stealMagnetCard(thief, officer);
+}
+
+void AGamePlayerController::TogglePauseMenu()
+{
+	// ugly hack for when code is execute twice at same time client and server
+	{
+		float realtimeSeconds = UGameplayStatics::GetRealTimeSeconds(GetWorld());
+
+		float diff = realtimeSeconds - time;
+		if (diff < 0.10f && time != 0)
+			return;
+
+		time = realtimeSeconds;
+	}
+
+	isPaused = !isPaused;
+
+	if (isPaused)
+	{
+		CenterViewportCursor();
+		SetInputMode(FInputModeGameAndUI());
+	}
+	else
+		SetInputMode(FInputModeGameOnly());
+
+	Cast<ABase3C>(GetPawn())->isPaused = isPaused;
+
+	bShowMouseCursor = isPaused;
+	PauseUI->ToggleView(bShowMouseCursor);
+}
+
+void AGamePlayerController::CenterViewportCursor()
+{
+	const ULocalPlayer* LocalPlayer = GetLocalPlayer();
+	if (LocalPlayer && LocalPlayer->ViewportClient)
+	{
+		FViewport* Viewport = LocalPlayer->ViewportClient->Viewport;
+		if (Viewport)
+		{
+			FVector2D ViewportSize;
+			LocalPlayer->ViewportClient->GetViewportSize(ViewportSize);
+			const int32 X = static_cast<int32>(ViewportSize.X * 0.5f);
+			const int32 Y = static_cast<int32>(ViewportSize.Y * 0.5f);
+
+			Viewport->SetMouse(X, Y);
+		}
+	}
+}
+
+void AGamePlayerController::MUlSetLerpRot_Implementation(UCameraCompThief* comp, FRotator rot)
+{
+	comp->MUlSetLerpRot(rot);
+}
+
+void AGamePlayerController::MUlSetRot_Implementation(UCameraCompThief* comp, FRotator rot)
+{
+	comp->MUlSetLerpRot(rot);
 }

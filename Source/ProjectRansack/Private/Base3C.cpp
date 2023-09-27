@@ -11,6 +11,7 @@
 #include <EOSGameInstance.h>
 #include <HelperClass.h>
 #include "DamageIndicatorComp.h"
+#include "GamePlayerController.h"
 
 ABase3C::ABase3C()
 {
@@ -130,8 +131,9 @@ void ABase3C::MulticastSetClientNickname_Implementation(const FString& pNickName
 
 void ABase3C::ClientFreezeInput_Implementation(float duration, AActor* pActor)
 {
-	/*if (bFreezeInput)
-		return;*/
+	// Can not freeze again someone already freeze to reset count down
+	if (bFreezeInput)
+		return;
 
 	bFreezeInput = true;
 	FreezeDuration = duration;
@@ -188,13 +190,17 @@ void ABase3C::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 
 		EnhancedInputComponent->BindAction(tableInstance->TabAction, ETriggerEvent::Started, this, &ABase3C::Tab);
 		EnhancedInputComponent->BindAction(tableInstance->TabAction, ETriggerEvent::Completed, this, &ABase3C::StopTab);
+		
+		EnhancedInputComponent->BindAction(tableInstance->PauseAction, ETriggerEvent::Started, this, &ABase3C::TogglePauseMenu);
 	}
 	cameraComponent->SetupInputComponent(PlayerInputComponent, tableInstance->lookAction);
 }
 
-
 void ABase3C::Move(const FInputActionValue& Value)
 {
+	if (isPaused)
+		return;
+
 	if (bFreezeInput)
 		return;
 
@@ -221,6 +227,9 @@ void ABase3C::Move(const FInputActionValue& Value)
 
 void ABase3C::Interact()
 {
+	if (isPaused)
+		return;
+
 	if (bFreezeInput)
 		return;
 }
@@ -231,6 +240,9 @@ void ABase3C::StopInteract()
 
 void ABase3C::StartAim()
 {
+	if (isPaused)
+		return;
+
 	if (bFreezeInput)
 		return;
 
@@ -244,6 +256,9 @@ void ABase3C::StopAim()
 
 void ABase3C::Fire()
 {
+	if (isPaused)
+		return;
+
 	if (bFreezeInput || currentState != CharacterState::Gun)
 		return;
 
@@ -291,7 +306,8 @@ void ABase3C::StopSprint()
 
 void ABase3C::Tab()
 {
-
+	if (isPaused)
+		return;
 }
 
 void ABase3C::StopTab()
@@ -304,7 +320,6 @@ void ABase3C::BindInputHandler()
 	if (tableInstance == nullptr)
 		if (!CreateTableInstance())
 			return;
-
 
 	//Add Input Mapping Context
 	if (APlayerController* PlayerController = Cast<APlayerController>(Controller))
@@ -356,4 +371,9 @@ void ABase3C::ToggleMagnetCardUI_Implementation(bool visible)
 {
 	if (WidgetUI != nullptr)
 		WidgetUI->ToggleMagnetCard(visible);
+}
+
+void ABase3C::TogglePauseMenu()
+{
+	Cast<AGamePlayerController>(GetController())->TogglePauseMenu();
 }

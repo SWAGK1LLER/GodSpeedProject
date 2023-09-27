@@ -180,6 +180,9 @@ void AThief::TimelineFinished2()
 
 void AThief::HandleNightVision() //Reacts to the input of MotionVision
 {
+	if (isPaused)
+		return;
+
 	if (NightTimelineRunning)
 		return;
 
@@ -199,6 +202,9 @@ void AThief::HandleNightVision() //Reacts to the input of MotionVision
 
 void AThief::Move(const FInputActionValue& Value)
 {
+	if (isPaused)
+		return;
+
 	if (bFreezeInput || beingArrest)
 		return;
 
@@ -392,6 +398,9 @@ void AThief::MUlDropInventory_Implementation(FVector location)
 
 void AThief::Interact()
 {
+	if (isPaused)
+		return;
+
 	if (bFreezeInput || beingArrest)
 		return;
 
@@ -432,6 +441,9 @@ void AThief::StopInteract()
 
 void AThief::Tab()
 {
+	if (isPaused)
+		return;
+
 	AGamePlayerController* PC = Cast<AGamePlayerController>(Controller);
 	if (PC != nullptr)
 		PC->ToogleTeamDuffleBagUI(true);
@@ -483,6 +495,9 @@ void AThief::ClientShowArrest_Implementation(bool pArrest)
 
 void AThief::CheckCanClimb()
 {
+	if (isPaused)
+		return;
+
 	if (CanClimb)
 	{
 		if (IsClimbing)
@@ -526,6 +541,9 @@ void AThief::ResetOfficerInArrestArea(AOfficer* pOfficerToSkip)
 
 void AThief::crouch()
 {
+	if (isPaused)
+		return;
+
 	Crouch();
 }
 

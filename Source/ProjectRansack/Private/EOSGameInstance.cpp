@@ -1,6 +1,3 @@
-// Fill out your copyright notice in the Description page of Project Settings.
-
-
 #include "EOSGameInstance.h"
 #include "Interfaces/OnlineSessionInterface.h"
 #include "Interfaces/OnlineIdentityInterface.h"
@@ -171,17 +168,17 @@ void UEOSGameInstance::OnLoginCompleteEOS(int32 LocalUserNum, bool bWasSuccessfu
 }
 //--------
 //Party creation
-void UEOSGameInstance::CreateParty(bool pTravel)
+bool UEOSGameInstance::CreateParty(bool pTravel)
 {
 	if (!bIsLogin)
-		return;
+		return false;
 
 	if (!OnlineSubsystem)
-		return;
+		return false;
 
 	IOnlineSessionPtr SessionPtr = OnlineSubsystem->GetSessionInterface();
 	if (!SessionPtr)
-		return;
+		return false;
 
 	FOnlineSessionSettings SessionSettings;
 	SessionSettings.bIsDedicated = false;
@@ -203,6 +200,7 @@ void UEOSGameInstance::CreateParty(bool pTravel)
 		bHasSession = true;
 	
 	SessionPtr->CreateSession(0, FSessionName, SessionSettings);
+	return true;
 }
 
 void UEOSGameInstance::OnCreateSessionComplete(FName SessionName, bool bWasSuccess)
@@ -669,8 +667,33 @@ void UEOSGameInstance::OnGameCloseComplete(FName SessionName, bool bWasSuccess)
 		return;
 
 	SessionPtr->ClearOnDestroySessionCompleteDelegates(this);
+}
 
-	UGameplayStatics::OpenLevel(GetWorld(), "/Game/Maps/MainMenu", true);
+void UEOSGameInstance::QuitMatch()
+{
+	IOnlineSessionPtr SessionPtr = OnlineSubsystem->GetSessionInterface();
+	if (!SessionPtr)
+	{
+		UGameplayStatics::OpenLevel(GetWorld(), "/Game/Maps/Login", true);
+		return;
+	}
+
+	SessionPtr->OnDestroySessionCompleteDelegates.AddUObject(this, &UEOSGameInstance::OnQuitMatchComplete);
+	SessionPtr->DestroySession(FGameSessionName);
+}
+
+void UEOSGameInstance::OnQuitMatchComplete(FName SessionName, bool bWasSuccess)
+{
+	IOnlineSessionPtr SessionPtr = OnlineSubsystem->GetSessionInterface();
+	if (!SessionPtr)
+	{
+		UGameplayStatics::OpenLevel(GetWorld(), "/Game/Maps/Login", true);
+		return;
+	}
+
+	SessionPtr->ClearOnDestroySessionCompleteDelegates(this);
+	if (!CreateParty())
+		UGameplayStatics::OpenLevel(GetWorld(), "/Game/Maps/Login", true);
 }
 
 void UEOSGameInstance::CancelFindGame()

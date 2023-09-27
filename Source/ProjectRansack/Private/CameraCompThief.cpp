@@ -3,6 +3,7 @@
 #include <ProjectRansack/Public/Base3C.h>
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Kismet/KismetMathLibrary.h"
+#include "GamePlayerController.h"
 
 bool SameSign(float x, float y)
 {
@@ -43,11 +44,18 @@ void UCameraCompThief::TickComponent(float DeltaTime, enum ELevelTick TickType, 
 	
 	if (speed > 3.0f && Character->GetCharacterMovement()->GetLastInputVector() != FVector(0, 0, 0))
 	{
-		Character->bUseControllerRotationYaw = true;
+		FRotator rotation = Character->GetViewRotation();
+		rotation.Pitch = 0;
+		rotation.Roll = 0;
+
+		Character->SetActorRotation(rotation);
+		Cast<AGamePlayerController>(Character->GetController())->MUlSetRot(this, rotation);
+
+		//Character->bUseControllerRotationYaw = true;
 		ShouldTurn = false;
 	}
-	else
-		Character->bUseControllerRotationYaw = false;
+	//else
+	//	Character->bUseControllerRotationYaw = false;
 	
 	if (ShouldTurn)
 	{
@@ -91,13 +99,25 @@ void UCameraCompThief::RotatePlayer(ACharacter* Character)
 	{
 		ShouldTurn = true;
 
-		//To do : lerp rotation
 		FRotator rotation = Character->GetViewRotation();
 		rotation.Pitch = 0;
 		rotation.Roll = 0;
 
 		finalRotation = rotation;
 
-		//Character->SetActorRotation(rotation);
+		ACharacter* Character = CastChecked<ACharacter>(GetOwner());
+		Cast<AGamePlayerController>(Character->GetController())->MUlSetLerpRot(this, finalRotation);
 	}
+}
+
+void UCameraCompThief::MUlSetLerpRot_Implementation(FRotator rot)
+{
+	ShouldTurn = true;
+	finalRotation = rot;
+}
+
+void UCameraCompThief::MUlSetRot_Implementation(FRotator rot)
+{
+	ACharacter* Character = CastChecked<ACharacter>(GetOwner());
+	Character->SetActorRotation(rot);
 }
