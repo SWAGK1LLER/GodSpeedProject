@@ -19,7 +19,7 @@ void UStunStick::BeginPlay()
 
 void UStunStick::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
 {
-    Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
+    UWeapon::TickComponent(DeltaTime, TickType, ThisTickFunction);
 }
 
 void UStunStick::Fire()

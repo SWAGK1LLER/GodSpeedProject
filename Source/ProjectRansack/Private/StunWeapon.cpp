@@ -26,6 +26,8 @@ void UStunWeapon::TickComponent(float DeltaTime, ELevelTick TickType, FActorComp
     if (player->WidgetUI == nullptr)
         return;
 
+    UE_LOG(LogTemp, Warning, TEXT("%f"), CoolDownCurrentTime);
+
     if (CoolDownCurrentTime > 0)
         player->WidgetUI->UpdateCooldown(CoolDownCurrentTime);
     else
@@ -54,17 +56,12 @@ void UStunWeapon::Fire()
     if (playerController == nullptr)
         return;
 
-
     playerController->SRSpawnParticle(particleEffect, position, (hitableEnemy ? StunDuration : -1) );
 
     if (!hitableEnemy)
         return;
 
-
     HitEntity(playerController, actor);
-
-
-    GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("Actor hitted!"));
 }
 
 AActor* UStunWeapon::HitScan(FVector& hitLocation)

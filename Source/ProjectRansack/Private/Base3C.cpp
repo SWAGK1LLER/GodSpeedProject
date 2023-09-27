@@ -21,6 +21,7 @@ ABase3C::ABase3C()
 	currentState = CharacterState::Gun;
 
 	StunWeapon = CreateDefaultSubobject<UStunWeapon>(TEXT("StunWeapon"));
+	StunWeapon->SetupAttachment(GetMesh());
 
 	damageIndicator = CreateDefaultSubobject<UDamageIndicatorComp>(TEXT("DamageIndicator"));
 }
@@ -131,6 +132,9 @@ void ABase3C::MulticastSetClientNickname_Implementation(const FString& pNickName
 
 void ABase3C::ClientFreezeInput_Implementation(float duration, AActor* pActor)
 {
+	if (GetController() != nullptr && GetController()->IsLocalPlayerController())
+		damageIndicator->ShowDamage(pActor);
+
 	// Can not freeze again someone already freeze to reset count down
 	if (bFreezeInput)
 		return;
@@ -140,9 +144,6 @@ void ABase3C::ClientFreezeInput_Implementation(float duration, AActor* pActor)
 	TimeFreezed = 0;
 	StopInteract();
 	StopAim();
-
-	if (GetController() != nullptr)
-		damageIndicator->ShowDamage(pActor);
 }
 
 void ABase3C::UnFreezeInput_Implementation()

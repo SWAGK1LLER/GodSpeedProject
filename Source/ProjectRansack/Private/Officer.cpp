@@ -32,6 +32,7 @@ AOfficer::AOfficer()
 	sensorGadgetOfficer = CreateDefaultSubobject<USensorGadgetOfficerComponent>(TEXT("Sensor Gadget Component"));
 
 	StunStick = CreateDefaultSubobject<UStunStick>(TEXT("StunBaton"));
+	StunStick->SetupAttachment(GetMesh());
 
 	HasMagnetCard = true;
 
