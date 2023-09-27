@@ -15,7 +15,6 @@ ADoor::ADoor()
     RootComponent = Trigger = CreateDefaultSubobject<UBoxComponent>(FName("Trigger"));
     Trigger->SetGenerateOverlapEvents(true);
 
-
     mesh = CreateDefaultSubobject<UStaticMeshComponent>(FName("Mesh"));
     mesh->SetupAttachment(Trigger);
 }

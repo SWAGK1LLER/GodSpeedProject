@@ -105,7 +105,6 @@ void UCameraCompThief::RotatePlayer(ACharacter* Character)
 
 		finalRotation = rotation;
 
-		ACharacter* Character = CastChecked<ACharacter>(GetOwner());
 		Cast<AGamePlayerController>(Character->GetController())->MUlSetLerpRot(this, finalRotation);
 	}
 }

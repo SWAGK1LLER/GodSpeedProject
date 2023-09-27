@@ -1,5 +1,3 @@
-// Fill out your copyright notice in the Description page of Project Settings.
-
 #pragma once
 
 #include "CoreMinimal.h"
@@ -16,6 +14,12 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	float coolDown = 2;
 	float CoolDownCurrentTime = 0;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Setup")
+	TArray<TSubclassOf<AActor>> EnemyHittable;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Setup")
+	UParticleSystem* particleEffect = nullptr;
 
 	UWeapon(const FObjectInitializer& ObjectInitializer);
 

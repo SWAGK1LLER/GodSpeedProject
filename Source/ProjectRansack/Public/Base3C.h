@@ -64,7 +64,8 @@ UENUM()
 enum CharacterState
 {
 	Gun		UMETA(DisplayName = "Gun"),
-	SensorGadget	UMETA(DisplayName = "SensorGadget"),
+	Baton	UMETA(DisplayName = "Baton"),
+	SensorGadget	UMETA(DisplayName = "SensorGadget")
 };
 
 UCLASS()
@@ -82,10 +83,10 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
 	class UCameraComp* cameraComponent = nullptr;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = damage, meta = (AllowPrivateAccess = "true"))
 	class UDamageIndicatorComp* damageIndicator = nullptr;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = weapon, meta = (AllowPrivateAccess = "true"))
 	class UStunWeapon* StunWeapon = nullptr;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)

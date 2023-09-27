@@ -55,6 +55,9 @@ class PROJECTRANSACK_API AOfficer : public ABase3C
 	GENERATED_BODY()
 
 public:
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = weapon, meta = (AllowPrivateAccess = "true"))
+	class UStunStick* StunStick = nullptr;
+
 	TArray<IOfficerInteractibleActor*> closeItems;
 	IOfficerInteractibleActor* ItemUsing = nullptr;
 

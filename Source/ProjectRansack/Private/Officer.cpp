@@ -16,6 +16,7 @@
 #include <GamePlayerController.h>
 #include <HelperClass.h>
 #include "CameraCompOfficer.h"
+#include "StunStick.h"
 #include <Components/BoxComponent.h>
 
 AOfficer::AOfficer()
@@ -29,6 +30,8 @@ AOfficer::AOfficer()
 	flashLight->SetupAttachment((USceneComponent*)cameraComponent->camera);
 
 	sensorGadgetOfficer = CreateDefaultSubobject<USensorGadgetOfficerComponent>(TEXT("Sensor Gadget Component"));
+
+	StunStick = CreateDefaultSubobject<UStunStick>(TEXT("StunBaton"));
 
 	HasMagnetCard = true;
 
