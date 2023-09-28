@@ -8,6 +8,15 @@
 
 AMagneticDoor::AMagneticDoor()
 {
+    secondDoor = CreateDefaultSubobject<UStaticMeshComponent>(FName("Door2"));
+    secondDoor->SetupAttachment(Trigger);
+}
+
+void AMagneticDoor::BeginPlay()
+{
+    Super::BeginPlay();
+
+    startingLocationDoor2 = secondDoor->GetComponentLocation();
 }
 
 void AMagneticDoor::OnTriggerOverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
@@ -117,4 +126,23 @@ void AMagneticDoor::UpdateUIText_Implementation()
 
         widget->SetDefaultText(widget->getTextState(player->HasMagnetCard, FuseStateOpen));
     }
+}
+
+void AMagneticDoor::TimelineProgress(float value)
+{
+    FVector translationAnim;
+    switch (slidingAxis)
+    {
+    case ESlidingAxis::X: translationAnim = FVector(value, 0, 0);
+        break;
+    case ESlidingAxis::Y: translationAnim = FVector(0, value, 0);
+        break;
+    case ESlidingAxis::Z: translationAnim = FVector(0, 0, value);
+        break;
+    default:
+        break;
+    }
+
+    mesh->SetWorldLocation(startingLocation + translationAnim);
+    secondDoor->SetWorldLocation(startingLocationDoor2 - translationAnim);
 }

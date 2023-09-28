@@ -12,6 +12,11 @@ class PROJECTRANSACK_API AMagneticDoor : public ADoor
 	
 public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	class UStaticMeshComponent* secondDoor = nullptr;
+
+	FVector startingLocationDoor2;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	TSubclassOf<UMagneticDoorUI> WidgetClass;
 	UMagneticDoorUI* Widget = nullptr;
 
@@ -25,6 +30,8 @@ public:
 
 	AMagneticDoor();
 
+	virtual void BeginPlay() override;
+
 	void OnTriggerOverlapBegin(class UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, class UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult) override;
 
 	void OnTriggerOverlapEnd(class UPrimitiveComponent* OverlappedComp, AActor* OtherActor, class UPrimitiveComponent* OtherComp, int32 OtherBodyIndex) override;
@@ -34,4 +41,6 @@ public:
 	void StartInteract(class AActor* pActor, bool pManullyOpen = false) override;
 
 	void UpdateUIText_Implementation() override;
+
+	void TimelineProgress(float value) override;
 };

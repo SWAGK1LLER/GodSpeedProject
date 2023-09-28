@@ -73,7 +73,7 @@ public:
 	virtual void UpdateUIText_Implementation();
 
 	UFUNCTION()
-	void TimelineProgress(float value);
+	virtual void TimelineProgress(float value);
 
 	UFUNCTION()
 	void TimelineFinished();
