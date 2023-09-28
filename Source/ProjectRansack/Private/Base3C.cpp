@@ -13,7 +13,7 @@
 #include "DamageIndicatorComp.h"
 #include "GamePlayerController.h"
 
-ABase3C::ABase3C()
+ABase3C::ABase3C(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
 {
  	PrimaryActorTick.bCanEverTick = true;
 	bReplicates = true;

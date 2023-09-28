@@ -86,7 +86,11 @@ public:
 
 	class AOfficer* stolenOfficerCard = nullptr;
 
-	AThief();
+	UPROPERTY(BlueprintReadWrite, VisibleAnywhere)
+	class UMyCharacterMovementComponent* MovementComponent;
+
+	AThief(const FObjectInitializer& ObjectInitializer);
+
 	virtual void BeginPlay() override;
 	virtual void Tick(float DeltaTime) override;
 
@@ -151,6 +155,13 @@ public:
 
 	void ResetOfficerInArrestArea(AOfficer* pOfficerToSkip = nullptr);
 
+	//-----------------
+	void MoveForward(float Value);
+	void MoveRight(float Value);
+	void Climb();
+	void CancelClimb();
+	void Jump();
+	//-----------------
 	void CheckCanClimb();
 
 	UFUNCTION(Server, Reliable, BlueprintCallable)
@@ -168,6 +179,7 @@ public:
 	UFUNCTION(NetMulticast, Reliable, BlueprintCallable)
 	void MulStopClimbing();
 	void MulStopClimbing_Implementation();
+	//------------------------------
 
 	UFUNCTION(Client, Reliable, BlueprintCallable)
 	void ClientShowArrest(bool pArrest);

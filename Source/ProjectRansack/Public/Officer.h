@@ -98,7 +98,7 @@ public:
 
 	bool usingSensorGadget = false;
 
-	AOfficer();
+	AOfficer(const FObjectInitializer& ObjectInitializer);
 	virtual void BeginPlay() override;
 	virtual void Tick(float DeltaTime) override;
 

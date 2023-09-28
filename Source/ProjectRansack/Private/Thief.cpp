@@ -17,8 +17,10 @@
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Kismet/KismetMathLibrary.h"
 #include <Kismet/KismetMaterialLibrary.h>
+#include <ProjectRansack/Public/MyCharacterMovementComponent.h>
 
-AThief::AThief()
+AThief::AThief(const FObjectInitializer& ObjectInitializer)
+	: Super(ObjectInitializer.SetDefaultSubobjectClass<UMyCharacterMovementComponent>(ACharacter::CharacterMovementComponentName))
 {
 	bReplicates = true;
 
@@ -34,6 +36,8 @@ AThief::AThief()
 	ClimbingArea = CreateDefaultSubobject<UBoxComponent>(FName("ClimbingArea"));
 	ClimbingArea->SetGenerateOverlapEvents(true);
 	ClimbingArea->SetupAttachment(RootComponent);
+
+	MovementComponent = Cast<UMyCharacterMovementComponent>(GetCharacterMovement());
 }
 
 void AThief::BeginPlay()
@@ -208,7 +212,58 @@ void AThief::Move(const FInputActionValue& Value)
 	if (bFreezeInput || beingArrest)
 		return;
 
-	ABase3C::Move(Value);
+	//ABase3C::Move(Value);
+
+	FVector2D MovementVector = Value.Get<FVector2D>();
+	MoveForward(MovementVector.Y);
+	MoveRight(MovementVector.X);
+}
+
+void AThief::MoveForward(float Value)
+{
+	if (Controller == nullptr || Value == 0.0f)
+	{
+		return;
+	}
+
+	FVector Direction;
+
+	if (MovementComponent->IsClimbing())
+	{
+		Direction = FVector::CrossProduct(MovementComponent->GetClimbSurfaceNormal(), -GetActorRightVector());
+	}
+	else
+	{
+		const FRotator Rotation = Controller->GetControlRotation();
+		const FRotator YawRotation(0, Rotation.Yaw, 0);
+
+		Direction = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::X);
+	}
+
+	AddMovementInput(Direction, Value);
+}
+
+void AThief::MoveRight(float Value)
+{
+	if (Controller == nullptr || Value == 0.0f)
+	{
+		return;
+	}
+
+	FVector Direction;
+	if (MovementComponent->IsClimbing())
+	{
+		Direction = FVector::CrossProduct(MovementComponent->GetClimbSurfaceNormal(), GetActorUpVector());
+	}
+	else
+	{
+		const FRotator Rotation = Controller->GetControlRotation();
+		const FRotator YawRotation(0, Rotation.Yaw, 0);
+
+		Direction = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::Y);
+	}
+
+	AddMovementInput(Direction, Value);
 }
 
 void AThief::SRReset_Implementation()
@@ -250,11 +305,34 @@ void AThief::MulReset_Implementation(FTransform transform)
 	}), thiefTableInstance->respawnTime, false);
 }
 
+//New climb system
+void AThief::Climb()
+{
+	MovementComponent->TryClimbing();
+}
+
+void AThief::CancelClimb()
+{
+	MovementComponent->CancelClimbing();
+}
+
+void AThief::Jump()
+{
+	if (MovementComponent->IsClimbing())
+	{
+		MovementComponent->TryClimbDashing();
+	}
+	else
+	{
+		Super::Jump();
+	}
+}
+
+// To refactor
 void AThief::SRStartClimbing_Implementation()
 {
 	MulStartClimbing();
 }
-
 
 void AThief::MulStartClimbing_Implementation()
 {
@@ -272,6 +350,7 @@ void AThief::MulStopClimbing_Implementation()
 	IsClimbing = false;
 	GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_Walking);
 }
+//-------------------------
 
 bool AThief::ValidateSpaceItem(AItem& pItem)
 {

@@ -116,7 +116,7 @@ public:
 
 	bool HasMagnetCard = false;
 
-	ABase3C();
+	ABase3C(const FObjectInitializer& ObjectInitializer);
 
 	virtual void BeginPlay() override;
 
@@ -156,10 +156,8 @@ public:
 	virtual void MulReset(FTransform transform);
 	virtual void MulReset_Implementation(FTransform transform);
 
-	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
-	/** Called for movement input */
 	virtual void Move(const FInputActionValue& Value);
 
 	virtual void Interact();

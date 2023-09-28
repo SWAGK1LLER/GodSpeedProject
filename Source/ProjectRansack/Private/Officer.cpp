@@ -19,7 +19,7 @@
 #include "StunStick.h"
 #include <Components/BoxComponent.h>
 
-AOfficer::AOfficer()
+AOfficer::AOfficer(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
 {
 	bReplicates = true;
 
