@@ -1,5 +1,3 @@
-// Fill out your copyright notice in the Description page of Project Settings.
-
 #pragma once
 
 #include "CoreMinimal.h"
@@ -47,7 +45,6 @@ public:
 	bool manullyOpen = false;
 
 	bool FuseStateOpen = true;
-	//bool FuseBoxHacked = false;
 
 	float time = 0;
 

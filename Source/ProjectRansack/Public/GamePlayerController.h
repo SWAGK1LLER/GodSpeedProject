@@ -205,4 +205,8 @@ public:
 	UFUNCTION(Server, Reliable, BlueprintCallable)
 	void MUlToggleEquipStunBaton(class UStunStick* comp, bool visibility);
 	void MUlToggleEquipStunBaton_Implementation(class UStunStick* comp, bool visibility);
+
+	UFUNCTION(Server, Reliable, BlueprintCallable)
+	void SRDisableSystem(class AProtectionLoot* actor);
+	void SRDisableSystem_Implementation(class AProtectionLoot* actor);
 };

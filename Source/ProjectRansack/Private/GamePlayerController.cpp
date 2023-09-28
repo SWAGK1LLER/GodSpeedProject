@@ -19,6 +19,7 @@
 #include "SensorGadget.h"
 #include "CameraCompThief.h"
 #include "StunStick.h"
+#include "ProtectionLoot.h"
 
 void AGamePlayerController::BeginPlay()
 {
@@ -547,4 +548,9 @@ void AGamePlayerController::MUlPlayAttackAnim_Implementation(UStunStick* comp)
 void AGamePlayerController::MUlToggleEquipStunBaton_Implementation(UStunStick* comp, bool visibility)
 {
 	comp->MUlToggleVisibility(visibility);
+}
+
+void AGamePlayerController::SRDisableSystem_Implementation(AProtectionLoot* actor)
+{
+	actor->DisableSystem();
 }
