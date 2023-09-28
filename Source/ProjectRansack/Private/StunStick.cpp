@@ -1,6 +1,7 @@
 #include "StunStick.h"
 #include "Components/BoxComponent.h"
 #include "GamePlayerController.h"
+#include <HelperClass.h>
 
 UStunStick::UStunStick(const FObjectInitializer& ObjectInitializer) : UStunWeapon(ObjectInitializer)
 {
@@ -15,6 +16,9 @@ void UStunStick::BeginPlay()
 
     HitArea->OnComponentBeginOverlap.AddDynamic(this, &UStunStick::OnHitTriggerOverlapBegin);
     HitArea->OnComponentEndOverlap.AddDynamic(this, &UStunStick::OnHitTriggerOverlapEnd);
+
+    HelperClass::deactivateTrigger(HitArea);
+    SetVisibility(false);
 }
 
 void UStunStick::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
@@ -30,6 +34,12 @@ void UStunStick::Fire()
     CoolDownCurrentTime = coolDown;
     
     //Play animation
+    AGamePlayerController* playerController = Cast<AGamePlayerController>(Cast<APawn>(GetOwner())->GetController());
+    if (playerController == nullptr)
+        return;
+
+    playerController->MUlPlayAttackAnim(this);
+    isAttacking = true;
 }
 
 void UStunStick::OnHitTriggerOverlapBegin(class UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, class UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
@@ -40,14 +50,13 @@ void UStunStick::OnHitTriggerOverlapBegin(class UPrimitiveComponent* OverlappedC
         if (CheckHittableActor(player))
             possibleHittedActor.Add(player);
     }
-        
 }
 
 void UStunStick::OnHitTriggerOverlapEnd(class UPrimitiveComponent* OverlappedComp, AActor* OtherActor, class UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
 {
-    ABase3C* player = Cast<ABase3C>(OtherActor);
+    /*ABase3C* player = Cast<ABase3C>(OtherActor);
     if (player != nullptr)
-        possibleHittedActor.Remove(player);
+        possibleHittedActor.Remove(player);*/
 }
 
 void UStunStick::CheckPossibleHit()
@@ -59,4 +68,23 @@ void UStunStick::CheckPossibleHit()
 
     for (ABase3C* player : possibleHittedActor)
         HitEntity(playerController, player);
+}
+
+void UStunStick::MUlPlayAttack_Implementation()
+{
+    HelperClass::activateTrigger(HitArea);
+    isAttacking = true;
+}
+
+void UStunStick::deactivateTrigger()
+{
+    HelperClass::deactivateTrigger(HitArea);
+    isAttacking = false;
+
+    possibleHittedActor.Empty();
+}
+
+void UStunStick::MUlToggleVisibility_Implementation(bool visible)
+{
+    SetVisibility(visible);
 }

@@ -31,7 +31,6 @@ void ABase3C::BeginPlay()
 	Super::BeginPlay();
 
 	SpawnTransform = GetActorTransform();
-	playTime = UGameplayStatics::GetRealTimeSeconds((GetWorld()));
 
 	if(!CreateTableInstance())
 		return;

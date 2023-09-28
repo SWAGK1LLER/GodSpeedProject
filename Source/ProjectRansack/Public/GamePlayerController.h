@@ -197,4 +197,12 @@ public:
 	UFUNCTION(Server, Reliable, BlueprintCallable)
 	void MUlSetRot(class UCameraCompThief* comp, FRotator rot);
 	void MUlSetRot_Implementation(class UCameraCompThief* comp, FRotator rot);
+
+	UFUNCTION(Server, Reliable, BlueprintCallable)
+	void MUlPlayAttackAnim(class UStunStick* comp);
+	void MUlPlayAttackAnim_Implementation(class UStunStick* comp);
+
+	UFUNCTION(Server, Reliable, BlueprintCallable)
+	void MUlToggleEquipStunBaton(class UStunStick* comp, bool visibility);
+	void MUlToggleEquipStunBaton_Implementation(class UStunStick* comp, bool visibility);
 };

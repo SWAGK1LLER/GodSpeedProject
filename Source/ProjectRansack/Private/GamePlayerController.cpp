@@ -18,6 +18,7 @@
 #include "Terminal.h"
 #include "SensorGadget.h"
 #include "CameraCompThief.h"
+#include "StunStick.h"
 
 void AGamePlayerController::BeginPlay()
 {
@@ -71,6 +72,7 @@ void AGamePlayerController::PawnIsPossess(APawn* InPawn)
 		AOfficer* officer = Cast<AOfficer>(InPawn);
 		if (officer != nullptr)
 			officer->SetClientUI();
+		SetUpUI(officer);
 		return;
 	}
 		
@@ -535,4 +537,14 @@ void AGamePlayerController::MUlSetLerpRot_Implementation(UCameraCompThief* comp,
 void AGamePlayerController::MUlSetRot_Implementation(UCameraCompThief* comp, FRotator rot)
 {
 	comp->MUlSetLerpRot(rot);
+}
+
+void AGamePlayerController::MUlPlayAttackAnim_Implementation(UStunStick* comp)
+{
+	comp->MUlPlayAttack();
+}
+
+void AGamePlayerController::MUlToggleEquipStunBaton_Implementation(UStunStick* comp, bool visibility)
+{
+	comp->MUlToggleVisibility(visibility);
 }

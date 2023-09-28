@@ -32,7 +32,7 @@ AOfficer::AOfficer()
 	sensorGadgetOfficer = CreateDefaultSubobject<USensorGadgetOfficerComponent>(TEXT("Sensor Gadget Component"));
 
 	StunStick = CreateDefaultSubobject<UStunStick>(TEXT("StunBaton"));
-	StunStick->SetupAttachment(GetMesh());
+	StunStick->SetupAttachment(GetMesh(), FName("RightHandSocket"));
 
 	HasMagnetCard = true;
 
@@ -245,6 +245,12 @@ void AOfficer::SensorGadgetAction() //Reacts to the input of SensorGadget
 	currentState = CharacterState::SensorGadget;
 	sensorGadgetOfficer->ToggleEnable(true);
 	usingSensorGadget = true;
+
+	AGamePlayerController* playerController = Cast<AGamePlayerController>(GetController());
+	if (playerController == nullptr)
+		return;
+
+	playerController->MUlToggleEquipStunBaton(StunStick, false);
 }
 
 void AOfficer::ToggleEquipStunBaton()
@@ -255,10 +261,19 @@ void AOfficer::ToggleEquipStunBaton()
 	if (currentState == CharacterState::Baton)
 	{
 		currentState = CharacterState::Gun;
-		return;
+		WidgetUI->ShowGunEquipped();
+	}
+	else
+	{
+		currentState = CharacterState::Baton;
+		WidgetUI->ShowStunBattonEquiped();
 	}
 
-	currentState = CharacterState::Baton;
+	AGamePlayerController* playerController = Cast<AGamePlayerController>(GetController());
+	if (playerController == nullptr)
+		return;
+
+	playerController->MUlToggleEquipStunBaton(StunStick, currentState == CharacterState::Baton);
 }
 
 void AOfficer::Fire()

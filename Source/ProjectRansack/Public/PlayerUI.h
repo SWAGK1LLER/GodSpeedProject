@@ -18,4 +18,10 @@ public:
 
 	UFUNCTION(BlueprintImplementableEvent)
 	void ToggleMagnetCard(bool show);
+
+	UFUNCTION(BlueprintImplementableEvent)
+	void ShowGunEquipped();
+
+	UFUNCTION(BlueprintImplementableEvent)
+	void ShowStunBattonEquiped();
 };
