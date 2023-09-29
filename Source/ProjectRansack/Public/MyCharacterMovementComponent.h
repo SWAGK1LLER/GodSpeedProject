@@ -32,8 +32,8 @@ public:
 	void TryClimbing_Implementation();
 
 	UFUNCTION(NetMulticast, Reliable, BlueprintCallable)
-	void TryCover();
-	void TryCover_Implementation();
+	void TryToggleCover();
+	void TryToggleCover_Implementation();
 
 	UFUNCTION(BlueprintCallable)
 	void TryClimbDashing();

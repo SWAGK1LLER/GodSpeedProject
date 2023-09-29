@@ -560,3 +560,8 @@ void AGamePlayerController::TryClimb_Implementation(AThief* thief)
 {
 	thief->MovementComponent->TryClimbing();
 }
+
+void AGamePlayerController::TryToggleCover_Implementation(AThief* thief)
+{
+	thief->MovementComponent->TryToggleCover();
+}

@@ -131,7 +131,7 @@ void UMyCharacterMovementComponent::OnMovementUpdated(float DeltaSeconds, const 
 {
 	if (bWantsToClimb)
 	{
-		SetMovementMode(EMovementMode::MOVE_Custom, ECustomMovementMode::CMOVE_Climbing);
+ 		SetMovementMode(EMovementMode::MOVE_Custom, ECustomMovementMode::CMOVE_Climbing);
 	}
 	else if (bWantsToCover)
 	{
@@ -394,35 +394,19 @@ bool UMyCharacterMovementComponent::CanMoveToSide(FVector direction) const
 {
 	const UCapsuleComponent* Capsule = CharacterOwner->GetCapsuleComponent();
 
-	// Could use a property instead for fine-tuning.
 	const FVector HorizontalOffset = FVector::UpVector * 50.f;
-	const FVector VerticalOffset = UpdatedComponent->GetForwardVector() * 50.f;
-	const FVector XOffset = FVector::RightVector * 150.f;
+	const FVector VerticalOffset = UpdatedComponent->GetForwardVector() * 100.f;
+	FVector XOffset;
+	if (direction.Y != 0)
+		XOffset = direction.Y > 0 ? FVector(0, 120.f, 0) : FVector(0, -120.f, 0);
 
 	const FVector CheckLocation = UpdatedComponent->GetComponentLocation() + HorizontalOffset + VerticalOffset + XOffset;
-
-	/*if (!IsLocationWalkable(CheckLocation))
-	{
-		return false;
-	}*/
 
 	FHitResult CapsuleHit;
 	const FVector CapsuleStartCheck = CheckLocation - HorizontalOffset;
 
 	const bool bBlocked = GetWorld()->SweepSingleByChannel(CapsuleHit, CapsuleStartCheck, CheckLocation,
 		FQuat::Identity, ECC_WorldStatic, Capsule->GetCollisionShape(), ClimbQueryParams);
-
-	/*UKismetSystemLibrary::DrawDebugCapsule
-	(
-		GetWorld(),
-		CheckLocation,
-		100,
-		20,
-		FRotator(0, 0, 0),
-		FLinearColor(1, 0, 0),
-		100,
-		10
-	);*/
 
 	return !bBlocked;
 }
@@ -573,26 +557,7 @@ void UMyCharacterMovementComponent::MoveAlongSideSurface(float deltaTime, int32 
 		}
 		else
 		{
-			// try to move forward
 			MoveAlongFloor(MoveVelocity, timeTick, &StepDownResult);
-
-			if (IsFalling())
-			{
-				// pawn decided to jump up
-				const float DesiredDist = Delta.Size();
-				if (DesiredDist > UE_KINDA_SMALL_NUMBER)
-				{
-					const float ActualDist = (UpdatedComponent->GetComponentLocation() - OldLocation).Size2D();
-					remainingTime += timeTick * (1.f - FMath::Min(1.f, ActualDist / DesiredDist));
-				}
-				StartNewPhysics(remainingTime, Iterations);
-				return;
-			}
-			else if (IsSwimming()) //just entered water
-			{
-				StartSwimming(OldLocation, OldVelocity, timeTick, remainingTime, Iterations);
-				return;
-			}
 		}
 
 		// Update floor.
@@ -799,6 +764,16 @@ void UMyCharacterMovementComponent::TryClimbing_Implementation()
 {
 	if (CanStartClimbing())
 	{
+		if (bWantsToCover)
+		{
+			bWantsToCover = false;
+			
+			//Rerotate player
+			CharacterOwner->GetMesh()->SetWorldRotation(CharacterOwner->GetActorForwardVector().Rotation() + relativeMeshRotation);
+
+			SetMovementMode(MOVE_Walking);
+		}
+
 		bWantsToClimb = true;
 	}
 }
@@ -814,9 +789,26 @@ void UMyCharacterMovementComponent::TryClimbDashing()
 	}
 }
 
-void UMyCharacterMovementComponent::TryCover_Implementation()
+void UMyCharacterMovementComponent::TryToggleCover_Implementation()
 {
-	if (CanStartCover())
+	if (bWantsToCover)
+	{
+		bWantsToCover = false;
+		
+		if (CrouchCover)
+		{
+			CrouchCover = false;
+
+			UCapsuleComponent* Capsule = CharacterOwner->GetCapsuleComponent();
+			Capsule->SetCapsuleHalfHeight(Capsule->GetUnscaledCapsuleHalfHeight() + CrouchedHalfHeight);
+		}
+
+		//Rerotate player
+		CharacterOwner->GetMesh()->SetWorldRotation(CharacterOwner->GetActorForwardVector().Rotation() + relativeMeshRotation);
+
+		SetMovementMode(MOVE_Walking);
+	}
+	else if (CanStartCover())
 	{
 		bWantsToCover = true;
 	}

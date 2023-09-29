@@ -236,16 +236,9 @@ void AThief::MoveRight(float Value)
 	}
 
 	FVector Direction;
-	if (MovementComponent->IsClimbing())
+	if (MovementComponent->IsClimbing() || MovementComponent->IsCover())
 	{
 		Direction = FVector::CrossProduct(MovementComponent->GetClimbSurfaceNormal(), GetActorUpVector());
-	}
-	else if (MovementComponent->IsCover())
-	{
-		Direction = FVector::CrossProduct(MovementComponent->GetClimbSurfaceNormal(), GetActorUpVector());
-
-		AddMovementInput(Direction, Value);
-		return;
 	}
 	else
 	{
@@ -299,8 +292,6 @@ void AThief::MulReset_Implementation(FTransform transform)
 
 void AThief::Climb()
 {
-	//MovementComponent->TryClimbing();
-
 	AGamePlayerController* pc = Cast<AGamePlayerController>(GetController());
 	if (pc == nullptr)
 		return;
@@ -327,7 +318,13 @@ void AThief::Jump()
 
 void AThief::Cover()
 {
-	MovementComponent->TryCover();
+	//MovementComponent->TryToggleCover();
+
+	AGamePlayerController* pc = Cast<AGamePlayerController>(GetController());
+	if (pc == nullptr)
+		return;
+
+	pc->TryToggleCover(this);
 }
 
 bool AThief::ValidateSpaceItem(AItem& pItem)
