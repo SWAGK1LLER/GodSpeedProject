@@ -121,6 +121,7 @@ void AThief::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 		EnhancedInputComponent->BindAction(thiefTableInstance->NightVisionAction, ETriggerEvent::Started, this, &AThief::HandleNightVision);
 		
 		EnhancedInputComponent->BindAction(thiefTableInstance->climbAction, ETriggerEvent::Started, this, &AThief::Climb);
+		EnhancedInputComponent->BindAction(thiefTableInstance->coverAction, ETriggerEvent::Started, this, &AThief::Cover);
 	}
 }
 
@@ -212,6 +213,10 @@ void AThief::MoveForward(float Value)
 	{
 		Direction = FVector::CrossProduct(MovementComponent->GetClimbSurfaceNormal(), -GetActorRightVector());
 	}
+	else if (MovementComponent->IsCover())
+	{
+		return;
+	}
 	else
 	{
 		const FRotator Rotation = Controller->GetControlRotation();
@@ -234,6 +239,13 @@ void AThief::MoveRight(float Value)
 	if (MovementComponent->IsClimbing())
 	{
 		Direction = FVector::CrossProduct(MovementComponent->GetClimbSurfaceNormal(), GetActorUpVector());
+	}
+	else if (MovementComponent->IsCover())
+	{
+		Direction = FVector::CrossProduct(MovementComponent->GetClimbSurfaceNormal(), GetActorUpVector());
+
+		AddMovementInput(Direction, Value);
+		return;
 	}
 	else
 	{
@@ -311,6 +323,11 @@ void AThief::Jump()
 	{
 		Super::Jump();
 	}
+}
+
+void AThief::Cover()
+{
+	MovementComponent->TryCover();
 }
 
 bool AThief::ValidateSpaceItem(AItem& pItem)

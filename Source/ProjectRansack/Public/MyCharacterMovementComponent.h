@@ -16,6 +16,9 @@ public:
 	bool IsClimbing() const;
 
 	UFUNCTION(BlueprintPure)
+	bool IsCover() const;
+
+	UFUNCTION(BlueprintPure)
 	bool IsClimbDashing() const;
 
 	UFUNCTION(BlueprintPure)
@@ -27,6 +30,10 @@ public:
 	UFUNCTION(NetMulticast, Reliable, BlueprintCallable)
 	void TryClimbing();
 	void TryClimbing_Implementation();
+
+	UFUNCTION(NetMulticast, Reliable, BlueprintCallable)
+	void TryCover();
+	void TryCover_Implementation();
 
 	UFUNCTION(BlueprintCallable)
 	void TryClimbDashing();
@@ -84,6 +91,11 @@ public:
 
 	bool bWantsToClimb = false;
 
+	bool bWantsToCover = false;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	bool CrouchCover = false;
+
 	bool bIsClimbDashing = false;
 
 	float CurrentClimbDashTime;
@@ -93,6 +105,8 @@ public:
 	FVector CurrentClimbingNormal;
 	
 	FVector CurrentClimbingPosition;
+
+	FRotator relativeMeshRotation;
 
 	virtual void BeginPlay() override;
 
@@ -111,8 +125,12 @@ public:
 	void UpdateClimbDashState(float deltaTime);
 
 	void PhysClimbing(float deltaTime, int32 Iterations);
+
+	void PhysCover(float deltaTime, int32 Iterations);
 	
 	bool EyeHeightTrace(const float TraceDistance) const;
+
+	bool BackEyeHeightTrace(const float TraceDistance) const;
 	
 	bool ShouldStopClimbing() const;
 	
@@ -123,14 +141,22 @@ public:
 	void SetRotationToStand() const;
 	
 	bool TryClimbUpLedge();
+
+	bool TryCrouchCover();
 	
 	bool HasReachedEdge() const;
+
+	bool HasReachedEdgeCover() const;
 	
 	bool IsLocationWalkable(const FVector& CheckLocation) const;
 	
 	bool CanMoveToLedgeClimbLocation() const;
 
+	bool CanMoveToSide(FVector direction) const;
+
 	bool CanStartClimbing();
+
+	bool CanStartCover();
 	
 	bool IsFacingSurface(float Steepness) const;
 
@@ -145,8 +171,12 @@ public:
 	void StopClimbDashing();
 
 	void ComputeClimbingVelocity(float deltaTime);
+
+	void ComputeCoverVelocity(float deltaTime);
 	
 	void MoveAlongClimbingSurface(float deltaTime);
+
+	void MoveAlongSideSurface(float deltaTime, int32 Iterations);
 
 	void SnapToClimbingSurface(float deltaTime) const;
 	

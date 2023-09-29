@@ -19,19 +19,16 @@ UCameraCompThief::UCameraCompThief()
 	CameraBoom->TargetArmLength = 300.0f;
 	CameraBoom->bUsePawnControlRotation = true;
 
-	// Create a follow camera
 	camera->bUsePawnControlRotation = false;
 
 	ABase3C* owner = Cast<ABase3C>(GetOwner());
 	if (owner == nullptr)
 		return;
 
-	// Don't rotate when the controller rotates. Let that just affect the camera.
 	owner->bUseControllerRotationPitch = false;
 	owner->bUseControllerRotationYaw = false;
 	owner->bUseControllerRotationRoll = false;
 
-	// Configure character movement
 	owner->GetCharacterMovement()->bOrientRotationToMovement = true;
 	owner->GetCharacterMovement()->RotationRate = FRotator(0.0f, 0.0f, 0.0f);
 }
@@ -41,7 +38,7 @@ void UCameraCompThief::TickComponent(float DeltaTime, enum ELevelTick TickType, 
 	UCameraComp::TickComponent(DeltaTime, TickType, ThisTickFunction);
 
 	AThief* Character = Cast<AThief>(GetOwner());
-	if (Character->MovementComponent->IsClimbing())
+	if (Character->MovementComponent->IsClimbing() || Character->MovementComponent->IsCover())
 		return;
 
 	speed = Character->GetCharacterMovement()->Velocity.Size2D();

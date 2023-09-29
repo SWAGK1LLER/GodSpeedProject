@@ -26,8 +26,6 @@ void UStunWeapon::TickComponent(float DeltaTime, ELevelTick TickType, FActorComp
     if (player->WidgetUI == nullptr)
         return;
 
-    UE_LOG(LogTemp, Warning, TEXT("%f"), CoolDownCurrentTime);
-
     if (CoolDownCurrentTime > 0)
         player->WidgetUI->UpdateCooldown(CoolDownCurrentTime);
     else

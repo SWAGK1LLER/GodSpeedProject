@@ -16,6 +16,8 @@ void UMyCharacterMovementComponent::BeginPlay()
 {
 	Super::BeginPlay();
 
+	relativeMeshRotation = CharacterOwner->GetMesh()->GetRelativeRotation();
+
 	AnimInstance = GetCharacterOwner()->GetMesh()->GetAnimInstance();
 	
 	ClimbQueryParams.AddIgnoredActor(GetOwner());
@@ -69,6 +71,28 @@ bool UMyCharacterMovementComponent::CanStartClimbing()
 	return false;
 }
 
+bool UMyCharacterMovementComponent::CanStartCover()
+{
+	for (FHitResult& Hit : CurrentWallHits)
+	{
+		const FVector HorizontalNormal = Hit.Normal.GetSafeNormal2D();
+
+		const float HorizontalDot = FVector::DotProduct(UpdatedComponent->GetForwardVector(), -HorizontalNormal);
+		const float VerticalDot = FVector::DotProduct(Hit.Normal, HorizontalNormal);
+
+		const float HorizontalDegrees = FMath::RadiansToDegrees(FMath::Acos(HorizontalDot));
+
+		const bool bIsCeiling = FMath::IsNearlyZero(VerticalDot);
+
+		if (HorizontalDegrees <= MinHorizontalDegreesToStartClimbing && !bIsCeiling)
+		{
+			return true;
+		}
+	}
+
+	return false;
+}
+
 bool UMyCharacterMovementComponent::IsFacingSurface(const float Steepness) const
 {
 	constexpr float BaseLength = 80;
@@ -90,11 +114,28 @@ bool UMyCharacterMovementComponent::EyeHeightTrace(const float TraceDistance) co
 	return GetWorld()->LineTraceSingleByChannel(UpperEdgeHit, Start, End, ECC_WorldStatic, ClimbQueryParams);
 }
 
+bool UMyCharacterMovementComponent::BackEyeHeightTrace(const float TraceDistance) const
+{
+	FHitResult UpperEdgeHit;
+
+	const float BaseEyeHeight = GetCharacterOwner()->BaseEyeHeight;
+	const float EyeHeightOffset = IsCover() ? BaseEyeHeight + ClimbingCollisionShrinkAmount : BaseEyeHeight;
+
+	const FVector Start = UpdatedComponent->GetComponentLocation() + UpdatedComponent->GetUpVector() * EyeHeightOffset;
+	const FVector End = Start + (UpdatedComponent->GetForwardVector() * TraceDistance);
+
+	return GetWorld()->LineTraceSingleByChannel(UpperEdgeHit, Start, End, ECC_WorldStatic, ClimbQueryParams);
+}
+
 void UMyCharacterMovementComponent::OnMovementUpdated(float DeltaSeconds, const FVector& OldLocation, const FVector& OldVelocity)
 {
 	if (bWantsToClimb)
 	{
 		SetMovementMode(EMovementMode::MOVE_Custom, ECustomMovementMode::CMOVE_Climbing);
+	}
+	else if (bWantsToCover)
+	{
+		SetMovementMode(EMovementMode::MOVE_Custom, ECustomMovementMode::CMOVE_Cover);
 	}
 
 	Super::OnMovementUpdated(DeltaSeconds, OldLocation, OldVelocity);
@@ -109,9 +150,18 @@ void UMyCharacterMovementComponent::OnMovementModeChanged(EMovementMode Previous
 		UCapsuleComponent* Capsule = CharacterOwner->GetCapsuleComponent();
 		Capsule->SetCapsuleHalfHeight(Capsule->GetUnscaledCapsuleHalfHeight() - ClimbingCollisionShrinkAmount);
 	}
+	else if (IsCover())
+	{
+		bOrientRotationToMovement = false;
+	}
 
 	const bool bWasClimbing = PreviousMovementMode == MOVE_Custom && PreviousCustomMode == CMOVE_Climbing;
-	if (bWasClimbing && !playingLedgeClimbAnim)
+	const bool bWasCover = PreviousMovementMode == MOVE_Custom && PreviousCustomMode == CMOVE_Cover;
+	if (bWasCover)
+	{
+		bOrientRotationToMovement = true;
+	}
+	else if (bWasClimbing && !playingLedgeClimbAnim)
 	{
 		bOrientRotationToMovement = true;
 
@@ -137,6 +187,10 @@ void UMyCharacterMovementComponent::PhysCustom(float deltaTime, int32 Iterations
 	if (CustomMovementMode == ECustomMovementMode::CMOVE_Climbing)
 	{
 		PhysClimbing(deltaTime, Iterations);
+	}
+	else if (CustomMovementMode == ECustomMovementMode::CMOVE_Cover)
+	{
+		PhysCover(deltaTime, Iterations);
 	}
 	
 	Super::PhysCustom(deltaTime, Iterations);
@@ -192,6 +246,36 @@ void UMyCharacterMovementComponent::PhysClimbing(float deltaTime, int32 Iteratio
 	}
 	
 	SnapToClimbingSurface(deltaTime);
+}
+
+void UMyCharacterMovementComponent::PhysCover(float deltaTime, int32 Iterations)
+{
+	if (deltaTime < MIN_TICK_TIME)
+	{
+		return;
+	}
+
+	ComputeSurfaceInfo();
+	ComputeCoverVelocity(deltaTime);
+
+	const FVector OldLocation = UpdatedComponent->GetComponentLocation();
+
+	MoveAlongSideSurface(deltaTime, Iterations);
+
+	TryCrouchCover();
+
+	if (!HasAnimRootMotion() && !CurrentRootMotion.HasOverrideVelocity())
+	{
+		Velocity = (UpdatedComponent->GetComponentLocation() - OldLocation) / deltaTime;
+	}
+
+	//Rotate player mesh along the wall
+	const FVector Start = UpdatedComponent->GetComponentLocation();
+	const FVector End = Start + (UpdatedComponent->GetForwardVector() * 100);
+	FHitResult hit;
+	GetWorld()->LineTraceSingleByChannel(hit, Start, End, ECC_WorldStatic, ClimbQueryParams);
+
+	CharacterOwner->GetMesh()->SetWorldRotation(hit.ImpactNormal.Rotation() + relativeMeshRotation);
 }
 
 void UMyCharacterMovementComponent::ComputeSurfaceInfo()
@@ -273,6 +357,14 @@ bool UMyCharacterMovementComponent::HasReachedEdge() const
 	return !EyeHeightTrace(TraceDistance);
 }
 
+bool UMyCharacterMovementComponent::HasReachedEdgeCover() const
+{
+	const UCapsuleComponent* Capsule = CharacterOwner->GetCapsuleComponent();
+	const float TraceDistance = Capsule->GetUnscaledCapsuleRadius() * 2.5f;
+
+	return !BackEyeHeightTrace(TraceDistance);
+}
+
 bool UMyCharacterMovementComponent::CanMoveToLedgeClimbLocation() const
 {
 	const UCapsuleComponent* Capsule = CharacterOwner->GetCapsuleComponent();
@@ -294,6 +386,44 @@ bool UMyCharacterMovementComponent::CanMoveToLedgeClimbLocation() const
 	const bool bBlocked = GetWorld()->SweepSingleByChannel(CapsuleHit, CapsuleStartCheck,CheckLocation,
 		FQuat::Identity, ECC_WorldStatic, Capsule->GetCollisionShape(), ClimbQueryParams);
 	
+	return !bBlocked;
+}
+
+#include "Kismet/KismetSystemLibrary.h"
+bool UMyCharacterMovementComponent::CanMoveToSide(FVector direction) const
+{
+	const UCapsuleComponent* Capsule = CharacterOwner->GetCapsuleComponent();
+
+	// Could use a property instead for fine-tuning.
+	const FVector HorizontalOffset = FVector::UpVector * 50.f;
+	const FVector VerticalOffset = UpdatedComponent->GetForwardVector() * 50.f;
+	const FVector XOffset = FVector::RightVector * 150.f;
+
+	const FVector CheckLocation = UpdatedComponent->GetComponentLocation() + HorizontalOffset + VerticalOffset + XOffset;
+
+	/*if (!IsLocationWalkable(CheckLocation))
+	{
+		return false;
+	}*/
+
+	FHitResult CapsuleHit;
+	const FVector CapsuleStartCheck = CheckLocation - HorizontalOffset;
+
+	const bool bBlocked = GetWorld()->SweepSingleByChannel(CapsuleHit, CapsuleStartCheck, CheckLocation,
+		FQuat::Identity, ECC_WorldStatic, Capsule->GetCollisionShape(), ClimbQueryParams);
+
+	/*UKismetSystemLibrary::DrawDebugCapsule
+	(
+		GetWorld(),
+		CheckLocation,
+		100,
+		20,
+		FRotator(0, 0, 0),
+		FLinearColor(1, 0, 0),
+		100,
+		10
+	);*/
+
 	return !bBlocked;
 }
 
@@ -332,6 +462,19 @@ void UMyCharacterMovementComponent::ComputeClimbingVelocity(float deltaTime)
 	ApplyRootMotionToVelocity(deltaTime);
 }
 
+void UMyCharacterMovementComponent::ComputeCoverVelocity(float deltaTime)
+{
+	RestorePreAdditiveRootMotionVelocity();
+
+	if (!HasAnimRootMotion() && !CurrentRootMotion.HasOverrideVelocity())
+	{
+		constexpr float Friction = 0.0f;
+		constexpr bool bFluid = false;
+		CalcVelocity(deltaTime, Friction, bFluid, BrakingDecelerationClimbing);
+	}
+
+	ApplyRootMotionToVelocity(deltaTime);
+}
 
 void UMyCharacterMovementComponent::AlignClimbDashDirection()
 {
@@ -372,6 +515,210 @@ void UMyCharacterMovementComponent::MoveAlongClimbingSurface(float deltaTime)
 	}
 }
 
+void UMyCharacterMovementComponent::MoveAlongSideSurface(float deltaTime, int32 Iterations)
+{
+	if (deltaTime < MIN_TICK_TIME)
+	{
+		return;
+	}
+
+	bJustTeleported = false;
+	bool bCheckedFall = false;
+	bool bTriedLedgeMove = false;
+	float remainingTime = deltaTime;
+
+	// Perform the move
+	while ((remainingTime >= MIN_TICK_TIME) && (Iterations < MaxSimulationIterations) && CharacterOwner && (CharacterOwner->Controller || bRunPhysicsWithNoController || HasAnimRootMotion() || CurrentRootMotion.HasOverrideVelocity() || (CharacterOwner->GetLocalRole() == ROLE_SimulatedProxy)))
+	{
+		Iterations++;
+		bJustTeleported = false;
+		const float timeTick = GetSimulationTimeStep(remainingTime, Iterations);
+		remainingTime -= timeTick;
+
+		// Save current values
+		UPrimitiveComponent* const OldBase = GetMovementBase();
+		const FVector PreviousBaseLocation = (OldBase != NULL) ? OldBase->GetComponentLocation() : FVector::ZeroVector;
+		const FVector OldLocation = UpdatedComponent->GetComponentLocation();
+		const FFindFloorResult OldFloor = CurrentFloor;
+
+		RestorePreAdditiveRootMotionVelocity();
+
+		// Ensure velocity is horizontal.
+		MaintainHorizontalGroundVelocity();
+		const FVector OldVelocity = Velocity;
+		Acceleration.Z = 0.f;
+
+		// Apply acceleration
+		if (!HasAnimRootMotion() && !CurrentRootMotion.HasOverrideVelocity())
+		{
+			CalcVelocity(timeTick, GroundFriction, false, GetMaxBrakingDeceleration());
+		}
+
+		ApplyRootMotionToVelocity(timeTick);
+
+		// Compute move parameters
+		const FVector MoveVelocity = Velocity;
+		const FVector Delta = timeTick * MoveVelocity;
+
+		//If player can move that means is out of the cover
+		if (CanMoveToSide(Velocity))
+			return;
+
+		const bool bZeroDelta = Delta.IsNearlyZero();
+		FStepDownResult StepDownResult;
+
+		if (bZeroDelta)
+		{
+			remainingTime = 0.f;
+		}
+		else
+		{
+			// try to move forward
+			MoveAlongFloor(MoveVelocity, timeTick, &StepDownResult);
+
+			if (IsFalling())
+			{
+				// pawn decided to jump up
+				const float DesiredDist = Delta.Size();
+				if (DesiredDist > UE_KINDA_SMALL_NUMBER)
+				{
+					const float ActualDist = (UpdatedComponent->GetComponentLocation() - OldLocation).Size2D();
+					remainingTime += timeTick * (1.f - FMath::Min(1.f, ActualDist / DesiredDist));
+				}
+				StartNewPhysics(remainingTime, Iterations);
+				return;
+			}
+			else if (IsSwimming()) //just entered water
+			{
+				StartSwimming(OldLocation, OldVelocity, timeTick, remainingTime, Iterations);
+				return;
+			}
+		}
+
+		// Update floor.
+		// StepUp might have already done it for us.
+		if (StepDownResult.bComputedFloor)
+		{
+			CurrentFloor = StepDownResult.FloorResult;
+		}
+		else
+		{
+			FindFloor(UpdatedComponent->GetComponentLocation(), CurrentFloor, bZeroDelta, NULL);
+		}
+
+		// check for ledges here
+		const bool bCheckLedges = !CanWalkOffLedges();
+		if (bCheckLedges && !CurrentFloor.IsWalkableFloor())
+		{
+			// calculate possible alternate movement
+			const FVector GravDir = FVector(0.f, 0.f, -1.f);
+			const FVector NewDelta = bTriedLedgeMove ? FVector::ZeroVector : GetLedgeMove(OldLocation, Delta, GravDir);
+			if (!NewDelta.IsZero())
+			{
+				// first revert this move
+				RevertMove(OldLocation, OldBase, PreviousBaseLocation, OldFloor, false);
+
+				// avoid repeated ledge moves if the first one fails
+				bTriedLedgeMove = true;
+
+				// Try new movement direction
+				Velocity = NewDelta / timeTick;
+				remainingTime += timeTick;
+				continue;
+			}
+			else
+			{
+				// see if it is OK to jump
+				// @todo collision : only thing that can be problem is that oldbase has world collision on
+				bool bMustJump = bZeroDelta || (OldBase == NULL || (!OldBase->IsQueryCollisionEnabled() && MovementBaseUtility::IsDynamicBase(OldBase)));
+				if ((bMustJump || !bCheckedFall) && CheckFall(OldFloor, CurrentFloor.HitResult, Delta, OldLocation, remainingTime, timeTick, Iterations, bMustJump))
+				{
+					return;
+				}
+				bCheckedFall = true;
+
+				// revert this move
+				RevertMove(OldLocation, OldBase, PreviousBaseLocation, OldFloor, true);
+				remainingTime = 0.f;
+				break;
+			}
+		}
+		else
+		{
+			// Validate the floor check
+			if (CurrentFloor.IsWalkableFloor())
+			{
+				if (ShouldCatchAir(OldFloor, CurrentFloor))
+				{
+					HandleWalkingOffLedge(OldFloor.HitResult.ImpactNormal, OldFloor.HitResult.Normal, OldLocation, timeTick);
+					if (IsMovingOnGround())
+					{
+						// If still walking, then fall. If not, assume the user set a different mode they want to keep.
+						StartFalling(Iterations, remainingTime, timeTick, Delta, OldLocation);
+					}
+					return;
+				}
+
+				AdjustFloorHeight();
+				SetBase(CurrentFloor.HitResult.Component.Get(), CurrentFloor.HitResult.BoneName);
+			}
+			else if (CurrentFloor.HitResult.bStartPenetrating && remainingTime <= 0.f)
+			{
+				// The floor check failed because it started in penetration
+				// We do not want to try to move downward because the downward sweep failed, rather we'd like to try to pop out of the floor.
+				FHitResult Hit(CurrentFloor.HitResult);
+				Hit.TraceEnd = Hit.TraceStart + FVector(0.f, 0.f, MAX_FLOOR_DIST);
+				const FVector RequestedAdjustment = GetPenetrationAdjustment(Hit);
+				ResolvePenetration(RequestedAdjustment, Hit, UpdatedComponent->GetComponentQuat());
+				bForceNextFloorCheck = true;
+			}
+
+			// check if just entered water
+			if (IsSwimming())
+			{
+				StartSwimming(OldLocation, Velocity, timeTick, remainingTime, Iterations);
+				return;
+			}
+
+			// See if we need to start falling.
+			if (!CurrentFloor.IsWalkableFloor() && !CurrentFloor.HitResult.bStartPenetrating)
+			{
+				const bool bMustJump = bJustTeleported || bZeroDelta || (OldBase == NULL || (!OldBase->IsQueryCollisionEnabled() && MovementBaseUtility::IsDynamicBase(OldBase)));
+				if ((bMustJump || !bCheckedFall) && CheckFall(OldFloor, CurrentFloor.HitResult, Delta, OldLocation, remainingTime, timeTick, Iterations, bMustJump))
+				{
+					return;
+				}
+				bCheckedFall = true;
+			}
+		}
+
+
+		// Allow overlap events and such to change physics state and velocity
+		if (IsMovingOnGround())
+		{
+			// Make velocity reflect actual move
+			if (!bJustTeleported && !HasAnimRootMotion() && !CurrentRootMotion.HasOverrideVelocity() && timeTick >= MIN_TICK_TIME)
+			{
+				// TODO-RootMotionSource: Allow this to happen during partial override Velocity, but only set allowed axes?
+				Velocity = (UpdatedComponent->GetComponentLocation() - OldLocation) / timeTick;
+				MaintainHorizontalGroundVelocity();
+			}
+		}
+
+		// If we didn't move at all this iteration then abort (since future iterations will also be stuck).
+		if (UpdatedComponent->GetComponentLocation() == OldLocation)
+		{
+			remainingTime = 0.f;
+			break;
+		}
+	}
+
+	if (IsMovingOnGround())
+	{
+		MaintainHorizontalGroundVelocity();
+	}
+}
+
 FQuat UMyCharacterMovementComponent::GetClimbingRotation(float deltaTime) const
 {
 	const FQuat Current = UpdatedComponent->GetComponentQuat();
@@ -399,7 +746,6 @@ bool UMyCharacterMovementComponent::TryClimbUpLedge()
 	
 	if (bIsMovingUp && HasReachedEdge() && CanMoveToLedgeClimbLocation())
 	{
-		//SetRotationToStand();
 		Cast<UCameraCompThief>(Cast<AThief>(GetOwner())->cameraComponent)->CameraBoom->bDoCollisionTest = false;
 
 		AnimInstance->Montage_Play(LedgeClimbMontage);
@@ -408,6 +754,28 @@ bool UMyCharacterMovementComponent::TryClimbUpLedge()
 		return true;
 	}
 	
+	return false;
+}
+
+bool UMyCharacterMovementComponent::UMyCharacterMovementComponent::TryCrouchCover()
+{
+	if (HasReachedEdgeCover()/* && CanMoveToLedgeClimbLocation()*/)
+	{
+		CrouchCover = true;
+		// Ajust capsule
+		UCapsuleComponent* Capsule = CharacterOwner->GetCapsuleComponent();
+		Capsule->SetCapsuleHalfHeight(Capsule->GetUnscaledCapsuleHalfHeight() - CrouchedHalfHeight);
+
+		return true;
+	}
+	else if (CrouchCover)
+	{
+		// Ajust capsule
+		UCapsuleComponent* Capsule = CharacterOwner->GetCapsuleComponent();
+		Capsule->SetCapsuleHalfHeight(Capsule->GetUnscaledCapsuleHalfHeight() + CrouchedHalfHeight);
+	}
+
+	CrouchCover = false;
 	return false;
 }
 
@@ -446,6 +814,14 @@ void UMyCharacterMovementComponent::TryClimbDashing()
 	}
 }
 
+void UMyCharacterMovementComponent::TryCover_Implementation()
+{
+	if (CanStartCover())
+	{
+		bWantsToCover = true;
+	}
+}
+
 void UMyCharacterMovementComponent::StoreClimbDashDirection()
 {
 	ClimbDashDirection = UpdatedComponent->GetUpVector();
@@ -475,6 +851,11 @@ FVector UMyCharacterMovementComponent::GetClimbDashDirection() const
 bool UMyCharacterMovementComponent::IsClimbing() const
 {
 	return MovementMode == EMovementMode::MOVE_Custom && CustomMovementMode == ECustomMovementMode::CMOVE_Climbing;
+}
+
+bool UMyCharacterMovementComponent::IsCover() const
+{
+	return MovementMode == EMovementMode::MOVE_Custom && CustomMovementMode == ECustomMovementMode::CMOVE_Cover;
 }
 
 bool UMyCharacterMovementComponent::IsClimbDashing() const

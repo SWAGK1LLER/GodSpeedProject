@@ -36,6 +36,9 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
 	class UInputAction* climbAction = nullptr;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
+	class UInputAction* coverAction = nullptr;
 };
 
 UCLASS()
@@ -152,6 +155,8 @@ public:
 	void Climb();
 	void CancelClimb();
 	void Jump();
+
+	void Cover();
 
 	UFUNCTION(Client, Reliable, BlueprintCallable)
 	void ClientShowArrest(bool pArrest);
