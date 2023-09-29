@@ -3,7 +3,9 @@
 #include "ECustomMovement.h"
 #include "Components/CapsuleComponent.h"
 #include "GameFramework/Character.h"
-
+#include <Thief.h>
+#include <CameraCompThief.h>
+#include "GamePlayerController.h"
 
 UMyCharacterMovementComponent::UMyCharacterMovementComponent(const FObjectInitializer& ObjectInitializer)
 	: Super(ObjectInitializer)
@@ -109,7 +111,7 @@ void UMyCharacterMovementComponent::OnMovementModeChanged(EMovementMode Previous
 	}
 
 	const bool bWasClimbing = PreviousMovementMode == MOVE_Custom && PreviousCustomMode == CMOVE_Climbing;
-	if (bWasClimbing)
+	if (bWasClimbing && !playingLedgeClimbAnim)
 	{
 		bOrientRotationToMovement = true;
 
@@ -385,7 +387,7 @@ FQuat UMyCharacterMovementComponent::GetClimbingRotation(float deltaTime) const
 	return FMath::QInterpTo(Current, Target, deltaTime, RotationSpeed);
 }
 
-bool UMyCharacterMovementComponent::TryClimbUpLedge() const
+bool UMyCharacterMovementComponent::TryClimbUpLedge()
 {
 	if (AnimInstance && AnimInstance->Montage_IsPlaying(LedgeClimbMontage))
 	{
@@ -397,9 +399,11 @@ bool UMyCharacterMovementComponent::TryClimbUpLedge() const
 	
 	if (bIsMovingUp && HasReachedEdge() && CanMoveToLedgeClimbLocation())
 	{
-		SetRotationToStand();
-		
+		//SetRotationToStand();
+		Cast<UCameraCompThief>(Cast<AThief>(GetOwner())->cameraComponent)->CameraBoom->bDoCollisionTest = false;
+
 		AnimInstance->Montage_Play(LedgeClimbMontage);
+		playingLedgeClimbAnim = true;
 		
 		return true;
 	}
@@ -423,7 +427,7 @@ void UMyCharacterMovementComponent::SnapToClimbingSurface(float deltaTime) const
 	UpdatedComponent->MoveComponent(Offset * SnapSpeed * deltaTime, Rotation, bSweep);
 }
 
-void UMyCharacterMovementComponent::TryClimbing()
+void UMyCharacterMovementComponent::TryClimbing_Implementation()
 {
 	if (CanStartClimbing())
 	{
@@ -476,4 +480,20 @@ bool UMyCharacterMovementComponent::IsClimbing() const
 bool UMyCharacterMovementComponent::IsClimbDashing() const
 {
 	return IsClimbing() && bIsClimbDashing;
+}
+
+void UMyCharacterMovementComponent::animationLedgeFinished()
+{
+	playingLedgeClimbAnim = false;
+
+	bOrientRotationToMovement = true;
+
+	SetRotationToStand();
+
+	UCapsuleComponent* Capsule = CharacterOwner->GetCapsuleComponent();
+	Capsule->SetCapsuleHalfHeight(Capsule->GetUnscaledCapsuleHalfHeight() + ClimbingCollisionShrinkAmount);
+
+	StopMovementImmediately();
+
+	Cast<UCameraCompThief>(Cast<AThief>(GetOwner())->cameraComponent)->CameraBoom->bDoCollisionTest = false;
 }

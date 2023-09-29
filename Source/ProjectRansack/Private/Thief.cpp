@@ -33,10 +33,6 @@ AThief::AThief(const FObjectInitializer& ObjectInitializer)
 	ArrestArea->SetGenerateOverlapEvents(true);
 	ArrestArea->SetupAttachment(RootComponent);
 
-	ClimbingArea = CreateDefaultSubobject<UBoxComponent>(FName("ClimbingArea"));
-	ClimbingArea->SetGenerateOverlapEvents(true);
-	ClimbingArea->SetupAttachment(RootComponent);
-
 	MovementComponent = Cast<UMyCharacterMovementComponent>(GetCharacterMovement());
 }
 
@@ -54,9 +50,6 @@ void AThief::BeginPlay()
 	HelperClass::deactivateTrigger(ArrestArea);
 	ArrestAreaActivate = false;
 	GetMovementComponent()->GetNavAgentPropertiesRef().bCanCrouch = true;
-
-	ClimbingArea->OnComponentBeginOverlap.AddDynamic(this, &AThief::ClimbTriggerOverlapBegin);
-	ClimbingArea->OnComponentEndOverlap.AddDynamic(this, &AThief::ClimbTriggerOverlapEnd);
 }
 
 void AThief::Tick(float DeltaTime)
@@ -109,20 +102,6 @@ void AThief::Tick(float DeltaTime)
 				
 				ui->Reset();
 			}
-		}
-	}
-	else if (IsClimbing)
-	{
-
-		FHitResult Hit = ClimbingLineTrace();
-		if (Hit.IsValidBlockingHit())
-		{
-			FVector normal = Hit.Normal;
-			FRotator Rot = UKismetMathLibrary::MakeRotFromX(normal);
-			Rot.Yaw += 180;
-			FRotator CurrentRotation = GetActorRotation();
-			CurrentRotation.Yaw = Rot.Yaw;
-			SetActorRotation(CurrentRotation);
 		}
 	}
 }
@@ -306,10 +285,15 @@ void AThief::MulReset_Implementation(FTransform transform)
 	}), thiefTableInstance->respawnTime, false);
 }
 
-//New climb system
 void AThief::Climb()
 {
-	MovementComponent->TryClimbing();
+	//MovementComponent->TryClimbing();
+
+	AGamePlayerController* pc = Cast<AGamePlayerController>(GetController());
+	if (pc == nullptr)
+		return;
+
+	pc->TryClimb(this);
 }
 
 void AThief::CancelClimb()
@@ -328,30 +312,6 @@ void AThief::Jump()
 		Super::Jump();
 	}
 }
-
-// To refactor
-void AThief::SRStartClimbing_Implementation()
-{
-	MulStartClimbing();
-}
-
-void AThief::MulStartClimbing_Implementation()
-{
-	IsClimbing = true;
-	GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_Flying);
-}
-
-void AThief::SRStopClimbing_Implementation()
-{
-	MulStopClimbing();
-}
-
-void AThief::MulStopClimbing_Implementation()
-{
-	IsClimbing = false;
-	GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_Walking);
-}
-//-------------------------
 
 bool AThief::ValidateSpaceItem(AItem& pItem)
 {
@@ -573,20 +533,6 @@ void AThief::ClientShowArrest_Implementation(bool pArrest)
 	ArrestUISelf->ToggleBeingArrested(pArrest);
 }
 
-void AThief::CheckCanClimb()
-{
-	if (isPaused)
-		return;
-
-	if (CanClimb)
-	{
-		if (IsClimbing)
-			SRStopClimbing();
-		else
-			SRStartClimbing();
-	}
-}
-
 void AThief::UnFreezeInput_Implementation()
 {
 	Super::UnFreezeInput_Implementation();
@@ -685,42 +631,6 @@ void AThief::OnArrestTriggerOverlapEnd(UPrimitiveComponent* OverlappedComp, AAct
 		AGamePlayerController* playerController = Cast<AGamePlayerController>(PC);
 		playerController->RemoveInteractibleWidgetUI(this);
 	}
-}
-
-void AThief::ClimbTriggerOverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
-{
-	if (OtherActor->ActorHasTag("CanClimb"))
-	{
-		//GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("CLimbing!"));
-		CanClimb = true;
-	}
-}
-
-void AThief::ClimbTriggerOverlapEnd(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
-{
-	if (OtherActor->ActorHasTag("CanClimb"))
-	{
-		//GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("stop cLimbing!"));
-		CanClimb = false;
-		SRStopClimbing();
-	}
-}
-
-FHitResult AThief::ClimbingLineTrace()
-{
-	FHitResult OutHit;
-	FVector Start = GetActorLocation();
-	Start.Z -= GetActorScale().Z;
-
-	FVector ForwardVector = GetActorForwardVector();
-	FVector End = ((ForwardVector * 1000.f) + Start);
-	FCollisionQueryParams CollisionParams;
-
-	//DrawDebugLine(GetWorld(), Start, End, FColor::Green, false, 1, 0, 1);
-
-	GetWorld()->LineTraceSingleByChannel(OutHit, Start, End, ECC_Visibility, CollisionParams);
-
-	return OutHit;
 }
 
 void AThief::SetClientUI_Implementation()

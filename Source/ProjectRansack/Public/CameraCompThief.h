@@ -42,4 +42,7 @@ public:
 	UFUNCTION(NetMulticast, Reliable, BlueprintCallable)
 	void MUlSetRot(FRotator rot);
 	void MUlSetRot_Implementation(FRotator rot);
+
+	void DetachFromSocket();
+	void AttachToSocket();
 };

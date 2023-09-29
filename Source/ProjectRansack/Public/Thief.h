@@ -76,14 +76,6 @@ public:
 
 	UArrestUI* ArrestUISelf = nullptr;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	class UShapeComponent* ClimbingArea = nullptr;
-
-	bool CanClimb = false;
-
-	UPROPERTY(BlueprintReadWrite, VisibleAnywhere)
-	bool IsClimbing = false;
-
 	class AOfficer* stolenOfficerCard = nullptr;
 
 	UPROPERTY(BlueprintReadWrite, VisibleAnywhere)
@@ -155,31 +147,11 @@ public:
 
 	void ResetOfficerInArrestArea(AOfficer* pOfficerToSkip = nullptr);
 
-	//-----------------
 	void MoveForward(float Value);
 	void MoveRight(float Value);
 	void Climb();
 	void CancelClimb();
 	void Jump();
-	//-----------------
-	void CheckCanClimb();
-
-	UFUNCTION(Server, Reliable, BlueprintCallable)
-	void SRStartClimbing();
-	void SRStartClimbing_Implementation();
-
-	UFUNCTION(NetMulticast, Reliable, BlueprintCallable)
-	void MulStartClimbing();
-	void MulStartClimbing_Implementation();
-
-	UFUNCTION(Server, Reliable, BlueprintCallable)
-	void SRStopClimbing();
-	void SRStopClimbing_Implementation();
-
-	UFUNCTION(NetMulticast, Reliable, BlueprintCallable)
-	void MulStopClimbing();
-	void MulStopClimbing_Implementation();
-	//------------------------------
 
 	UFUNCTION(Client, Reliable, BlueprintCallable)
 	void ClientShowArrest(bool pArrest);
@@ -211,12 +183,4 @@ public:
 
 	UFUNCTION()
 	void OnArrestTriggerOverlapEnd(class UPrimitiveComponent* OverlappedComp, AActor* OtherActor, class UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);
-
-	UFUNCTION()
-	void ClimbTriggerOverlapBegin(class UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, class UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
-
-	UFUNCTION()
-	void ClimbTriggerOverlapEnd(class UPrimitiveComponent* OverlappedComp, AActor* OtherActor, class UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);
-
-	FHitResult ClimbingLineTrace();
 };

@@ -20,6 +20,7 @@
 #include "CameraCompThief.h"
 #include "StunStick.h"
 #include "ProtectionLoot.h"
+#include "MyCharacterMovementComponent.h"
 
 void AGamePlayerController::BeginPlay()
 {
@@ -553,4 +554,9 @@ void AGamePlayerController::MUlToggleEquipStunBaton_Implementation(UStunStick* c
 void AGamePlayerController::SRDisableSystem_Implementation(AProtectionLoot* actor)
 {
 	actor->DisableSystem();
+}
+
+void AGamePlayerController::TryClimb_Implementation(AThief* thief)
+{
+	thief->MovementComponent->TryClimbing();
 }

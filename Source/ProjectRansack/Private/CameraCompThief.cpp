@@ -75,6 +75,18 @@ void UCameraCompThief::SetupCamera(USceneComponent* root)
 	rootMesh = root;
 }
 
+void UCameraCompThief::DetachFromSocket()
+{
+	CameraBoom->DetachFromComponent(FDetachmentTransformRules::KeepRelativeTransform);
+	CameraBoom->AttachToComponent(rootMesh, FAttachmentTransformRules::KeepRelativeTransform);
+}
+
+void UCameraCompThief::AttachToSocket()
+{
+	CameraBoom->DetachFromComponent(FDetachmentTransformRules::KeepRelativeTransform);
+	CameraBoom->AttachToComponent(rootMesh, FAttachmentTransformRules::KeepRelativeTransform, "NeckSocket");
+}
+
 void UCameraCompThief::look(const FInputActionValue& Value)
 {
 	FVector2D LookAxisVector = Value.Get<FVector2D>();

@@ -24,8 +24,9 @@ public:
 	UFUNCTION(BlueprintPure)
 	FVector GetClimbDashDirection() const;
 
-	UFUNCTION(BlueprintCallable)
+	UFUNCTION(NetMulticast, Reliable, BlueprintCallable)
 	void TryClimbing();
+	void TryClimbing_Implementation();
 
 	UFUNCTION(BlueprintCallable)
 	void TryClimbDashing();
@@ -68,6 +69,8 @@ public:
 
 	UPROPERTY(Category="Character Movement: Climbing", EditDefaultsOnly)
 	UAnimMontage* LedgeClimbMontage;
+
+	bool playingLedgeClimbAnim = false;
 
 	UPROPERTY(Category="Character Movement: Climbing", EditDefaultsOnly)
 	UCurveFloat* ClimbDashCurve;
@@ -119,7 +122,7 @@ public:
 	
 	void SetRotationToStand() const;
 	
-	bool TryClimbUpLedge() const;
+	bool TryClimbUpLedge();
 	
 	bool HasReachedEdge() const;
 	
@@ -150,4 +153,7 @@ public:
 	void ComputeSurfaceInfo();
 	
 	void SweepAndStoreWallHits();
+
+	UFUNCTION(BlueprintCallable)
+	void animationLedgeFinished();
 };

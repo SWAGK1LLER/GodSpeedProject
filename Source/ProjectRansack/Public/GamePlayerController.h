@@ -209,4 +209,8 @@ public:
 	UFUNCTION(Server, Reliable, BlueprintCallable)
 	void SRDisableSystem(class AProtectionLoot* actor);
 	void SRDisableSystem_Implementation(class AProtectionLoot* actor);
+
+	UFUNCTION(Server, Reliable, BlueprintCallable)
+	void TryClimb(class AThief* thief);
+	void TryClimb_Implementation(class AThief* thief);
 };
