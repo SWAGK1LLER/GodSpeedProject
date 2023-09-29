@@ -140,7 +140,8 @@ void AThief::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 		EnhancedInputComponent->BindAction(thiefTableInstance->crouchAction, ETriggerEvent::Started, this, &AThief::crouch);
 		EnhancedInputComponent->BindAction(thiefTableInstance->crouchAction, ETriggerEvent::Completed, this, &AThief::unCrouch);
 		EnhancedInputComponent->BindAction(thiefTableInstance->NightVisionAction, ETriggerEvent::Started, this, &AThief::HandleNightVision);
-		EnhancedInputComponent->BindAction(thiefTableInstance->climbAction, ETriggerEvent::Started, this, &AThief::CheckCanClimb);
+		
+		EnhancedInputComponent->BindAction(thiefTableInstance->climbAction, ETriggerEvent::Started, this, &AThief::Climb);
 	}
 }
 

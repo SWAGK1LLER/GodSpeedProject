@@ -4,6 +4,8 @@
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Kismet/KismetMathLibrary.h"
 #include "GamePlayerController.h"
+#include "Thief.h"
+#include "MyCharacterMovementComponent.h"
 
 bool SameSign(float x, float y)
 {
@@ -38,7 +40,9 @@ void UCameraCompThief::TickComponent(float DeltaTime, enum ELevelTick TickType, 
 {
 	UCameraComp::TickComponent(DeltaTime, TickType, ThisTickFunction);
 
-	ACharacter* Character = CastChecked<ACharacter>(GetOwner());
+	AThief* Character = Cast<AThief>(GetOwner());
+	if (Character->MovementComponent->IsClimbing())
+		return;
 
 	speed = Character->GetCharacterMovement()->Velocity.Size2D();
 	
@@ -51,11 +55,8 @@ void UCameraCompThief::TickComponent(float DeltaTime, enum ELevelTick TickType, 
 		Character->SetActorRotation(rotation);
 		Cast<AGamePlayerController>(Character->GetController())->MUlSetRot(this, rotation);
 
-		//Character->bUseControllerRotationYaw = true;
 		ShouldTurn = false;
 	}
-	//else
-	//	Character->bUseControllerRotationYaw = false;
 	
 	if (ShouldTurn)
 	{
