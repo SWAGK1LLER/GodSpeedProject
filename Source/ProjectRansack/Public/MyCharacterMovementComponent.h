@@ -183,6 +183,7 @@ public:
 	void ComputeSurfaceInfo();
 	
 	void SweepAndStoreWallHits();
+	void SweepAndStoreWallHitsCover();
 
 	UFUNCTION(BlueprintCallable)
 	void animationLedgeFinished();

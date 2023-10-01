@@ -30,7 +30,10 @@ void UMyCharacterMovementComponent::TickComponent(float DeltaTime, ELevelTick Ti
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 
-	SweepAndStoreWallHits();
+	if (IsCover())
+		SweepAndStoreWallHitsCover();
+	else
+		SweepAndStoreWallHits();
 }
 
 void UMyCharacterMovementComponent::SweepAndStoreWallHits()
@@ -47,29 +50,54 @@ void UMyCharacterMovementComponent::SweepAndStoreWallHits()
 	const bool HitWall = GetWorld()->SweepMultiByChannel(Hits, Start, End, FQuat::Identity,
 		  ECC_WorldStatic, CollisionShape, ClimbQueryParams);
 
-	if (IsCover())
+	/*const UCapsuleComponent* Capsule = CharacterOwner->GetCapsuleComponent();
+	UKismetSystemLibrary::DrawDebugCapsule(GetWorld(), Start, Capsule->GetUnscaledCapsuleHalfHeight(), Capsule->GetUnscaledCapsuleRadius(), UpdatedComponent->GetComponentRotation(), FLinearColor(1, 0, 0), 3, 3);*/
+
+	HitWall ? CurrentWallHits = Hits : CurrentWallHits.Reset();
+}
+
+void UMyCharacterMovementComponent::SweepAndStoreWallHitsCover()
+{
+	const FCollisionShape CollisionShape = FCollisionShape::MakeCapsule(CollisionCapsuleRadius, CollisionCapsuleHalfHeight);
+	UCapsuleComponent* Capsule = CharacterOwner->GetCapsuleComponent();
+
+	const FVector StartOffset = Capsule->GetForwardVector() * 40;
+
+	// Avoid using the same Start/End location for a Sweep, as it doesn't trigger hits on Landscapes.
+	const FVector Start = UpdatedComponent->GetComponentLocation() + StartOffset;
+	const FVector End = Start + Capsule->GetForwardVector();
+
+	TArray<FHitResult> Hits;
+	const bool HitWall = GetWorld()->SweepMultiByChannel(Hits, Start, End, FQuat::Identity,
+		ECC_WorldStatic, CollisionShape, ClimbQueryParams);
+
+	for (int i = 0; i < Hits.Num(); i++)
 	{
-		for (int i = 0; i < Hits.Num(); i++)
+		FHitResult& Hit = Hits[i];
+
+		/*if (Hit.Normal.Y >= 0.9f)
 		{
-			FHitResult& Hit = Hits[i];
+			Hits.RemoveAt(i);
+			i--;
+			continue;
+		}*/
 
-			const FVector HorizontalNormal = Hit.Normal.GetSafeNormal2D();
+		const FVector HorizontalNormal = Hit.Normal;
 
-			const float HorizontalDot = FVector::DotProduct(UpdatedComponent->GetForwardVector(), -HorizontalNormal);
-			const float VerticalDot = FVector::DotProduct(Hit.Normal, HorizontalNormal);
+		const float HorizontalDot = FVector::DotProduct(Capsule->GetForwardVector(), -HorizontalNormal);
+		const float VerticalDot = FVector::DotProduct(Hit.Normal, HorizontalNormal);
 
-			const float HorizontalDegrees = FMath::RadiansToDegrees(FMath::Acos(HorizontalDot));
+		const float HorizontalDegrees = FMath::RadiansToDegrees(FMath::Acos(HorizontalDot));
 
-			const bool bIsCeiling = FMath::IsNearlyZero(VerticalDot);
+		const bool bIsCeiling = FMath::IsNearlyZero(VerticalDot);
 
-			if (HorizontalDegrees >= 5 && HorizontalDegrees != 90.0f)
-			{
-				Hits.RemoveAt(i);
-				i--;
-			}
+		if (HorizontalDegrees >= 5 && HorizontalDegrees < 85)
+		{
+			Hits.RemoveAt(i);
+			i--;
 		}
 	}
-
+	
 	/*const UCapsuleComponent* Capsule = CharacterOwner->GetCapsuleComponent();
 	UKismetSystemLibrary::DrawDebugCapsule(GetWorld(), Start, Capsule->GetUnscaledCapsuleHalfHeight(), Capsule->GetUnscaledCapsuleRadius(), UpdatedComponent->GetComponentRotation(), FLinearColor(1, 0, 0), 3, 3);*/
 
@@ -101,8 +129,15 @@ bool UMyCharacterMovementComponent::CanStartClimbing()
 
 bool UMyCharacterMovementComponent::CanStartCover()
 {
-	for (FHitResult& Hit : CurrentWallHits)
+	for (int i = 0; i < CurrentWallHits.Num(); i++)
 	{
+		FHitResult& Hit = CurrentWallHits[i];
+
+		/*if (Hit.Normal.Y >= 0.9f)
+		{
+			continue;
+		}*/
+
 		const FVector HorizontalNormal = Hit.Normal.GetSafeNormal2D();
 
 		const float HorizontalDot = FVector::DotProduct(UpdatedComponent->GetForwardVector(), -HorizontalNormal);
@@ -150,9 +185,11 @@ bool UMyCharacterMovementComponent::BackEyeHeightTrace(const float TraceDistance
 	const float EyeHeightOffset = IsCover() ? BaseEyeHeight + ClimbingCollisionShrinkAmount : BaseEyeHeight;
 
 	const FVector Start = UpdatedComponent->GetComponentLocation() + UpdatedComponent->GetUpVector() * EyeHeightOffset;
-	const FVector End = Start + (UpdatedComponent->GetForwardVector() * TraceDistance);
 
-	//DrawDebugLine(GetWorld(), Start, End, FColor(1, 0, 0), false, 2);
+	const UCapsuleComponent* Capsule = CharacterOwner->GetCapsuleComponent();
+	const FVector End = Start + (Capsule->GetForwardVector() * TraceDistance);
+
+	DrawDebugLine(GetWorld(), Start, End, FColor(1, 0, 0), false, 2);
 
 	return GetWorld()->LineTraceSingleByChannel(UpperEdgeHit, Start, End, ECC_WorldStatic, ClimbQueryParams);
 }
@@ -304,6 +341,12 @@ void UMyCharacterMovementComponent::PhysCover(float deltaTime, int32 Iterations)
 	const FVector End = Start + (UpdatedComponent->GetForwardVector() * 100);
 	FHitResult hit;
 	GetWorld()->LineTraceSingleByChannel(hit, Start, End, ECC_WorldStatic, ClimbQueryParams);
+
+	if (hit.GetActor() == nullptr)
+	{
+		TryToggleCover();
+		return;
+	}
 
 	UCapsuleComponent* Capsule = CharacterOwner->GetCapsuleComponent();
 	Capsule->SetWorldRotation((-hit.ImpactNormal).Rotation());
@@ -570,8 +613,6 @@ void UMyCharacterMovementComponent::MoveAlongSideSurface(float deltaTime, int32 
 		MaintainHorizontalGroundVelocity();
 		const FVector OldVelocity = Velocity;
 		Acceleration.Z = 0.f;
-
-		UE_LOG(LogTemp, Warning, TEXT("direction %f, %f, %f"), Velocity.X, Velocity.Y, Velocity.Z);
 
 		// Apply acceleration
 		if (!HasAnimRootMotion() && !CurrentRootMotion.HasOverrideVelocity())

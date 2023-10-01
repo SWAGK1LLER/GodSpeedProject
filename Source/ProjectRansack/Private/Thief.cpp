@@ -239,6 +239,10 @@ void AThief::MoveRight(float Value)
 	if (MovementComponent->IsClimbing() || MovementComponent->IsCover())
 	{
 		Direction = FVector::CrossProduct(MovementComponent->GetClimbSurfaceNormal(), GetActorUpVector());
+
+		UE_LOG(LogTemp, Warning, TEXT("direction %f, %f, %f"), Direction.X, Direction.Y, Direction.Z);
+		UE_LOG(LogTemp, Warning, TEXT("move %f"), Value);
+		UE_LOG(LogTemp, Warning, TEXT("norm %f, %f, %f"), MovementComponent->GetClimbSurfaceNormal().X, MovementComponent->GetClimbSurfaceNormal().Y, MovementComponent->GetClimbSurfaceNormal().Z);
 	}
 	else
 	{
