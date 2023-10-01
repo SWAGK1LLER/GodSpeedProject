@@ -6,6 +6,8 @@
 #include <Thief.h>
 #include <CameraCompThief.h>
 #include "GamePlayerController.h"
+#include "Kismet/KismetSystemLibrary.h"
+#include "DrawDebugHelpers.h"
 
 UMyCharacterMovementComponent::UMyCharacterMovementComponent(const FObjectInitializer& ObjectInitializer)
 	: Super(ObjectInitializer)
@@ -44,6 +46,32 @@ void UMyCharacterMovementComponent::SweepAndStoreWallHits()
 	TArray<FHitResult> Hits;
 	const bool HitWall = GetWorld()->SweepMultiByChannel(Hits, Start, End, FQuat::Identity,
 		  ECC_WorldStatic, CollisionShape, ClimbQueryParams);
+
+	if (IsCover())
+	{
+		for (int i = 0; i < Hits.Num(); i++)
+		{
+			FHitResult& Hit = Hits[i];
+
+			const FVector HorizontalNormal = Hit.Normal.GetSafeNormal2D();
+
+			const float HorizontalDot = FVector::DotProduct(UpdatedComponent->GetForwardVector(), -HorizontalNormal);
+			const float VerticalDot = FVector::DotProduct(Hit.Normal, HorizontalNormal);
+
+			const float HorizontalDegrees = FMath::RadiansToDegrees(FMath::Acos(HorizontalDot));
+
+			const bool bIsCeiling = FMath::IsNearlyZero(VerticalDot);
+
+			if (HorizontalDegrees >= 5 && HorizontalDegrees != 90.0f)
+			{
+				Hits.RemoveAt(i);
+				i--;
+			}
+		}
+	}
+
+	/*const UCapsuleComponent* Capsule = CharacterOwner->GetCapsuleComponent();
+	UKismetSystemLibrary::DrawDebugCapsule(GetWorld(), Start, Capsule->GetUnscaledCapsuleHalfHeight(), Capsule->GetUnscaledCapsuleRadius(), UpdatedComponent->GetComponentRotation(), FLinearColor(1, 0, 0), 3, 3);*/
 
 	HitWall ? CurrentWallHits = Hits : CurrentWallHits.Reset();
 }
@@ -123,6 +151,8 @@ bool UMyCharacterMovementComponent::BackEyeHeightTrace(const float TraceDistance
 
 	const FVector Start = UpdatedComponent->GetComponentLocation() + UpdatedComponent->GetUpVector() * EyeHeightOffset;
 	const FVector End = Start + (UpdatedComponent->GetForwardVector() * TraceDistance);
+
+	//DrawDebugLine(GetWorld(), Start, End, FColor(1, 0, 0), false, 2);
 
 	return GetWorld()->LineTraceSingleByChannel(UpperEdgeHit, Start, End, ECC_WorldStatic, ClimbQueryParams);
 }
@@ -269,13 +299,17 @@ void UMyCharacterMovementComponent::PhysCover(float deltaTime, int32 Iterations)
 		Velocity = (UpdatedComponent->GetComponentLocation() - OldLocation) / deltaTime;
 	}
 
-	//Rotate player mesh along the wall
+	//Rotate player mesh and capsule compoenent along the wall
 	const FVector Start = UpdatedComponent->GetComponentLocation();
 	const FVector End = Start + (UpdatedComponent->GetForwardVector() * 100);
 	FHitResult hit;
 	GetWorld()->LineTraceSingleByChannel(hit, Start, End, ECC_WorldStatic, ClimbQueryParams);
 
+	UCapsuleComponent* Capsule = CharacterOwner->GetCapsuleComponent();
+	Capsule->SetWorldRotation((-hit.ImpactNormal).Rotation());
 	CharacterOwner->GetMesh()->SetWorldRotation(hit.ImpactNormal.Rotation() + relativeMeshRotation);
+
+	//DrawDebugLine(GetWorld(), Start, End, FColor(1, 0, 0), false, 2);
 }
 
 void UMyCharacterMovementComponent::ComputeSurfaceInfo()
@@ -389,24 +423,29 @@ bool UMyCharacterMovementComponent::CanMoveToLedgeClimbLocation() const
 	return !bBlocked;
 }
 
-#include "Kismet/KismetSystemLibrary.h"
 bool UMyCharacterMovementComponent::CanMoveToSide(FVector direction) const
 {
+
+	//UE_LOG(LogTemp, Warning, TEXT("direction %f, %f, %f"), direction.X, direction.Y, direction.Z);
+
 	const UCapsuleComponent* Capsule = CharacterOwner->GetCapsuleComponent();
 
 	const FVector HorizontalOffset = FVector::UpVector * 50.f;
-	const FVector VerticalOffset = UpdatedComponent->GetForwardVector() * 100.f;
-	FVector XOffset;
-	if (direction.Y != 0)
-		XOffset = direction.Y > 0 ? FVector(0, 120.f, 0) : FVector(0, -120.f, 0);
+	const FVector VerticalOffset = UpdatedComponent->GetForwardVector() * 30.f;
 
-	const FVector CheckLocation = UpdatedComponent->GetComponentLocation() + HorizontalOffset + VerticalOffset + XOffset;
+	FVector dirNorm = FVector(direction);
+	dirNorm.Normalize();
+	dirNorm *= 100;
+
+	const FVector CheckLocation = UpdatedComponent->GetComponentLocation() + dirNorm + HorizontalOffset + VerticalOffset;
 
 	FHitResult CapsuleHit;
 	const FVector CapsuleStartCheck = CheckLocation - HorizontalOffset;
 
 	const bool bBlocked = GetWorld()->SweepSingleByChannel(CapsuleHit, CapsuleStartCheck, CheckLocation,
 		FQuat::Identity, ECC_WorldStatic, Capsule->GetCollisionShape(), ClimbQueryParams);
+
+	//UKismetSystemLibrary::DrawDebugCapsule(GetWorld(), CheckLocation, Capsule->GetUnscaledCapsuleHalfHeight(), Capsule->GetUnscaledCapsuleRadius(), UpdatedComponent->GetComponentRotation(), FLinearColor(1, 0, 0), 3, 3);
 
 	return !bBlocked;
 }
@@ -531,6 +570,8 @@ void UMyCharacterMovementComponent::MoveAlongSideSurface(float deltaTime, int32 
 		MaintainHorizontalGroundVelocity();
 		const FVector OldVelocity = Velocity;
 		Acceleration.Z = 0.f;
+
+		UE_LOG(LogTemp, Warning, TEXT("direction %f, %f, %f"), Velocity.X, Velocity.Y, Velocity.Z);
 
 		// Apply acceleration
 		if (!HasAnimRootMotion() && !CurrentRootMotion.HasOverrideVelocity())
@@ -726,10 +767,13 @@ bool UMyCharacterMovementComponent::UMyCharacterMovementComponent::TryCrouchCove
 {
 	if (HasReachedEdgeCover()/* && CanMoveToLedgeClimbLocation()*/)
 	{
-		CrouchCover = true;
-		// Ajust capsule
-		UCapsuleComponent* Capsule = CharacterOwner->GetCapsuleComponent();
-		Capsule->SetCapsuleHalfHeight(Capsule->GetUnscaledCapsuleHalfHeight() - CrouchedHalfHeight);
+		if (!CrouchCover)
+		{
+			CrouchCover = true;
+			// Ajust capsule
+			UCapsuleComponent* Capsule = CharacterOwner->GetCapsuleComponent();
+			Capsule->SetCapsuleHalfHeight(Capsule->GetUnscaledCapsuleHalfHeight() - CrouchedHalfHeight);
+		}
 
 		return true;
 	}
