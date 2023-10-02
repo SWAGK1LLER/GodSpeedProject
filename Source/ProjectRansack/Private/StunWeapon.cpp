@@ -30,15 +30,21 @@ void UStunWeapon::TickComponent(float DeltaTime, ELevelTick TickType, FActorComp
         player->WidgetUI->UpdateCooldown(CoolDownCurrentTime);
     else
         player->WidgetUI->ShowGunReady();
-    
 }
 
 void UStunWeapon::Fire()
 {
-	if (CoolDownCurrentTime > 0)
-		return;
+	/*if (CoolDownCurrentTime > 0)
+		return;*/
+    if (ammo <= 0)
+        return;
 
-    CoolDownCurrentTime = coolDown;
+    ammo--;
+    if (ammo == 0)
+    {
+        CoolDownCurrentTime = coolDown;
+        isReloading = true;
+    }
 
     FVector hitLocation;
     AActor* actor = HitScan(hitLocation);

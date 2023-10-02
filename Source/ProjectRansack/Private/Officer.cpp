@@ -58,6 +58,8 @@ void AOfficer::BeginPlay()
 	StunArea->OnComponentEndOverlap.AddDynamic(this, &AOfficer::OnStunTriggerOverlapEnd);
 	HelperClass::deactivateTrigger(StunArea);
 	StunAreaActivate = false;
+
+	StunWeapon->maxAmmo = StunWeapon->ammo = officerTableInstance->MaxGunAmmo;
 }
 
 void AOfficer::Tick(float DeltaTime)
@@ -112,6 +114,7 @@ void AOfficer::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 		EnhancedInputComponent->BindAction(officerTableInstance->FlashlightAction, ETriggerEvent::Started, this, &AOfficer::ToggleFlashight);
 		EnhancedInputComponent->BindAction(officerTableInstance->SensorGadgetAction, ETriggerEvent::Started, this, &AOfficer::SensorGadgetAction);
 		EnhancedInputComponent->BindAction(officerTableInstance->StunBatonAction, ETriggerEvent::Started, this, &AOfficer::ToggleEquipStunBaton);
+		EnhancedInputComponent->BindAction(officerTableInstance->ReloadAction, ETriggerEvent::Started, this, &AOfficer::ReloadGun);
 	}
 }
 
@@ -456,4 +459,12 @@ void AOfficer::ToggleMagnetCard_Implementation(bool possess)
 void AOfficer::ToggleMagnetCardIU_Implementation()
 {
 	ToggleMagnetCardUI(HasMagnetCard);
+}
+
+void AOfficer::ReloadGun()
+{
+	if (currentState != CharacterState::Gun || StunWeapon->isReloading)
+		return;
+	
+	StunWeapon->Reload();
 }

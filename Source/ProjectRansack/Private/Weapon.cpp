@@ -15,5 +15,21 @@ void UWeapon::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponen
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 
+	if (CoolDownCurrentTime < 0)
+		return;
+
 	CoolDownCurrentTime -= DeltaTime;
+
+	if (CoolDownCurrentTime < 0)
+	{
+		ammo = maxAmmo;
+		isReloading = false;
+	}
+}
+
+void UWeapon::Reload()
+{
+	CoolDownCurrentTime = coolDown;
+	ammo = 0;
+	isReloading = true;
 }
