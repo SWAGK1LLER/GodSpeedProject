@@ -38,7 +38,7 @@ void UCameraCompThief::TickComponent(float DeltaTime, enum ELevelTick TickType, 
 	UCameraComp::TickComponent(DeltaTime, TickType, ThisTickFunction);
 
 	AThief* Character = Cast<AThief>(GetOwner());
-	if (Character->MovementComponent->IsClimbing() || Character->MovementComponent->IsCover())
+	if (Character->MovementComponent->IsClimbing() || Character->MovementComponent->IsCover() || Character->MovementComponent->isPlayingMantling())
 		return;
 
 	speed = Character->GetCharacterMovement()->Velocity.Size2D();

@@ -833,6 +833,10 @@ void UMyCharacterMovementComponent::TryClimbing_Implementation()
 
 		bWantsToClimb = true;
 	}
+	else if (!CurrentWallHits.IsEmpty() && !IsClimbing())
+	{
+		playMantling();
+	}
 }
 
 void UMyCharacterMovementComponent::TryClimbDashing()
@@ -926,4 +930,22 @@ void UMyCharacterMovementComponent::animationLedgeFinished()
 	StopMovementImmediately();
 
 	Cast<UCameraCompThief>(Cast<AThief>(GetOwner())->cameraComponent)->CameraBoom->bDoCollisionTest = false;
+}
+
+void UMyCharacterMovementComponent::playMantling()
+{
+	if (AnimInstance && AnimInstance->Montage_IsPlaying(MantlingClimbMontage))
+	{
+		return;
+	}
+
+	//UCapsuleComponent* Capsule = CharacterOwner->GetCapsuleComponent();
+	//Capsule->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+
+	AnimInstance->Montage_Play(MantlingClimbMontage);
+}
+
+bool UMyCharacterMovementComponent::isPlayingMantling()
+{
+	return AnimInstance->Montage_IsPlaying(MantlingClimbMontage);
 }

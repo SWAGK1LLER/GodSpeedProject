@@ -77,6 +77,9 @@ public:
 	UPROPERTY(Category="Character Movement: Climbing", EditDefaultsOnly)
 	UAnimMontage* LedgeClimbMontage;
 
+	UPROPERTY(Category = "Character Movement: Climbing", EditDefaultsOnly)
+	UAnimMontage* MantlingClimbMontage;
+
 	bool playingLedgeClimbAnim = false;
 
 	UPROPERTY(Category="Character Movement: Climbing", EditDefaultsOnly)
@@ -187,4 +190,8 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 	void animationLedgeFinished();
+
+	void playMantling();
+
+	bool isPlayingMantling();
 };
