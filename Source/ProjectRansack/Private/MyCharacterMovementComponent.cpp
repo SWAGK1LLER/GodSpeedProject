@@ -48,7 +48,7 @@ void UMyCharacterMovementComponent::SweepAndStoreWallHits()
 
 	TArray<FHitResult> Hits;
 	const bool HitWall = GetWorld()->SweepMultiByChannel(Hits, Start, End, FQuat::Identity,
-		  ECC_WorldStatic, CollisionShape, ClimbQueryParams);
+		ECC_GameTraceChannel1, CollisionShape, ClimbQueryParams);
 
 	HitWall ? CurrentWallHits = Hits : CurrentWallHits.Reset();
 }
@@ -66,7 +66,7 @@ void UMyCharacterMovementComponent::SweepAndStoreWallHitsCover()
 
 	TArray<FHitResult> Hits;
 	const bool HitWall = GetWorld()->SweepMultiByChannel(Hits, Start, End, FQuat::Identity,
-		ECC_WorldStatic, CollisionShape, ClimbQueryParams);
+		ECC_GameTraceChannel1, CollisionShape, ClimbQueryParams);
 
 	for (int i = 0; i < Hits.Num(); i++)
 	{
@@ -155,7 +155,7 @@ bool UMyCharacterMovementComponent::EyeHeightTrace(const float TraceDistance) co
 	const FVector Start = UpdatedComponent->GetComponentLocation() + UpdatedComponent->GetUpVector() * EyeHeightOffset;
 	const FVector End = Start + (UpdatedComponent->GetForwardVector() * TraceDistance);
 
-	return GetWorld()->LineTraceSingleByChannel(UpperEdgeHit, Start, End, ECC_WorldStatic, ClimbQueryParams);
+	return GetWorld()->LineTraceSingleByChannel(UpperEdgeHit, Start, End, ECC_GameTraceChannel1, ClimbQueryParams);
 }
 
 bool UMyCharacterMovementComponent::BackEyeHeightTrace(const float TraceDistance) const
@@ -170,7 +170,7 @@ bool UMyCharacterMovementComponent::BackEyeHeightTrace(const float TraceDistance
 	const UCapsuleComponent* Capsule = CharacterOwner->GetCapsuleComponent();
 	const FVector End = Start + (Capsule->GetForwardVector() * TraceDistance);
 
-	return GetWorld()->LineTraceSingleByChannel(UpperEdgeHit, Start, End, ECC_WorldStatic, ClimbQueryParams);
+	return GetWorld()->LineTraceSingleByChannel(UpperEdgeHit, Start, End, ECC_GameTraceChannel1, ClimbQueryParams);
 }
 
 void UMyCharacterMovementComponent::OnMovementUpdated(float DeltaSeconds, const FVector& OldLocation, const FVector& OldVelocity)
@@ -319,7 +319,7 @@ void UMyCharacterMovementComponent::PhysCover(float deltaTime, int32 Iterations)
 	const FVector Start = UpdatedComponent->GetComponentLocation();
 	const FVector End = Start + (UpdatedComponent->GetForwardVector() * 100);
 	FHitResult hit;
-	GetWorld()->LineTraceSingleByChannel(hit, Start, End, ECC_WorldStatic, ClimbQueryParams);
+	GetWorld()->LineTraceSingleByChannel(hit, Start, End, ECC_GameTraceChannel1, ClimbQueryParams);
 
 	if (hit.GetActor() == nullptr)
 	{
@@ -351,7 +351,7 @@ void UMyCharacterMovementComponent::ComputeSurfaceInfo()
 		
 		FHitResult AssistHit;
 		GetWorld()->SweepSingleByChannel(AssistHit, Start, End, FQuat::Identity,
-		                                 ECC_WorldStatic, CollisionSphere, ClimbQueryParams);
+		                                 ECC_GameTraceChannel1, CollisionSphere, ClimbQueryParams);
 		
 		CurrentClimbingPosition += AssistHit.Location;
 		CurrentClimbingNormal += AssistHit.Normal;
@@ -400,7 +400,7 @@ bool UMyCharacterMovementComponent::CheckFloor(FHitResult& FloorHit) const
 	const FVector Start = UpdatedComponent->GetComponentLocation() + (UpdatedComponent->GetUpVector() * - 20);
 	const FVector End = Start + FVector::DownVector * FloorCheckDistance;
 
-	return GetWorld()->LineTraceSingleByChannel(FloorHit, Start, End, ECC_WorldStatic, ClimbQueryParams);
+	return GetWorld()->LineTraceSingleByChannel(FloorHit, Start, End, ECC_GameTraceChannel1, ClimbQueryParams);
 }
 
 bool UMyCharacterMovementComponent::HasReachedEdge() const
@@ -438,7 +438,7 @@ bool UMyCharacterMovementComponent::CanMoveToLedgeClimbLocation() const
 	const FVector CapsuleStartCheck = CheckLocation - HorizontalOffset;
 
 	const bool bBlocked = GetWorld()->SweepSingleByChannel(CapsuleHit, CapsuleStartCheck,CheckLocation,
-		FQuat::Identity, ECC_WorldStatic, Capsule->GetCollisionShape(), ClimbQueryParams);
+		FQuat::Identity, ECC_GameTraceChannel1, Capsule->GetCollisionShape(), ClimbQueryParams);
 	
 	return !bBlocked;
 }
@@ -460,7 +460,7 @@ bool UMyCharacterMovementComponent::CanMoveToSide(FVector direction) const
 	const FVector CapsuleStartCheck = CheckLocation - HorizontalOffset;
 
 	const bool bBlocked = GetWorld()->SweepSingleByChannel(CapsuleHit, CapsuleStartCheck, CheckLocation,
-		FQuat::Identity, ECC_WorldStatic, Capsule->GetCollisionShape(), ClimbQueryParams);
+		FQuat::Identity, ECC_GameTraceChannel1, Capsule->GetCollisionShape(), ClimbQueryParams);
 
 	return !bBlocked;
 }
@@ -471,7 +471,7 @@ bool UMyCharacterMovementComponent::IsLocationWalkable(const FVector& CheckLocat
 
 	FHitResult LedgeHit;
 	const bool bHitLedgeGround = GetWorld()->LineTraceSingleByChannel(LedgeHit, CheckLocation, CheckEnd,
-	                                                                  ECC_WorldStatic, ClimbQueryParams);
+	                                                                  ECC_GameTraceChannel1, ClimbQueryParams);
 
 	return bHitLedgeGround && LedgeHit.Normal.Z >= GetWalkableFloorZ();
 }
