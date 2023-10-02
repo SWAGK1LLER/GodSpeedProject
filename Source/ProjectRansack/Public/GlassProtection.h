@@ -40,5 +40,5 @@ public:
 	UFUNCTION()
 	void TimelineFinished();
 
-	void PlayAnimation() override;
+	void PlayAnimation(bool reverse = false) override;
 };

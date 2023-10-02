@@ -101,6 +101,8 @@ public:
 
 	bool bIsClimbDashing = false;
 
+	bool bIsMantling = false;
+
 	float CurrentClimbDashTime;
 
 	FVector ClimbDashDirection;
@@ -191,7 +193,8 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void animationLedgeFinished();
 
-	void playMantling();
+	UFUNCTION(BlueprintCallable)
+	void animationMantlingFinished();
 
-	bool isPlayingMantling();
+	void playMantling();
 };

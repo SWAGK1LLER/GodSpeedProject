@@ -47,11 +47,14 @@ void AGlassProtection::TimelineFinished()
     animationRunning = false;
 }
 
-void AGlassProtection::PlayAnimation()
+void AGlassProtection::PlayAnimation(bool reverse)
 {
     if (animationRunning)
         return;
 
     animationRunning = true;
-    GlassTimeLine.PlayFromStart();
+    if (reverse)
+        GlassTimeLine.ReverseFromEnd();
+    else
+        GlassTimeLine.PlayFromStart();
 }

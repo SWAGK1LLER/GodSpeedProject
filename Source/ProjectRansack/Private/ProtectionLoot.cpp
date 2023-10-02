@@ -42,36 +42,57 @@ void AProtectionLoot::DisableSystem_Implementation()
     currentlyInteracting = false;
     acteurUsingThis = nullptr;
 
-    for (AItem* item : itemToActivate)
-        HelperClass::activateTrigger(item->Trigger);
 
-    TArray<AActor*> thiefInRange;
-    Trigger->GetOverlappingActors(thiefInRange, AThief::StaticClass());
-    for (AActor* actor : thiefInRange)
+    if (UsableByThief)
     {
-        OnTriggerOverlapEnd(nullptr, actor, nullptr, 0);
-        Cast<AThief>(actor)->TryGeneratingOverlapEvent();
+        for (AItem* item : itemToActivate)
+            HelperClass::activateTrigger(item->Trigger);
+
+        TArray<AActor*> thiefInRange;
+        Trigger->GetOverlappingActors(thiefInRange, AThief::StaticClass());
+        for (AActor* actor : thiefInRange)
+        {
+            OnTriggerOverlapEnd(nullptr, actor, nullptr, 0);
+            Cast<AThief>(actor)->TryGeneratingOverlapEvent();
+        }
+
+        //HelperClass::deactivateTrigger(Trigger);
+
+        //Play animation
+        PlayAnimation();
+    }
+    else
+    {
+        for (AItem* item : itemToActivate)
+            HelperClass::deactivateTrigger(item->Trigger);
+
+        TArray<AActor*> thiefInRange;
+        Trigger->GetOverlappingActors(thiefInRange, AOfficer::StaticClass());
+        for (AActor* actor : thiefInRange)
+        {
+            OnTriggerOverlapEnd(nullptr, actor, nullptr, 0);
+            Cast<AOfficer>(actor)->TryGeneratingOverlapEvent();
+        }
+
+        PlayAnimation(true);
     }
 
-    HelperClass::deactivateTrigger(Trigger);
-    
-    //Play animation
-    PlayAnimation();
+    UsableByThief = !UsableByThief;
 }
 
-void AProtectionLoot::PlayAnimation()
+void AProtectionLoot::PlayAnimation(bool reverse)
 {
 
 }
 
 void AProtectionLoot::UpdateProgressHack(float DeltaTime)
 {
-    if (currentlyInteracting)
+    ABase3C* player = Cast<ABase3C>(acteurUsingThis);
+    if (currentlyInteracting && UsableByThief && player->IsA(AThief::StaticClass()))
     {
         currentTime += DeltaTime;
 
         //Update ui progress bar
-        ABase3C* player = Cast<ABase3C>(acteurUsingThis);
         AGamePlayerController* playerController = Cast<AGamePlayerController>(player->GetController());
         UProtectionLootUI* widget = Cast<UProtectionLootUI>(playerController->GetWidget(this));
         if (widget == nullptr)
@@ -82,12 +103,34 @@ void AProtectionLoot::UpdateProgressHack(float DeltaTime)
             currentlyInteracting = false;
             currentTime = 0;
 
-            widget->SetDefaultText(widget->getText());
+            widget->SetDefaultText(widget->getTextStateThief());
 
             playerController->SRDisableSystem(this);
         }
         else
             widget->setProgressBarValue(HelperClass::mapValue(currentTime, 0, TimeToHackThief, 0, 1));
+    }
+    else if (currentlyInteracting && !UsableByThief && player->IsA(AOfficer::StaticClass()))
+    {
+        currentTime += DeltaTime;
+
+        //Update ui progress bar
+        AGamePlayerController* playerController = Cast<AGamePlayerController>(player->GetController());
+        UProtectionLootUI* widget = Cast<UProtectionLootUI>(playerController->GetWidget(this));
+        if (widget == nullptr)
+            return;
+
+        if (currentTime >= TimeToFixOfficer)
+        {
+            currentlyInteracting = false;
+            currentTime = 0;
+
+            widget->SetDefaultText(widget->getTextStateOfficer());
+
+            playerController->SRDisableSystem(this);
+        }
+        else
+            widget->setProgressBarValue(HelperClass::mapValue(currentTime, 0, TimeToFixOfficer, 0, 1));
     }
 }
 
@@ -102,14 +145,26 @@ void AProtectionLoot::OnTriggerOverlapBegin(UPrimitiveComponent* OverlappedCompo
     AController* PC = player->GetController();
     if (PC != nullptr && PC->IsLocalPlayerController())
     {
+        AGamePlayerController* playerController = Cast<AGamePlayerController>(PC);
+        
+
         AThief* thief = Cast<AThief>(OtherActor);
-        if (thief)
+        if (thief && UsableByThief)
         {
-            AGamePlayerController* playerController = Cast<AGamePlayerController>(PC);
             widget = Cast<UProtectionLootUI>(playerController->AddInteractibleWidgetUI(this, WidgetClass));
 
             thief->closeItems.Add(this);
-            widget->SetDefaultText(widget->getText());
+            widget->SetDefaultText(widget->getTextStateThief());
+            return;
+        }
+
+        AOfficer* officer = Cast<AOfficer>(OtherActor);
+        if (officer && !UsableByThief)
+        {
+            widget = Cast<UProtectionLootUI>(playerController->AddInteractibleWidgetUI(this, WidgetClass));
+
+            officer->closeItems.Add(this);
+            widget->SetDefaultText(widget->getTextStateOfficer());
         }
     }
 }
@@ -123,13 +178,18 @@ void AProtectionLoot::OnTriggerOverlapEnd(UPrimitiveComponent* OverlappedComp, A
     AController* PC = player->GetController();
     if (PC != nullptr && PC->IsLocalPlayerController())
     {
+        AGamePlayerController* playerController = Cast<AGamePlayerController>(PC);
+        playerController->RemoveInteractibleWidgetUI(this);
+
         AThief* thief = Cast<AThief>(OtherActor);
         if (thief)
         {
-            AGamePlayerController* playerController = Cast<AGamePlayerController>(PC);
-            playerController->RemoveInteractibleWidgetUI(this);
-
             thief->closeItems.Remove(this);
+        }
+        else
+        {
+            AOfficer* officer = Cast<AOfficer>(OtherActor);
+            officer->closeItems.Remove(this);
         }
     }
 }
@@ -137,7 +197,7 @@ void AProtectionLoot::OnTriggerOverlapEnd(UPrimitiveComponent* OverlappedComp, A
 void AProtectionLoot::Interact_Implementation(class AActor* pActor)
 {
     AThief* thief = Cast<AThief>(pActor);
-    if (thief != nullptr)
+    if (thief != nullptr && UsableByThief)
     {
         currentlyInteracting = true;
         currentTime = 0;
@@ -147,6 +207,21 @@ void AProtectionLoot::Interact_Implementation(class AActor* pActor)
         AGamePlayerController* playerController = Cast<AGamePlayerController>(thief->GetController());
         UProtectionLootUI* widget = Cast<UProtectionLootUI>(playerController->GetWidget(this));
         widget->ActivateProgressBar();
+        return;
+    }
+
+    AOfficer* officer = Cast<AOfficer>(pActor);
+    if (officer != nullptr && !UsableByThief)
+    {
+        currentlyInteracting = true;
+        currentTime = 0;
+        acteurUsingThis = pActor;
+
+        //Show progress bar
+        AGamePlayerController* playerController = Cast<AGamePlayerController>(officer->GetController());
+        UProtectionLootUI* widget = Cast<UProtectionLootUI>(playerController->GetWidget(this));
+        widget->ActivateProgressBar();
+        return;
     }
 }
 
@@ -161,5 +236,12 @@ void AProtectionLoot::StopInteract_Implementation(AActor* pActor)
     AGamePlayerController* playerController = Cast<AGamePlayerController>(Cast<ABase3C>(pActor)->GetController());
     UProtectionLootUI* widget = Cast<UProtectionLootUI>(playerController->GetWidget(this));
 
-    widget->SetDefaultText(widget->getText());
+    if (Cast<AThief>(pActor) != nullptr)
+    {
+        widget->SetDefaultText(widget->getTextStateThief());
+    }
+    else
+    {
+        widget->SetDefaultText(widget->getTextStateOfficer());
+    }
 }

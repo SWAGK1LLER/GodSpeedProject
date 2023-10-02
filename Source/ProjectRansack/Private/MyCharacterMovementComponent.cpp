@@ -833,7 +833,7 @@ void UMyCharacterMovementComponent::TryClimbing_Implementation()
 
 		bWantsToClimb = true;
 	}
-	else if (!CurrentWallHits.IsEmpty() && !IsClimbing())
+	else if (!CurrentWallHits.IsEmpty() && !IsClimbing() && !CurrentWallHits.IsEmpty())
 	{
 		playMantling();
 	}
@@ -939,13 +939,17 @@ void UMyCharacterMovementComponent::playMantling()
 		return;
 	}
 
-	//UCapsuleComponent* Capsule = CharacterOwner->GetCapsuleComponent();
-	//Capsule->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	UCapsuleComponent* Capsule = CharacterOwner->GetCapsuleComponent();
+	Capsule->SetCapsuleHalfHeight(Capsule->GetUnscaledCapsuleHalfHeight() - CrouchedHalfHeight);
 
 	AnimInstance->Montage_Play(MantlingClimbMontage);
+	bIsMantling = true;
 }
 
-bool UMyCharacterMovementComponent::isPlayingMantling()
+void UMyCharacterMovementComponent::animationMantlingFinished()
 {
-	return AnimInstance->Montage_IsPlaying(MantlingClimbMontage);
+	UCapsuleComponent* Capsule = CharacterOwner->GetCapsuleComponent();
+	Capsule->SetCapsuleHalfHeight(Capsule->GetUnscaledCapsuleHalfHeight() + CrouchedHalfHeight);
+
+	bIsMantling = false;
 }

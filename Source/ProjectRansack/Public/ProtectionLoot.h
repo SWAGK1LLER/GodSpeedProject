@@ -3,11 +3,12 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
 #include "ThiefInteractibleActor.h"
+#include "OfficerInteractibleActor.h"
 #include "ProtectionLootUI.h"
 #include "ProtectionLoot.generated.h"
 
 UCLASS()
-class PROJECTRANSACK_API AProtectionLoot : public AActor, public IThiefInteractibleActor
+class PROJECTRANSACK_API AProtectionLoot : public AActor, public IThiefInteractibleActor, public IOfficerInteractibleActor
 {
 	GENERATED_BODY()
 	
@@ -28,10 +29,15 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	float TimeToHackThief = 5;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	float TimeToFixOfficer = 2;
+
 	float currentTime = 0;
 	bool currentlyInteracting = false;
 
 	class AActor* acteurUsingThis = nullptr;
+
+	bool UsableByThief = true;
 
 	AProtectionLoot();
 
@@ -55,5 +61,5 @@ public:
 	void DisableSystem();
 	void DisableSystem_Implementation();
 
-	virtual void PlayAnimation();
+	virtual void PlayAnimation(bool reverse = false);
 };

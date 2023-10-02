@@ -19,5 +19,7 @@ public:
 	UFUNCTION(BlueprintImplementableEvent)
 	void setProgressBarValue(float percentage);
 
-	FString getText();
+	FString getTextStateOfficer();
+
+	FString getTextStateThief();
 };
