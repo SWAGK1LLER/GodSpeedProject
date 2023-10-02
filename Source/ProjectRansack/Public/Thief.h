@@ -84,6 +84,9 @@ public:
 	UPROPERTY(BlueprintReadWrite, VisibleAnywhere)
 	class UMyCharacterMovementComponent* MovementComponent;
 
+	UPROPERTY(BlueprintReadWrite, VisibleAnywhere)
+	class UGrenadeTrajectory* GrenateTrajectory;
+
 	AThief(const FObjectInitializer& ObjectInitializer);
 
 	virtual void BeginPlay() override;

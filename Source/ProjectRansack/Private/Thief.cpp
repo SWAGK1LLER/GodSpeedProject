@@ -1,6 +1,3 @@
-// Fill out your copyright notice in the Description page of Project Settings.
-
-
 #include "Thief.h"
 #include "Item.h"
 #include "HighTierItem.h"
@@ -18,6 +15,7 @@
 #include "Kismet/KismetMathLibrary.h"
 #include <Kismet/KismetMaterialLibrary.h>
 #include <ProjectRansack/Public/MyCharacterMovementComponent.h>
+#include "GrenadeTrajectory.h"
 
 AThief::AThief(const FObjectInitializer& ObjectInitializer)
 	: Super(ObjectInitializer.SetDefaultSubobjectClass<UMyCharacterMovementComponent>(ACharacter::CharacterMovementComponentName))
@@ -32,6 +30,9 @@ AThief::AThief(const FObjectInitializer& ObjectInitializer)
 	ArrestArea = CreateDefaultSubobject<UBoxComponent>(FName("ArrestArea"));
 	ArrestArea->SetGenerateOverlapEvents(true);
 	ArrestArea->SetupAttachment(RootComponent);
+
+	GrenateTrajectory = CreateDefaultSubobject<UGrenadeTrajectory>(TEXT("Grenate Trajectory"));
+	GrenateTrajectory->SetupAttachment(RootComponent);
 
 	MovementComponent = Cast<UMyCharacterMovementComponent>(GetCharacterMovement());
 }
