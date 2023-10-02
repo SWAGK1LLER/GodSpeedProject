@@ -50,9 +50,6 @@ void UMyCharacterMovementComponent::SweepAndStoreWallHits()
 	const bool HitWall = GetWorld()->SweepMultiByChannel(Hits, Start, End, FQuat::Identity,
 		  ECC_WorldStatic, CollisionShape, ClimbQueryParams);
 
-	/*const UCapsuleComponent* Capsule = CharacterOwner->GetCapsuleComponent();
-	UKismetSystemLibrary::DrawDebugCapsule(GetWorld(), Start, Capsule->GetUnscaledCapsuleHalfHeight(), Capsule->GetUnscaledCapsuleRadius(), UpdatedComponent->GetComponentRotation(), FLinearColor(1, 0, 0), 3, 3);*/
-
 	HitWall ? CurrentWallHits = Hits : CurrentWallHits.Reset();
 }
 
@@ -74,14 +71,6 @@ void UMyCharacterMovementComponent::SweepAndStoreWallHitsCover()
 	for (int i = 0; i < Hits.Num(); i++)
 	{
 		FHitResult& Hit = Hits[i];
-
-		/*if (Hit.Normal.Y >= 0.9f)
-		{
-			Hits.RemoveAt(i);
-			i--;
-			continue;
-		}*/
-
 		const FVector HorizontalNormal = Hit.Normal;
 
 		const float HorizontalDot = FVector::DotProduct(Capsule->GetForwardVector(), -HorizontalNormal);
@@ -97,9 +86,6 @@ void UMyCharacterMovementComponent::SweepAndStoreWallHitsCover()
 			i--;
 		}
 	}
-	
-	/*const UCapsuleComponent* Capsule = CharacterOwner->GetCapsuleComponent();
-	UKismetSystemLibrary::DrawDebugCapsule(GetWorld(), Start, Capsule->GetUnscaledCapsuleHalfHeight(), Capsule->GetUnscaledCapsuleRadius(), UpdatedComponent->GetComponentRotation(), FLinearColor(1, 0, 0), 3, 3);*/
 
 	HitWall ? CurrentWallHits = Hits : CurrentWallHits.Reset();
 }
@@ -132,11 +118,6 @@ bool UMyCharacterMovementComponent::CanStartCover()
 	for (int i = 0; i < CurrentWallHits.Num(); i++)
 	{
 		FHitResult& Hit = CurrentWallHits[i];
-
-		/*if (Hit.Normal.Y >= 0.9f)
-		{
-			continue;
-		}*/
 
 		const FVector HorizontalNormal = Hit.Normal.GetSafeNormal2D();
 
@@ -188,8 +169,6 @@ bool UMyCharacterMovementComponent::BackEyeHeightTrace(const float TraceDistance
 
 	const UCapsuleComponent* Capsule = CharacterOwner->GetCapsuleComponent();
 	const FVector End = Start + (Capsule->GetForwardVector() * TraceDistance);
-
-	DrawDebugLine(GetWorld(), Start, End, FColor(1, 0, 0), false, 2);
 
 	return GetWorld()->LineTraceSingleByChannel(UpperEdgeHit, Start, End, ECC_WorldStatic, ClimbQueryParams);
 }
@@ -351,8 +330,6 @@ void UMyCharacterMovementComponent::PhysCover(float deltaTime, int32 Iterations)
 	UCapsuleComponent* Capsule = CharacterOwner->GetCapsuleComponent();
 	Capsule->SetWorldRotation((-hit.ImpactNormal).Rotation());
 	CharacterOwner->GetMesh()->SetWorldRotation(hit.ImpactNormal.Rotation() + relativeMeshRotation);
-
-	//DrawDebugLine(GetWorld(), Start, End, FColor(1, 0, 0), false, 2);
 }
 
 void UMyCharacterMovementComponent::ComputeSurfaceInfo()
@@ -468,9 +445,6 @@ bool UMyCharacterMovementComponent::CanMoveToLedgeClimbLocation() const
 
 bool UMyCharacterMovementComponent::CanMoveToSide(FVector direction) const
 {
-
-	//UE_LOG(LogTemp, Warning, TEXT("direction %f, %f, %f"), direction.X, direction.Y, direction.Z);
-
 	const UCapsuleComponent* Capsule = CharacterOwner->GetCapsuleComponent();
 
 	const FVector HorizontalOffset = FVector::UpVector * 50.f;
@@ -487,8 +461,6 @@ bool UMyCharacterMovementComponent::CanMoveToSide(FVector direction) const
 
 	const bool bBlocked = GetWorld()->SweepSingleByChannel(CapsuleHit, CapsuleStartCheck, CheckLocation,
 		FQuat::Identity, ECC_WorldStatic, Capsule->GetCollisionShape(), ClimbQueryParams);
-
-	//UKismetSystemLibrary::DrawDebugCapsule(GetWorld(), CheckLocation, Capsule->GetUnscaledCapsuleHalfHeight(), Capsule->GetUnscaledCapsuleRadius(), UpdatedComponent->GetComponentRotation(), FLinearColor(1, 0, 0), 3, 3);
 
 	return !bBlocked;
 }
