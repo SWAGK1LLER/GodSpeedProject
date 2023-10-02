@@ -89,6 +89,9 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = weapon, meta = (AllowPrivateAccess = "true"))
 	class UStunWeapon* StunWeapon = nullptr;
 
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = sound, meta = (AllowPrivateAccess = "true"))
+	class UAudioComponent* audioComp = nullptr;
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	FString nickName = "";
 
@@ -115,6 +118,9 @@ public:
 	bool Revealed = false;
 
 	bool HasMagnetCard = false;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	bool bIsRunning = false;
 
 	ABase3C(const FObjectInitializer& ObjectInitializer);
 
@@ -209,4 +215,7 @@ public:
 	void ToggleMagnetCardUI_Implementation(bool visible);
 
 	void TogglePauseMenu();
+
+	UFUNCTION(BlueprintCallable)
+	void PlayFootstep();
 };

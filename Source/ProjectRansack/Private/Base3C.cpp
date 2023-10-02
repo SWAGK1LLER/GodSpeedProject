@@ -12,6 +12,7 @@
 #include <HelperClass.h>
 #include "DamageIndicatorComp.h"
 #include "GamePlayerController.h"
+#include "Components/AudioComponent.h"
 
 ABase3C::ABase3C(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
 {
@@ -22,6 +23,8 @@ ABase3C::ABase3C(const FObjectInitializer& ObjectInitializer) : Super(ObjectInit
 
 	StunWeapon = CreateDefaultSubobject<UStunWeapon>(TEXT("StunWeapon"));
 	StunWeapon->SetupAttachment(GetMesh());
+
+	audioComp = CreateDefaultSubobject<UAudioComponent>(TEXT("Audio"));
 
 	damageIndicator = CreateDefaultSubobject<UDamageIndicatorComp>(TEXT("DamageIndicator"));
 }
@@ -281,6 +284,7 @@ void ABase3C::MulStartSprinting_Implementation()
 		return;
 
 	GetCharacterMovement()->MaxWalkSpeed = normalWalkSpeed * tableInstance->sprintSpeed;
+	bIsRunning = true;
 }
 
 void ABase3C::SRStopSprinting_Implementation()
@@ -291,6 +295,7 @@ void ABase3C::SRStopSprinting_Implementation()
 void ABase3C::MulStopSprinting_Implementation()
 {
 	GetCharacterMovement()->MaxWalkSpeed = normalWalkSpeed * tableInstance->movementSpeed;
+	bIsRunning = false;
 }
 
 void ABase3C::Sprint()
@@ -378,4 +383,12 @@ void ABase3C::ToggleMagnetCardUI_Implementation(bool visible)
 void ABase3C::TogglePauseMenu()
 {
 	Cast<AGamePlayerController>(GetController())->TogglePauseMenu();
+}
+
+void ABase3C::PlayFootstep()
+{
+	if (!bIsRunning)
+		return;
+
+	audioComp->Play();
 }
