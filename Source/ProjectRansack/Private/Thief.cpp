@@ -16,6 +16,7 @@
 #include <Kismet/KismetMaterialLibrary.h>
 #include <ProjectRansack/Public/MyCharacterMovementComponent.h>
 #include "GrenadeTrajectory.h"
+#include "Camera/CameraComponent.h"
 
 AThief::AThief(const FObjectInitializer& ObjectInitializer)
 	: Super(ObjectInitializer.SetDefaultSubobjectClass<UMyCharacterMovementComponent>(ACharacter::CharacterMovementComponentName))
@@ -32,7 +33,7 @@ AThief::AThief(const FObjectInitializer& ObjectInitializer)
 	ArrestArea->SetupAttachment(RootComponent);
 
 	GrenateTrajectory = CreateDefaultSubobject<UGrenadeTrajectory>(TEXT("Grenate Trajectory"));
-	GrenateTrajectory->SetupAttachment(RootComponent);
+	GrenateTrajectory->FinishAttachment(GetMesh());
 
 	MovementComponent = Cast<UMyCharacterMovementComponent>(GetCharacterMovement());
 }
@@ -104,6 +105,10 @@ void AThief::Tick(float DeltaTime)
 				ui->Reset();
 			}
 		}
+	}
+	else
+	{
+		GrenateTrajectory->PredictGrenade(cameraComponent->camera->GetComponentRotation().Pitch);
 	}
 }
 
