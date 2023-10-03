@@ -31,6 +31,8 @@ UCameraCompThief::UCameraCompThief()
 
 	owner->GetCharacterMovement()->bOrientRotationToMovement = true;
 	owner->GetCharacterMovement()->RotationRate = FRotator(0.0f, 0.0f, 0.0f);
+
+	thiefCast = Cast<AThief>(owner);
 }
 
 void UCameraCompThief::TickComponent(float DeltaTime, enum ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
@@ -43,7 +45,7 @@ void UCameraCompThief::TickComponent(float DeltaTime, enum ELevelTick TickType, 
 
 	speed = Character->GetCharacterMovement()->Velocity.Size2D();
 	
-	if (speed > 3.0f && Character->GetCharacterMovement()->GetLastInputVector() != FVector(0, 0, 0))
+	if ((speed > 3.0f && Character->GetCharacterMovement()->GetLastInputVector() != FVector(0, 0, 0)) || thiefCast->bIsZooming)
 	{
 		FRotator rotation = Character->GetViewRotation();
 		rotation.Pitch = 0;

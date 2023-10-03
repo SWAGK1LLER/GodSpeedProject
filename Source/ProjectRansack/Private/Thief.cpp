@@ -33,7 +33,7 @@ AThief::AThief(const FObjectInitializer& ObjectInitializer)
 	ArrestArea->SetupAttachment(RootComponent);
 
 	GrenateTrajectory = CreateDefaultSubobject<UGrenadeTrajectory>(TEXT("Grenate Trajectory"));
-	GrenateTrajectory->FinishAttachment(GetMesh());
+	GrenateTrajectory->FinishAttachment(GetMesh(), cameraComponent->camera);
 
 	MovementComponent = Cast<UMyCharacterMovementComponent>(GetCharacterMovement());
 }
@@ -106,10 +106,6 @@ void AThief::Tick(float DeltaTime)
 			}
 		}
 	}
-	else
-	{
-		GrenateTrajectory->PredictGrenade(cameraComponent->camera->GetComponentRotation().Pitch);
-	}
 }
 
 void AThief::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
@@ -128,6 +124,8 @@ void AThief::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 		
 		EnhancedInputComponent->BindAction(thiefTableInstance->climbAction, ETriggerEvent::Started, this, &AThief::Climb);
 		EnhancedInputComponent->BindAction(thiefTableInstance->coverAction, ETriggerEvent::Started, this, &AThief::Cover);
+
+		EnhancedInputComponent->BindAction(thiefTableInstance->GrenadeAction, ETriggerEvent::Started, this, &AThief::ToggleEquipGrenade);
 	}
 }
 
@@ -659,4 +657,43 @@ void AThief::SetClientUI_Implementation()
 
 	ArrestUISelf = (UArrestUI*)CreateWidget<UUserWidget>(GetWorld(), ArrestOfficerWidgetClass);
 	ArrestUISelf->AddToViewport();
+}
+
+void AThief::ToggleEquipGrenade()
+{
+	if (isPaused)
+		return;
+
+	if (currentState == CharacterState::Grenade)
+	{
+		currentState = CharacterState::Gun;
+		WidgetUI->ShowGunEquipped();
+	}
+	else
+	{
+		currentState = CharacterState::Grenade;
+		//WidgetUI->ShowGrenadeEquiped();
+	}
+
+	AGamePlayerController* playerController = Cast<AGamePlayerController>(GetController());
+	if (playerController == nullptr)
+		return;
+
+	playerController->MUlToggleEquipGrenade(GrenateTrajectory, currentState == CharacterState::Grenade);
+}
+
+void AThief::Fire()
+{
+	if (isPaused)
+		return;
+
+	if (bFreezeInput)
+		return;
+
+	if (currentState == CharacterState::Gun)
+	{
+		Super::Fire();
+	}
+	else if (currentState == CharacterState::Grenade)
+		GrenateTrajectory->ThrowGrenade();
 }

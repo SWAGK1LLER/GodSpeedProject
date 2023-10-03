@@ -64,6 +64,7 @@ UENUM()
 enum CharacterState
 {
 	Gun		UMETA(DisplayName = "Gun"),
+	Grenade		UMETA(DisplayName = "Grenade"),
 	Baton	UMETA(DisplayName = "Baton"),
 	SensorGadget	UMETA(DisplayName = "SensorGadget")
 };

@@ -207,6 +207,10 @@ public:
 	void MUlToggleEquipStunBaton_Implementation(class UStunStick* comp, bool visibility);
 
 	UFUNCTION(Server, Reliable, BlueprintCallable)
+	void MUlToggleEquipGrenade(class UGrenadeTrajectory* comp, bool visibility);
+	void MUlToggleEquipGrenade_Implementation(class UGrenadeTrajectory* comp, bool visibility);
+
+	UFUNCTION(Server, Reliable, BlueprintCallable)
 	void SRDisableSystem(class AProtectionLoot* actor);
 	void SRDisableSystem_Implementation(class AProtectionLoot* actor);
 

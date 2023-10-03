@@ -26,6 +26,8 @@ public:
 
 	USceneComponent* rootMesh = nullptr;
 
+	class AThief* thiefCast = nullptr;
+
 	UCameraCompThief();
 
 	void TickComponent(float DeltaTime, enum ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;

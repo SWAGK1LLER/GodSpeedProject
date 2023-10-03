@@ -30,12 +30,19 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	float radius = 10;
 
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
+	class UCameraComponent* camera;
+
 	float refreshCounter = -1;
 	FVector throwingVelo;
 
+	bool refresh = false;
+
+	float timer = 0;
+
 	UGrenadeTrajectory();
 
-	void FinishAttachment(USceneComponent* root);
+	void FinishAttachment(USceneComponent* root, class UCameraComponent* pCamera);
 
 	virtual void BeginPlay() override;
 
@@ -43,4 +50,8 @@ public:
 
 	void PredictGrenade(float cameraRot);
 	void ThrowGrenade();
+
+	UFUNCTION(NetMulticast, Reliable, BlueprintCallable)
+	void MUlToggleVisibility(bool visible);
+	void MUlToggleVisibility_Implementation(bool visible);
 };

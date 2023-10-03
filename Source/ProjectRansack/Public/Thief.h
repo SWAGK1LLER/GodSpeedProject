@@ -1,5 +1,3 @@
-// Fill out your copyright notice in the Description page of Project Settings.
-
 #pragma once
 
 #include "CoreMinimal.h"
@@ -39,6 +37,9 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
 	class UInputAction* coverAction = nullptr;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
+	class UInputAction* GrenadeAction = nullptr;
 };
 
 UCLASS()
@@ -161,6 +162,8 @@ public:
 
 	void Cover();
 
+	virtual void Fire() override;
+
 	UFUNCTION(Client, Reliable, BlueprintCallable)
 	void ClientShowArrest(bool pArrest);
 	void ClientShowArrest_Implementation(bool pArrest);
@@ -191,4 +194,6 @@ public:
 
 	UFUNCTION()
 	void OnArrestTriggerOverlapEnd(class UPrimitiveComponent* OverlappedComp, AActor* OtherActor, class UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);
+
+	void ToggleEquipGrenade();
 };

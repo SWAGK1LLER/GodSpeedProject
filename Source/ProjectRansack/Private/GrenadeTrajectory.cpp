@@ -2,6 +2,7 @@
 #include "NiagaraComponent.h"
 #include "Kismet/GameplayStatics.h"
 #include "NiagaraDataInterfaceArrayFunctionLibrary.h"
+#include "Camera/CameraComponent.h"
 
 UGrenadeTrajectory::UGrenadeTrajectory()
 {
@@ -10,9 +11,10 @@ UGrenadeTrajectory::UGrenadeTrajectory()
 	niagara = CreateDefaultSubobject<UNiagaraComponent>(TEXT("Trajectory"));
 }
 
-void UGrenadeTrajectory::FinishAttachment(USceneComponent* root)
+void UGrenadeTrajectory::FinishAttachment(USceneComponent* root, UCameraComponent* pCamera)
 {
 	niagara->SetupAttachment(root);
+	camera = pCamera;
 }
 
 void UGrenadeTrajectory::BeginPlay()
@@ -24,6 +26,10 @@ void UGrenadeTrajectory::TickComponent(float DeltaTime, ELevelTick TickType, FAc
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 	refreshCounter -= DeltaTime;
+	timer -= DeltaTime;
+
+	if (refresh)
+		PredictGrenade(camera->GetComponentRotation().Pitch);
 }
 
 void UGrenadeTrajectory::PredictGrenade(float cameraRot)
@@ -31,13 +37,12 @@ void UGrenadeTrajectory::PredictGrenade(float cameraRot)
 	if (refreshCounter > 0)
 		return;
 
-	refreshCounter = 0.05;
+	refreshCounter = 0.005;
 
 	throwingVelo = throwVelocity * GetOwner()->GetActorForwardVector();
 	throwingVelo.Z = throwVelocity.Z * (cameraRot / 8);
 
 	FPredictProjectilePathParams param(radius, GetOwner()->GetActorLocation(), throwingVelo, simulationDuree);
-	//param.DrawDebugType = EDrawDebugTrace::Persistent;
 	FPredictProjectilePathResult result;
 
 	UGameplayStatics::PredictProjectilePath(GetWorld(), param, result);
@@ -52,6 +57,25 @@ void UGrenadeTrajectory::PredictGrenade(float cameraRot)
 
 void UGrenadeTrajectory::ThrowGrenade()
 {
+	if (timer > 0)
+		return;
+
+	timer = 0.1;
+
 	AGrenade* newGrenade = GetWorld()->GetWorld()->SpawnActor<AGrenade>(GrenadeClass, GetOwner()->GetActorLocation(), FRotator(), FActorSpawnParameters());
 	newGrenade->SetVelocity(throwingVelo);
+}
+
+void UGrenadeTrajectory::MUlToggleVisibility_Implementation(bool visible)
+{
+	refresh = visible;
+
+	if (!visible)
+	{
+		PredictionPositions.Empty();
+		UNiagaraDataInterfaceArrayFunctionLibrary::SetNiagaraArrayVector(niagara, FName("Positions"), PredictionPositions);
+	}
+
+	//Spawn one grenade in the hand of the player
+	//SetVisibility(visible);
 }

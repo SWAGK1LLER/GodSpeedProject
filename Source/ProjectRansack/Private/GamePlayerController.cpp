@@ -21,6 +21,7 @@
 #include "StunStick.h"
 #include "ProtectionLoot.h"
 #include "MyCharacterMovementComponent.h"
+#include "GrenadeTrajectory.h"
 
 void AGamePlayerController::BeginPlay()
 {
@@ -547,6 +548,11 @@ void AGamePlayerController::MUlPlayAttackAnim_Implementation(UStunStick* comp)
 }
 
 void AGamePlayerController::MUlToggleEquipStunBaton_Implementation(UStunStick* comp, bool visibility)
+{
+	comp->MUlToggleVisibility(visibility);
+}
+
+void AGamePlayerController::MUlToggleEquipGrenade_Implementation(UGrenadeTrajectory* comp, bool visibility)
 {
 	comp->MUlToggleVisibility(visibility);
 }
