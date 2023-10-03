@@ -1,13 +1,16 @@
 #include "Grenade.h"
 #include "Components/StaticMeshComponent.h"
 #include "Particles/ParticleSystemComponent.h"
+#include "GameFramework/ProjectileMovementComponent.h"
+#include "GamePlayerController.h"
+#include "GenericParticleSystemComponent.h"
+#include <Kismet/GameplayStatics.h>
 
 AGrenade::AGrenade()
 {
 	PrimaryActorTick.bCanEverTick = true;
 
 	RootComponent = mesh = CreateDefaultSubobject<UStaticMeshComponent>(FName("mesh"));
-	particleSys = CreateDefaultSubobject<UParticleSystemComponent>(FName("particule"));
 }
 
 void AGrenade::BeginPlay()
@@ -21,11 +24,13 @@ void AGrenade::BeginPlay()
 void AGrenade::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+
+	UE_LOG(LogTemp, Warning, TEXT("%f %f %f"), RootComponent->GetComponentVelocity().X, RootComponent->GetComponentVelocity().Y, RootComponent->GetComponentVelocity().Z);
 }
 
 void AGrenade::OnHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit)
 {
-	if (!counterStarted)
+	if (counterStarted)
 		return;
 
 	counterStarted = true;
@@ -38,7 +43,21 @@ void AGrenade::OnHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPri
 
 void AGrenade::Explose()
 {
-	particleSys->ActivateSystem(true);
-
 	SetLifeSpan(effectDuration);
+
+	UGenericParticleSystemComponent* particle = (UGenericParticleSystemComponent*)UGameplayStatics::SpawnEmitterAtLocation(
+		GetWorld(),
+		particleEffect,
+		GetActorLocation(), FRotator(),
+		true,
+		EPSCPoolMethod::AutoRelease,
+		true
+	);
+	
+	particle->setLifeSpan(effectDuration);
+}
+
+void AGrenade::SetVelocity(FVector velocity)
+{
+	mesh->SetPhysicsLinearVelocity(velocity);
 }

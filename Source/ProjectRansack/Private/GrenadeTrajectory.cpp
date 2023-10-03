@@ -23,7 +23,6 @@ void UGrenadeTrajectory::BeginPlay()
 void UGrenadeTrajectory::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
-
 	refreshCounter -= DeltaTime;
 }
 
@@ -53,5 +52,6 @@ void UGrenadeTrajectory::PredictGrenade(float cameraRot)
 
 void UGrenadeTrajectory::ThrowGrenade()
 {
-	
+	AGrenade* newGrenade = GetWorld()->GetWorld()->SpawnActor<AGrenade>(GrenadeClass, GetOwner()->GetActorLocation(), FRotator(), FActorSpawnParameters());
+	newGrenade->SetVelocity(throwingVelo);
 }

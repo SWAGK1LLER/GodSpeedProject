@@ -1,6 +1,3 @@
-// Fill out your copyright notice in the Description page of Project Settings.
-
-
 #include "GenericParticleSystemComponent.h"
 #include "GameFramework/Actor.h"
 #include "TimerManager.h"

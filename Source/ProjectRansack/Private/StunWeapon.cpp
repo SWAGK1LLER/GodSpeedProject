@@ -34,8 +34,6 @@ void UStunWeapon::TickComponent(float DeltaTime, ELevelTick TickType, FActorComp
 
 void UStunWeapon::Fire()
 {
-	/*if (CoolDownCurrentTime > 0)
-		return;*/
     if (ammo <= 0)
         return;
 

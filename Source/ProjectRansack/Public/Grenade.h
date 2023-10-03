@@ -19,10 +19,12 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	float effectDuration = 5;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	class UParticleSystemComponent* particleSys = nullptr;
+	UPROPERTY(EditDefaultsOnly, Category = "Setup")
+	UParticleSystem* particleEffect = nullptr;
 
 	bool counterStarted = false;
+
+	FVector startingVelo;
 
 	AGrenade();
 
@@ -34,4 +36,6 @@ public:
 	void OnHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit);
 
 	void Explose();
+
+	void SetVelocity(FVector velocity);
 };
