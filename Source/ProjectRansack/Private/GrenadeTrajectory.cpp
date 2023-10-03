@@ -3,23 +3,31 @@
 #include "Kismet/GameplayStatics.h"
 #include "NiagaraDataInterfaceArrayFunctionLibrary.h"
 #include "Camera/CameraComponent.h"
+#include "Components/StaticMeshComponent.h"
 
 UGrenadeTrajectory::UGrenadeTrajectory()
 {
 	PrimaryComponentTick.bCanEverTick = true;
 
 	niagara = CreateDefaultSubobject<UNiagaraComponent>(TEXT("Trajectory"));
+
+	mesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("MeshExposed"));
 }
 
 void UGrenadeTrajectory::FinishAttachment(USceneComponent* root, UCameraComponent* pCamera)
 {
 	niagara->SetupAttachment(root);
 	camera = pCamera;
+
+	mesh->SetupAttachment(root, FName("RightHandSocket"));
 }
 
 void UGrenadeTrajectory::BeginPlay()
 {
 	Super::BeginPlay();
+
+	mesh->SetVisibility(false);
+	UNiagaraDataInterfaceArrayFunctionLibrary::SetNiagaraArrayVector(niagara, FName("Positions"), PredictionPositions);
 }
 
 void UGrenadeTrajectory::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
@@ -42,7 +50,12 @@ void UGrenadeTrajectory::PredictGrenade(float cameraRot)
 	throwingVelo = throwVelocity * GetOwner()->GetActorForwardVector();
 	throwingVelo.Z = throwVelocity.Z * (cameraRot / 8);
 
-	FPredictProjectilePathParams param(radius, GetOwner()->GetActorLocation(), throwingVelo, simulationDuree);
+	FPredictProjectilePathParams param;
+	if (isThrowing)
+		param = FPredictProjectilePathParams(radius, throwPosition + predictionPathOffset, throwingVelo, simulationDuree);
+	else
+		param = FPredictProjectilePathParams(radius, mesh->GetComponentLocation() + predictionPathOffset, throwingVelo, simulationDuree);
+	
 	FPredictProjectilePathResult result;
 
 	UGameplayStatics::PredictProjectilePath(GetWorld(), param, result);
@@ -62,7 +75,7 @@ void UGrenadeTrajectory::ThrowGrenade()
 
 	timer = 0.1;
 
-	AGrenade* newGrenade = GetWorld()->GetWorld()->SpawnActor<AGrenade>(GrenadeClass, GetOwner()->GetActorLocation(), FRotator(), FActorSpawnParameters());
+	AGrenade* newGrenade = GetWorld()->GetWorld()->SpawnActor<AGrenade>(GrenadeClass, mesh->GetComponentLocation(), FRotator(), FActorSpawnParameters());
 	newGrenade->SetVelocity(throwingVelo);
 }
 
@@ -70,12 +83,24 @@ void UGrenadeTrajectory::MUlToggleVisibility_Implementation(bool visible)
 {
 	refresh = visible;
 
+	mesh->SetVisibility(visible);
+
 	if (!visible)
 	{
 		PredictionPositions.Empty();
 		UNiagaraDataInterfaceArrayFunctionLibrary::SetNiagaraArrayVector(niagara, FName("Positions"), PredictionPositions);
 	}
+}
 
-	//Spawn one grenade in the hand of the player
-	//SetVisibility(visible);
+void UGrenadeTrajectory::StarThrow()
+{
+	isThrowing = true;
+	throwPosition = mesh->GetComponentLocation();
+	PredictionPositions.Empty();
+	UNiagaraDataInterfaceArrayFunctionLibrary::SetNiagaraArrayVector(niagara, FName("Positions"), PredictionPositions);
+}
+
+void UGrenadeTrajectory::EndThrow()
+{
+	isThrowing = false;
 }

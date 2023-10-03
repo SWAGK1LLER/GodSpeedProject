@@ -7,6 +7,7 @@
 #include "EOSGameInstance.h"
 #include "ArrestUI.h"
 #include <Officer.h>
+#include "Animation/AnimMontage.h"
 #include "Thief.generated.h"
 
 USTRUCT(BlueprintType)
@@ -87,6 +88,9 @@ public:
 
 	UPROPERTY(BlueprintReadWrite, VisibleAnywhere)
 	class UGrenadeTrajectory* GrenateTrajectory;
+
+	UPROPERTY(Category = "Animation", EditDefaultsOnly)
+	class UAnimMontage* GrenadeThrowMontage;
 
 	AThief(const FObjectInitializer& ObjectInitializer);
 
@@ -196,4 +200,10 @@ public:
 	void OnArrestTriggerOverlapEnd(class UPrimitiveComponent* OverlappedComp, AActor* OtherActor, class UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);
 
 	void ToggleEquipGrenade();
+
+	UFUNCTION(BlueprintCallable)
+	void ThrowGrenade();
+
+	UFUNCTION(BlueprintCallable)
+	void ThrowFinish();
 };

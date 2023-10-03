@@ -14,6 +14,9 @@ class PROJECTRANSACK_API UGrenadeTrajectory : public UActorComponent
 
 public:	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	class UStaticMeshComponent* mesh = nullptr;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	TSubclassOf<AGrenade> GrenadeClass;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
@@ -33,12 +36,19 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
 	class UCameraComponent* camera;
 
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
+	FVector predictionPathOffset = FVector(0, 0, 90);
+
+	FVector throwPosition;
+
 	float refreshCounter = -1;
 	FVector throwingVelo;
 
 	bool refresh = false;
 
 	float timer = 0;
+
+	bool isThrowing = false;
 
 	UGrenadeTrajectory();
 
@@ -47,6 +57,9 @@ public:
 	virtual void BeginPlay() override;
 
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
+
+	void StarThrow();
+	void EndThrow();
 
 	void PredictGrenade(float cameraRot);
 	void ThrowGrenade();

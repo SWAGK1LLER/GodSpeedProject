@@ -17,6 +17,7 @@
 #include <ProjectRansack/Public/MyCharacterMovementComponent.h>
 #include "GrenadeTrajectory.h"
 #include "Camera/CameraComponent.h"
+#include "Animation/AnimInstance.h"
 
 AThief::AThief(const FObjectInitializer& ObjectInitializer)
 	: Super(ObjectInitializer.SetDefaultSubobjectClass<UMyCharacterMovementComponent>(ACharacter::CharacterMovementComponentName))
@@ -695,5 +696,22 @@ void AThief::Fire()
 		Super::Fire();
 	}
 	else if (currentState == CharacterState::Grenade)
-		GrenateTrajectory->ThrowGrenade();
+	{
+		UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
+		if (AnimInstance->Montage_IsPlaying(GrenadeThrowMontage))
+			return;
+
+		AnimInstance->Montage_Play(GrenadeThrowMontage);
+		GrenateTrajectory->StarThrow();
+	}
+}
+
+void AThief::ThrowGrenade()
+{
+	GrenateTrajectory->ThrowGrenade();
+}
+
+void AThief::ThrowFinish()
+{
+	GrenateTrajectory->EndThrow();
 }
