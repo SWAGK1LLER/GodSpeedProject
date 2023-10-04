@@ -681,6 +681,7 @@ void AThief::ToggleEquipGrenade()
 		return;
 
 	playerController->MUlToggleEquipGrenade(GrenateTrajectory, currentState == CharacterState::Grenade);
+	GrenateTrajectory->CLTogglePredictPath(currentState == CharacterState::Grenade);
 }
 
 void AThief::Fire()
@@ -697,13 +698,22 @@ void AThief::Fire()
 	}
 	else if (currentState == CharacterState::Grenade)
 	{
-		UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
-		if (AnimInstance->Montage_IsPlaying(GrenadeThrowMontage))
+		AGamePlayerController* playerController = Cast<AGamePlayerController>(GetController());
+		if (playerController == nullptr)
 			return;
 
-		AnimInstance->Montage_Play(GrenadeThrowMontage);
-		GrenateTrajectory->StarThrow();
+		playerController->SRThrowGrenade(this);
 	}
+}
+
+void AThief::MUlThrowGrenade_Implementation()
+{
+	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
+	if (AnimInstance->Montage_IsPlaying(GrenadeThrowMontage))
+		return;
+
+	AnimInstance->Montage_Play(GrenadeThrowMontage);
+	GrenateTrajectory->StarThrow();
 }
 
 void AThief::ThrowGrenade()

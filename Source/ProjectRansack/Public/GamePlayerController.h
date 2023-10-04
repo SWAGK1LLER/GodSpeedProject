@@ -221,4 +221,8 @@ public:
 	UFUNCTION(Server, Reliable, BlueprintCallable)
 	void TryToggleCover(class AThief* thief);
 	void TryToggleCover_Implementation(class AThief* thief);
+
+	UFUNCTION(Server, Reliable, BlueprintCallable)
+	void SRThrowGrenade(class AThief* thief);
+	void SRThrowGrenade_Implementation(class AThief* thief);
 };

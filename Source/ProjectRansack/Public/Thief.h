@@ -201,6 +201,10 @@ public:
 
 	void ToggleEquipGrenade();
 
+	UFUNCTION(NetMulticast, Reliable, BlueprintCallable)
+	void MUlThrowGrenade();
+	void MUlThrowGrenade_Implementation();
+
 	UFUNCTION(BlueprintCallable)
 	void ThrowGrenade();
 

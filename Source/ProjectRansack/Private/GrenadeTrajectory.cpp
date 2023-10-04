@@ -4,6 +4,7 @@
 #include "NiagaraDataInterfaceArrayFunctionLibrary.h"
 #include "Camera/CameraComponent.h"
 #include "Components/StaticMeshComponent.h"
+#include <Thief.h>
 
 UGrenadeTrajectory::UGrenadeTrajectory()
 {
@@ -22,12 +23,16 @@ void UGrenadeTrajectory::FinishAttachment(USceneComponent* root, UCameraComponen
 	mesh->SetupAttachment(root, FName("RightHandSocket"));
 }
 
+void UGrenadeTrajectory::SetIslocalController(bool local)
+{
+	isLocalComp = local;
+}
+
 void UGrenadeTrajectory::BeginPlay()
 {
 	Super::BeginPlay();
 
 	mesh->SetVisibility(false);
-	UNiagaraDataInterfaceArrayFunctionLibrary::SetNiagaraArrayVector(niagara, FName("Positions"), PredictionPositions);
 }
 
 void UGrenadeTrajectory::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
@@ -36,19 +41,25 @@ void UGrenadeTrajectory::TickComponent(float DeltaTime, ELevelTick TickType, FAc
 	refreshCounter -= DeltaTime;
 	timer -= DeltaTime;
 
-	if (refresh)
-		PredictGrenade(camera->GetComponentRotation().Pitch);
+	//Calculate throwing velo each frame
+	throwingVelo = throwVelocity * GetOwner()->GetActorForwardVector();
+	throwingVelo.Z = throwVelocity.Z * (camera->GetComponentRotation().Pitch / 8);
+
+	if (refresh && isLocalComp)
+		PredictGrenade();
+	else if (isLocalComp)
+	{
+		PredictionPositions.Empty();
+		UNiagaraDataInterfaceArrayFunctionLibrary::SetNiagaraArrayVector(niagara, FName("Positions"), PredictionPositions);
+	}
 }
 
-void UGrenadeTrajectory::PredictGrenade(float cameraRot)
+void UGrenadeTrajectory::PredictGrenade()
 {
 	if (refreshCounter > 0)
 		return;
 
 	refreshCounter = 0.005;
-
-	throwingVelo = throwVelocity * GetOwner()->GetActorForwardVector();
-	throwingVelo.Z = throwVelocity.Z * (cameraRot / 8);
 
 	FPredictProjectilePathParams param;
 	if (isThrowing)
@@ -81,11 +92,13 @@ void UGrenadeTrajectory::ThrowGrenade()
 
 void UGrenadeTrajectory::MUlToggleVisibility_Implementation(bool visible)
 {
-	refresh = visible;
-
 	mesh->SetVisibility(visible);
+}
 
-	if (!visible)
+void UGrenadeTrajectory::CLTogglePredictPath/*_Implementation*/(bool visible)
+{
+	refresh = visible;
+	if (!refresh)
 	{
 		PredictionPositions.Empty();
 		UNiagaraDataInterfaceArrayFunctionLibrary::SetNiagaraArrayVector(niagara, FName("Positions"), PredictionPositions);

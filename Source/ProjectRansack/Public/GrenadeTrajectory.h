@@ -50,7 +50,11 @@ public:
 
 	bool isThrowing = false;
 
+	bool isLocalComp = false;
+
 	UGrenadeTrajectory();
+
+	void SetIslocalController(bool local);
 
 	void FinishAttachment(USceneComponent* root, class UCameraComponent* pCamera);
 
@@ -61,10 +65,14 @@ public:
 	void StarThrow();
 	void EndThrow();
 
-	void PredictGrenade(float cameraRot);
+	void PredictGrenade();
 	void ThrowGrenade();
 
 	UFUNCTION(NetMulticast, Reliable, BlueprintCallable)
 	void MUlToggleVisibility(bool visible);
 	void MUlToggleVisibility_Implementation(bool visible);
+
+	//UFUNCTION(Client, Reliable, BlueprintCallable)
+	void CLTogglePredictPath(bool visible);
+	//void CLTogglePredictPath_Implementation(bool visible);
 };

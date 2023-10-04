@@ -78,7 +78,9 @@ void AGamePlayerController::PawnIsPossess(APawn* InPawn)
 		SetUpUI(officer);
 		return;
 	}
-		
+
+	thief->GrenateTrajectory->SetIslocalController(true);
+
 	SetUpUI(thief);
 	SRGetTeamData();
 	SRUpdatePlayerName();
@@ -86,6 +88,9 @@ void AGamePlayerController::PawnIsPossess(APawn* InPawn)
 
 void AGamePlayerController::SetUpUI_Implementation(APawn* InPawn)
 {
+	if (InPawn == nullptr)
+		return;
+
 	PauseUI = (UGamePauseMenu*)CreateWidget<UGamePauseMenu>(GetWorld(), PauseMenuClass);
 	PauseUI->AddToViewport(10000);
 
@@ -570,4 +575,9 @@ void AGamePlayerController::TryClimb_Implementation(AThief* thief)
 void AGamePlayerController::TryToggleCover_Implementation(AThief* thief)
 {
 	thief->MovementComponent->TryToggleCover();
+}
+
+void AGamePlayerController::SRThrowGrenade_Implementation(AThief* thief)
+{
+	thief->MUlThrowGrenade();
 }
