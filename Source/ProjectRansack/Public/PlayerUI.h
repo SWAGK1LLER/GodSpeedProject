@@ -23,5 +23,8 @@ public:
 	void ShowGunEquipped();
 
 	UFUNCTION(BlueprintImplementableEvent)
+	void ShowGrenade();
+
+	UFUNCTION(BlueprintImplementableEvent)
 	void ShowStunBattonEquiped();
 };

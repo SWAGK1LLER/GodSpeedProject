@@ -24,8 +24,6 @@ void AGrenade::BeginPlay()
 void AGrenade::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-
-	UE_LOG(LogTemp, Warning, TEXT("%f %f %f"), RootComponent->GetComponentVelocity().X, RootComponent->GetComponentVelocity().Y, RootComponent->GetComponentVelocity().Z);
 }
 
 void AGrenade::OnHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit)

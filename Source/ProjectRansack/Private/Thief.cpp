@@ -673,7 +673,7 @@ void AThief::ToggleEquipGrenade()
 	else
 	{
 		currentState = CharacterState::Grenade;
-		//WidgetUI->ShowGrenadeEquiped();
+		WidgetUI->ShowGrenade();
 	}
 
 	AGamePlayerController* playerController = Cast<AGamePlayerController>(GetController());
