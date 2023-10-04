@@ -212,6 +212,13 @@ void UEOSGameInstance::OnCreateSessionComplete(FName SessionName, bool bWasSucce
 	SessionPtr->ClearOnCreateSessionCompleteDelegates(this);
 	GetWorld()->ServerTravel(FString("/Game/Maps/MainMenu?listen"), false);
 	bHasSession = true;
+
+	if (bIsOwnerOfGame)
+	{
+		SessionPtr->OnDestroySessionCompleteDelegates.AddUObject(this, &UEOSGameInstance::OnQuitMatchComplete);
+		SessionPtr->DestroySession(FGameSessionName);
+	}
+	
 }
 //--------
 //Party Initation
@@ -355,6 +362,7 @@ void UEOSGameInstance::OnCreateGameComplete(FName SessionName, bool bWasSuccess)
 
 	SessionPtr->ClearOnCreateSessionCompleteDelegates(this);
 	GetWorld()->ServerTravel(FString("/Game/Maps/GameLobby?listen"), false);
+	bIsOwnerOfGame = true;
 }
 
 void UEOSGameInstance::OnRegisterPlayersCompleteDelegates(FName SessionName, const TArray<TSharedRef<const FUniqueNetId>>& Players, bool bWasSuccessful)
@@ -678,8 +686,8 @@ void UEOSGameInstance::QuitMatch()
 		return;
 	}
 
-	SessionPtr->OnDestroySessionCompleteDelegates.AddUObject(this, &UEOSGameInstance::OnQuitMatchComplete);
-	SessionPtr->DestroySession(FGameSessionName);
+	SessionPtr->OnDestroySessionCompleteDelegates.AddUObject(this, &UEOSGameInstance::OnClearPartySession);
+	SessionPtr->DestroySession(FSessionName);
 }
 
 void UEOSGameInstance::OnQuitMatchComplete(FName SessionName, bool bWasSuccess)
@@ -692,9 +700,7 @@ void UEOSGameInstance::OnQuitMatchComplete(FName SessionName, bool bWasSuccess)
 	}
 
 	SessionPtr->ClearOnDestroySessionCompleteDelegates(this);
-
-	SessionPtr->OnDestroySessionCompleteDelegates.AddUObject(this, &UEOSGameInstance::OnClearPartySession);
-	SessionPtr->DestroySession(FSessionName);
+	bIsOwnerOfGame = false;
 }
 
 void UEOSGameInstance::OnClearPartySession(FName SessionName, bool bWasSuccess)
