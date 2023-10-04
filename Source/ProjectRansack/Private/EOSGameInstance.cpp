@@ -692,6 +692,24 @@ void UEOSGameInstance::OnQuitMatchComplete(FName SessionName, bool bWasSuccess)
 	}
 
 	SessionPtr->ClearOnDestroySessionCompleteDelegates(this);
+
+	SessionPtr->OnDestroySessionCompleteDelegates.AddUObject(this, &UEOSGameInstance::OnClearPartySession);
+	SessionPtr->DestroySession(FSessionName);
+}
+
+void UEOSGameInstance::OnClearPartySession(FName SessionName, bool bWasSuccess)
+{
+	bHasSession = false;
+
+	IOnlineSessionPtr SessionPtr = OnlineSubsystem->GetSessionInterface();
+	if (!SessionPtr)
+	{
+		UGameplayStatics::OpenLevel(GetWorld(), "/Game/Maps/Login", true);
+		return;
+	}
+
+	SessionPtr->ClearOnDestroySessionCompleteDelegates(this);
+
 	if (!CreateParty())
 		UGameplayStatics::OpenLevel(GetWorld(), "/Game/Maps/Login", true);
 }
@@ -783,6 +801,9 @@ void UEOSGameInstance::SaveGame()
 
 void UEOSGameInstance::LoadSaveGame()
 {
+	if (isLoadingSaveGame)
+		return;
+
 	isLoadingSaveGame = true;
 	GetPlayerData();
 }

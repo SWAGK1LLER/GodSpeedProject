@@ -113,6 +113,7 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void QuitMatch();
 	void OnQuitMatchComplete(FName SessionName, bool bWasSuccess);
+	void OnClearPartySession(FName SessionName, bool bWasSuccess);
 	//------------
 	//start Game
 	UFUNCTION(BlueprintCallable)
