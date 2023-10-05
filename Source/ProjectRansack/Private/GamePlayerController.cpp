@@ -22,6 +22,7 @@
 #include "ProtectionLoot.h"
 #include "MyCharacterMovementComponent.h"
 #include "GrenadeTrajectory.h"
+#include "DecoyActor.h"
 
 void AGamePlayerController::BeginPlay()
 {
@@ -580,4 +581,9 @@ void AGamePlayerController::TryToggleCover_Implementation(AThief* thief)
 void AGamePlayerController::SRThrowGrenade_Implementation(AThief* thief)
 {
 	thief->MUlThrowGrenade();
+}
+
+void AGamePlayerController::SpawnDecoy_Implementation(TSubclassOf<ADecoyActor> DecoyActorClass, FVector location, FRotator rotation)
+{
+	GetWorld()->GetWorld()->SpawnActor<ADecoyActor>(DecoyActorClass, location, rotation, FActorSpawnParameters());
 }

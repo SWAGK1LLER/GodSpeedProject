@@ -4,6 +4,7 @@
 #include "CameraComp.h"
 #include "DecoyActor.h"
 #include "GameFramework/PawnMovementComponent.h"
+#include <GamePlayerController.h>
 
 UDecoy::UDecoy()
 {
@@ -29,10 +30,15 @@ void UDecoy::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponent
 
 void UDecoy::SpawnDecoy()
 {
-	if (timer > 0)
+	/*if (timer > 0)
+		return;*/
+	
+	//timer = 0.2f;
+	
+	AController* controller = owner->GetController();
+	if (controller == nullptr || !controller->IsLocalPlayerController())
 		return;
 
-	timer = 0.2f;
 
 	FVector velocityoffSet = owner->GetActorForwardVector() * 50;
 
@@ -40,6 +46,9 @@ void UDecoy::SpawnDecoy()
 	cam.Roll = 0;
 	cam.Pitch = 0;
 
-	ADecoyActor* actor = GetWorld()->GetWorld()->SpawnActor<ADecoyActor>(DecoyActorClass, owner->GetActorLocation() + velocityoffSet, cam, FActorSpawnParameters());
-	actor->GetMovementComponent()->Velocity = owner->GetMovementComponent()->Velocity;
+	AGamePlayerController* pc = Cast<AGamePlayerController>(controller);
+	pc->SpawnDecoy(DecoyActorClass, owner->GetActorLocation() + velocityoffSet, cam);
+
+	/*ADecoyActor* actor = GetWorld()->GetWorld()->SpawnActor<ADecoyActor>(DecoyActorClass, owner->GetActorLocation() + velocityoffSet, cam, FActorSpawnParameters());
+	actor->GetMovementComponent()->Velocity = owner->GetMovementComponent()->Velocity;*/
 }

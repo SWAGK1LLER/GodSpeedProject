@@ -225,4 +225,8 @@ public:
 	UFUNCTION(Server, Reliable, BlueprintCallable)
 	void SRThrowGrenade(class AThief* thief);
 	void SRThrowGrenade_Implementation(class AThief* thief);
+
+	UFUNCTION(Server, Reliable, BlueprintCallable)
+	void SpawnDecoy(TSubclassOf<class ADecoyActor> DecoyActorClass, FVector location, FRotator rotation);
+	void SpawnDecoy_Implementation(TSubclassOf<class ADecoyActor> DecoyActorClass, FVector location, FRotator rotation);
 };
