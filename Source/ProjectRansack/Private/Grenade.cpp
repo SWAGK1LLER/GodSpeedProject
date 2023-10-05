@@ -52,6 +52,9 @@ void AGrenade::Explose()
 		true
 	);
 	
+	if (particle == nullptr)
+		return;
+
 	particle->setLifeSpan(effectDuration);
 }
 

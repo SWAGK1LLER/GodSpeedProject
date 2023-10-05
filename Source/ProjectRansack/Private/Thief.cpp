@@ -755,7 +755,19 @@ void AThief::ToggleDecoyGadget()
 	}
 	else
 	{
+		CharacterState prev = currentState;
+
 		currentState = CharacterState::Decoy;
 		WidgetUI->ShowDecoy();
+
+		if (prev == CharacterState::Grenade)
+		{
+			AGamePlayerController* playerController = Cast<AGamePlayerController>(GetController());
+			if (playerController == nullptr)
+				return;
+
+			playerController->MUlToggleEquipGrenade(GrenateTrajectory, false);
+			GrenateTrajectory->CLTogglePredictPath(false);
+		}
 	}
 }

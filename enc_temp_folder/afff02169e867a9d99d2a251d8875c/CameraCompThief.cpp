@@ -45,6 +45,9 @@ void UCameraCompThief::TickComponent(float DeltaTime, enum ELevelTick TickType, 
 
 	speed = Character->GetCharacterMovement()->Velocity.Size2D();
 	
+	if (Character->currentState == CharacterState::Decoy)
+		return;
+
 	if ((speed > 3.0f && Character->GetCharacterMovement()->GetLastInputVector() != FVector(0, 0, 0)) || thiefCast->bIsZooming)
 	{
 		FRotator rotation = Character->GetViewRotation();
