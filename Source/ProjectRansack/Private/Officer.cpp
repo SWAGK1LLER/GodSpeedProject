@@ -287,6 +287,9 @@ void AOfficer::Fire()
 	if (bFreezeInput)
 		return;
 
+	if (ItemUsing != nullptr)
+		return;
+
 	if (currentState == CharacterState::SensorGadget)
 		sensorGadgetOfficer->Place();
 	else if (currentState == CharacterState::Baton)

@@ -310,6 +310,15 @@ void UMyCharacterMovementComponent::PhysCover(float deltaTime, int32 Iterations)
 
 	TryCrouchCover();
 
+	if (Cast<AThief>(GetOwner())->forceCrouch && !CrouchCover)
+	{
+		CrouchCover = true;
+		// Ajust capsule
+		UCapsuleComponent* Capsule = CharacterOwner->GetCapsuleComponent();
+		Capsule->SetCapsuleHalfHeight(Capsule->GetUnscaledCapsuleHalfHeight() - CrouchedHalfHeight);
+	}
+
+
 	if (!HasAnimRootMotion() && !CurrentRootMotion.HasOverrideVelocity())
 	{
 		Velocity = (UpdatedComponent->GetComponentLocation() - OldLocation) / deltaTime;

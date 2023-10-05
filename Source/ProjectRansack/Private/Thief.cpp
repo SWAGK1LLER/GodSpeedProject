@@ -590,11 +590,13 @@ void AThief::crouch()
 		return;
 
 	Crouch();
+	forceCrouch = true;
 }
 
 void AThief::unCrouch()
 {
 	UnCrouch();
+	forceCrouch = false;
 }
 
 void AThief::MUlStealMagnetCard_Implementation(AOfficer* officer)
@@ -690,6 +692,9 @@ void AThief::Fire()
 		return;
 
 	if (bFreezeInput)
+		return;
+
+	if (ItemUsing != nullptr)
 		return;
 
 	if (currentState == CharacterState::Gun)

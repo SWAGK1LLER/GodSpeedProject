@@ -92,6 +92,8 @@ public:
 	UPROPERTY(Category = "Animation", EditDefaultsOnly)
 	class UAnimMontage* GrenadeThrowMontage;
 
+	bool forceCrouch = false;
+
 	AThief(const FObjectInitializer& ObjectInitializer);
 
 	virtual void BeginPlay() override;
