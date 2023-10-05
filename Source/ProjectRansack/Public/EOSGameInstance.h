@@ -172,6 +172,9 @@ public:
 	ETeam team = ETeam::A;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	bool bIsOwnerOfGame = false;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	int TotalConnectedPlayer = 1;
 
 	FSaveGameSlot<class UPlayerSaveGame> ServerGameSlot = { "SaveGame.sav", 0, nullptr };

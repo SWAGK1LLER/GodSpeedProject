@@ -23,6 +23,9 @@ public:
 	void ShowGunEquipped();
 
 	UFUNCTION(BlueprintImplementableEvent)
+	void ShowSensorEquipped();
+
+	UFUNCTION(BlueprintImplementableEvent)
 	void ShowGrenade();
 
 	UFUNCTION(BlueprintImplementableEvent)

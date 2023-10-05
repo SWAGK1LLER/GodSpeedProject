@@ -46,7 +46,7 @@ public:
 	FVector secondLocation;
 	FRotator secondRotation;
 
-	int maxSensors = 0;
+	int maxSensors = 2;
 
 	int sensorsUsed = 0;
 
@@ -56,7 +56,6 @@ public:
 
 	void updatePosing(FVector CamLocation, FVector CamForward);
 	
-
 	void ToggleEnable(bool Enabled);
 
 	bool ValidFirstPosition(FVector CamLocation, FVector CamForward);
@@ -70,4 +69,6 @@ public:
 	UFUNCTION(Server, Reliable)
 	void ServerSpawnSensor(FVector pfirstLocation, FRotator pfirstRotation, FVector psecondLocation, FRotator psecondRotation, class AOfficer* pOwner);
 	void ServerSpawnSensor_Implementation(FVector pfirstLocation, FRotator pfirstRotation, FVector psecondLocation, FRotator psecondRotation, class AOfficer* pOwner);
+
+	bool HasUnusedSensor();
 };

@@ -310,6 +310,15 @@ void UMyCharacterMovementComponent::PhysCover(float deltaTime, int32 Iterations)
 
 	TryCrouchCover();
 
+	if (Cast<AThief>(GetOwner())->forceCrouch && !CrouchCover)
+	{
+		CrouchCover = true;
+		// Ajust capsule
+		UCapsuleComponent* Capsule = CharacterOwner->GetCapsuleComponent();
+		Capsule->SetCapsuleHalfHeight(Capsule->GetUnscaledCapsuleHalfHeight() - GetCrouchedHalfHeight());
+	}
+
+
 	if (!HasAnimRootMotion() && !CurrentRootMotion.HasOverrideVelocity())
 	{
 		Velocity = (UpdatedComponent->GetComponentLocation() - OldLocation) / deltaTime;
@@ -785,7 +794,7 @@ bool UMyCharacterMovementComponent::UMyCharacterMovementComponent::TryCrouchCove
 			CrouchCover = true;
 			// Ajust capsule
 			UCapsuleComponent* Capsule = CharacterOwner->GetCapsuleComponent();
-			Capsule->SetCapsuleHalfHeight(Capsule->GetUnscaledCapsuleHalfHeight() - CrouchedHalfHeight);
+			Capsule->SetCapsuleHalfHeight(Capsule->GetUnscaledCapsuleHalfHeight() - GetCrouchedHalfHeight());
 		}
 
 		return true;
@@ -794,7 +803,7 @@ bool UMyCharacterMovementComponent::UMyCharacterMovementComponent::TryCrouchCove
 	{
 		// Ajust capsule
 		UCapsuleComponent* Capsule = CharacterOwner->GetCapsuleComponent();
-		Capsule->SetCapsuleHalfHeight(Capsule->GetUnscaledCapsuleHalfHeight() + CrouchedHalfHeight);
+		Capsule->SetCapsuleHalfHeight(Capsule->GetUnscaledCapsuleHalfHeight() + GetCrouchedHalfHeight());
 	}
 
 	CrouchCover = false;
@@ -861,7 +870,7 @@ void UMyCharacterMovementComponent::TryToggleCover_Implementation()
 			CrouchCover = false;
 
 			UCapsuleComponent* Capsule = CharacterOwner->GetCapsuleComponent();
-			Capsule->SetCapsuleHalfHeight(Capsule->GetUnscaledCapsuleHalfHeight() + CrouchedHalfHeight);
+			Capsule->SetCapsuleHalfHeight(Capsule->GetUnscaledCapsuleHalfHeight() + GetCrouchedHalfHeight());
 		}
 
 		//Rerotate player
@@ -940,7 +949,7 @@ void UMyCharacterMovementComponent::playMantling()
 	}
 
 	UCapsuleComponent* Capsule = CharacterOwner->GetCapsuleComponent();
-	Capsule->SetCapsuleHalfHeight(Capsule->GetUnscaledCapsuleHalfHeight() - CrouchedHalfHeight);
+	Capsule->SetCapsuleHalfHeight(Capsule->GetUnscaledCapsuleHalfHeight() - GetCrouchedHalfHeight());
 
 	AnimInstance->Montage_Play(MantlingClimbMontage);
 	bIsMantling = true;
@@ -949,7 +958,7 @@ void UMyCharacterMovementComponent::playMantling()
 void UMyCharacterMovementComponent::animationMantlingFinished()
 {
 	UCapsuleComponent* Capsule = CharacterOwner->GetCapsuleComponent();
-	Capsule->SetCapsuleHalfHeight(Capsule->GetUnscaledCapsuleHalfHeight() + CrouchedHalfHeight);
+	Capsule->SetCapsuleHalfHeight(Capsule->GetUnscaledCapsuleHalfHeight() + GetCrouchedHalfHeight());
 
 	bIsMantling = false;
 }
