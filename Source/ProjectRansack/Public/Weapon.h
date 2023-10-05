@@ -38,4 +38,6 @@ public:
 	virtual void Fire() {};
 
 	virtual void Reload();
+
+	bool isFull() { return ammo == maxAmmo; };
 };

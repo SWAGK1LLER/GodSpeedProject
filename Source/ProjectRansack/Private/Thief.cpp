@@ -667,7 +667,7 @@ void AThief::ToggleEquipGrenade()
 	if (isPaused)
 		return;
 
-	if (currentState == CharacterState::Grenade)
+	if (currentState == CharacterState::Grenade || GrenateTrajectory->ammo == 0)
 	{
 		currentState = CharacterState::Gun;
 		WidgetUI->ShowGunEquipped();
@@ -706,6 +706,9 @@ void AThief::Fire()
 		AGamePlayerController* playerController = Cast<AGamePlayerController>(GetController());
 		if (playerController == nullptr)
 			return;
+
+		if (GrenateTrajectory->ammo - 1 == 0)
+			ToggleEquipGrenade();
 
 		playerController->SRThrowGrenade(this);
 	}

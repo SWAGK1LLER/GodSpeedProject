@@ -161,3 +161,8 @@ void USensorGadgetOfficerComponent::ServerSpawnSensor_Implementation(FVector pfi
 	Sensor->MULSetOfficer(pOwner);
 	Sensor->SetRevealTime(revealTime);
 }
+
+bool USensorGadgetOfficerComponent::HasUnusedSensor() 
+{ 
+	return sensorsUsed < maxSensors; 
+}

@@ -237,23 +237,20 @@ void AOfficer::SensorGadgetAction() //Reacts to the input of SensorGadget
 	if (isPaused)
 		return;
 
-	if (currentState == CharacterState::SensorGadget)
+	if (currentState == CharacterState::SensorGadget || !sensorGadgetOfficer->HasUnusedSensor())
 	{
 		currentState = CharacterState::Gun;
 		usingSensorGadget = false;
 		sensorGadgetOfficer->ToggleEnable(false);
-		return;
+		WidgetUI->ShowGunEquipped();
 	}
-
-	currentState = CharacterState::SensorGadget;
-	sensorGadgetOfficer->ToggleEnable(true);
-	usingSensorGadget = true;
-
-	AGamePlayerController* playerController = Cast<AGamePlayerController>(GetController());
-	if (playerController == nullptr)
-		return;
-
-	playerController->MUlToggleEquipStunBaton(StunStick, false);
+	else
+	{
+		currentState = CharacterState::SensorGadget;
+		sensorGadgetOfficer->ToggleEnable(true);
+		usingSensorGadget = true;
+		WidgetUI->ShowSensorEquipped();
+	}
 }
 
 void AOfficer::ToggleEquipStunBaton()
@@ -291,7 +288,12 @@ void AOfficer::Fire()
 		return;
 
 	if (currentState == CharacterState::SensorGadget)
+	{
 		sensorGadgetOfficer->Place();
+	
+		if (!sensorGadgetOfficer->HasUnusedSensor())
+			SensorGadgetAction();
+	}
 	else if (currentState == CharacterState::Baton)
 		StunStick->Fire();
 	else if (currentState == CharacterState::Gun)
@@ -466,7 +468,7 @@ void AOfficer::ToggleMagnetCardIU_Implementation()
 
 void AOfficer::ReloadGun()
 {
-	if (currentState != CharacterState::Gun || StunWeapon->isReloading)
+	if (currentState != CharacterState::Gun || StunWeapon->isReloading || StunWeapon->isFull())
 		return;
 	
 	StunWeapon->Reload();
