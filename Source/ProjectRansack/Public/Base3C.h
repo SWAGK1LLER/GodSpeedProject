@@ -66,7 +66,8 @@ enum CharacterState
 	Gun		UMETA(DisplayName = "Gun"),
 	Grenade		UMETA(DisplayName = "Grenade"),
 	Baton	UMETA(DisplayName = "Baton"),
-	SensorGadget	UMETA(DisplayName = "SensorGadget")
+	SensorGadget	UMETA(DisplayName = "SensorGadget"),
+	Decoy	UMETA(DisplayName = "DecoyGadget")
 };
 
 UCLASS()

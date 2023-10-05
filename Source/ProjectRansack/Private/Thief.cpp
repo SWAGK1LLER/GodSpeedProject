@@ -18,6 +18,7 @@
 #include "GrenadeTrajectory.h"
 #include "Camera/CameraComponent.h"
 #include "Animation/AnimInstance.h"
+#include "Decoy.h"
 
 AThief::AThief(const FObjectInitializer& ObjectInitializer)
 	: Super(ObjectInitializer.SetDefaultSubobjectClass<UMyCharacterMovementComponent>(ACharacter::CharacterMovementComponentName))
@@ -35,6 +36,9 @@ AThief::AThief(const FObjectInitializer& ObjectInitializer)
 
 	GrenateTrajectory = CreateDefaultSubobject<UGrenadeTrajectory>(TEXT("Grenate Trajectory"));
 	GrenateTrajectory->FinishAttachment(GetMesh(), cameraComponent->camera);
+
+	decoyGadget = CreateDefaultSubobject<UDecoy>(TEXT("Decoy Gadget"));
+	decoyGadget->SetupComp(this);
 
 	MovementComponent = Cast<UMyCharacterMovementComponent>(GetCharacterMovement());
 }
@@ -127,6 +131,7 @@ void AThief::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 		EnhancedInputComponent->BindAction(thiefTableInstance->coverAction, ETriggerEvent::Started, this, &AThief::Cover);
 
 		EnhancedInputComponent->BindAction(thiefTableInstance->GrenadeAction, ETriggerEvent::Started, this, &AThief::ToggleEquipGrenade);
+		EnhancedInputComponent->BindAction(thiefTableInstance->DecoyAction, ETriggerEvent::Started, this, &AThief::ToggleDecoyGadget);
 	}
 }
 
@@ -712,6 +717,10 @@ void AThief::Fire()
 
 		playerController->SRThrowGrenade(this);
 	}
+	else if (currentState == CharacterState::Decoy)
+	{
+		decoyGadget->SpawnDecoy();
+	}
 }
 
 void AThief::MUlThrowGrenade_Implementation()
@@ -732,4 +741,21 @@ void AThief::ThrowGrenade()
 void AThief::ThrowFinish()
 {
 	GrenateTrajectory->EndThrow();
+}
+
+void AThief::ToggleDecoyGadget()
+{
+	if (isPaused)
+		return;
+
+	if (currentState == CharacterState::Decoy/* || GrenateTrajectory->ammo == 0*/)
+	{
+		currentState = CharacterState::Gun;
+		WidgetUI->ShowGunEquipped();
+	}
+	else
+	{
+		currentState = CharacterState::Decoy;
+		WidgetUI->ShowDecoy();
+	}
 }

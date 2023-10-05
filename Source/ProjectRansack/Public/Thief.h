@@ -41,6 +41,9 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
 	class UInputAction* GrenadeAction = nullptr;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
+	class UInputAction* DecoyAction = nullptr;
 };
 
 UCLASS()
@@ -91,6 +94,9 @@ public:
 
 	UPROPERTY(Category = "Animation", EditDefaultsOnly)
 	class UAnimMontage* GrenadeThrowMontage;
+
+	UPROPERTY(BlueprintReadWrite, VisibleAnywhere)
+	class UDecoy* decoyGadget;
 
 	bool forceCrouch = false;
 
@@ -212,4 +218,7 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 	void ThrowFinish();
+
+	UFUNCTION(BlueprintCallable)
+	void ToggleDecoyGadget();
 };

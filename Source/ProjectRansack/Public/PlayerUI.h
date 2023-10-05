@@ -30,4 +30,7 @@ public:
 
 	UFUNCTION(BlueprintImplementableEvent)
 	void ShowStunBattonEquiped();
+
+	UFUNCTION(BlueprintImplementableEvent)
+	void ShowDecoy();
 };

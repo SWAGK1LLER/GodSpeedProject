@@ -96,7 +96,7 @@ void UGrenadeTrajectory::MUlToggleVisibility_Implementation(bool visible)
 	mesh->SetVisibility(visible);
 }
 
-void UGrenadeTrajectory::CLTogglePredictPath/*_Implementation*/(bool visible)
+void UGrenadeTrajectory::CLTogglePredictPath(bool visible)
 {
 	refresh = visible;
 	if (!refresh)
