@@ -19,8 +19,6 @@ void UGun::BeginPlay()
 {
 	Super::BeginPlay();
 	CoolDownCurrentTime = 0;
-
-	isActive = true;
 }
 
 void UGun::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)

@@ -109,15 +109,24 @@ void UEquipement::EquipeBelt1()
 		{
 			IWeapon::Execute_UpdateUI(StunWeapon->_getUObject());
 			GrenateTrajectory->CurrentGrenadeClass = GrenadeType::None;
-			pcCache->SREquipWeapon(this, StunWeapon);
-			EquipWeapon(StunWeapon);
+
+			if (pcCache != nullptr)
+			{
+				pcCache->SREquipWeapon(this, StunWeapon);
+				EquipWeapon(StunWeapon);
+			}
+			
 		}
 	}
 	else
 	{
 		IWeapon::Execute_UpdateUI(weapon.GetObject());
-		pcCache->SREquipWeapon(this, weapon);
-		EquipWeapon(weapon);
+
+		if (pcCache != nullptr)
+		{
+			pcCache->SREquipWeapon(this, weapon);
+			EquipWeapon(weapon);
+		}
 	}
 }
 
@@ -134,15 +143,21 @@ void UEquipement::EquipeBelt2()
 		{
 			IWeapon::Execute_UpdateUI(StunWeapon->_getUObject());
 			GrenateTrajectory->CurrentGrenadeClass = GrenadeType::None;
-			pcCache->SREquipWeapon(this, StunWeapon);
-			EquipWeapon(StunWeapon);
+			if (pcCache != nullptr)
+			{
+				pcCache->SREquipWeapon(this, StunWeapon);
+				EquipWeapon(StunWeapon);
+			}
 		}
 	}
 	else
 	{
 		IWeapon::Execute_UpdateUI(weapon.GetObject());
-		pcCache->SREquipWeapon(this, weapon);
-		EquipWeapon(weapon);
+		if (pcCache != nullptr)
+		{
+			pcCache->SREquipWeapon(this, weapon);
+			EquipWeapon(weapon);
+		}
 	}
 }
 
@@ -159,15 +174,21 @@ void UEquipement::EquipeBelt3()
 		{
 			IWeapon::Execute_UpdateUI(StunWeapon->_getUObject());
 			GrenateTrajectory->CurrentGrenadeClass = GrenadeType::None;
-			pcCache->SREquipWeapon(this, StunWeapon);
-			EquipWeapon(StunWeapon);
+			if (pcCache != nullptr)
+			{
+				pcCache->SREquipWeapon(this, StunWeapon);
+				EquipWeapon(StunWeapon);
+			}
 		}
 	}
 	else
 	{
 		IWeapon::Execute_UpdateUI(weapon.GetObject());
-		pcCache->SREquipWeapon(this, weapon);
-		EquipWeapon(weapon);
+		if (pcCache != nullptr)
+		{
+			pcCache->SREquipWeapon(this, weapon);
+			EquipWeapon(weapon);
+		}
 	}
 }
 
