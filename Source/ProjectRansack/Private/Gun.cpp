@@ -25,6 +25,9 @@ void UGun::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTi
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 
+	if (!isActive)
+		return;
+
 	if (isReloading)
 	{
 		CoolDownCurrentTime -= DeltaTime;
@@ -135,4 +138,12 @@ void UGun::HitEntity(AGamePlayerController* PlayerController, AActor* pActorToHi
 void UGun::UpdateUI_Implementation()
 {
 	Cast<ABase3C>(GetOwner())->WidgetUI->ShowGunEquipped();
+}
+
+void UGun::MUlToggleVisibility_Implementation(bool visible)
+{
+	isActive = visible;
+
+	if (!visible && isReloading)
+		CoolDownCurrentTime = coolDown;
 }

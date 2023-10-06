@@ -583,3 +583,8 @@ void AGamePlayerController::SpawnDecoy_Implementation(TSubclassOf<ADecoyActor> D
 {
 	GetWorld()->GetWorld()->SpawnActor<ADecoyActor>(DecoyActorClass, location, rotation, FActorSpawnParameters());
 }
+
+void AGamePlayerController::SetGrenade_Implementation(UEquipement* equip, GrenadeType grenade)
+{
+	equip->SetGrenadeType(grenade);
+}

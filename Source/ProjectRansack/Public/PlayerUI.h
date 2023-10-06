@@ -26,7 +26,7 @@ public:
 	void ShowSensorEquipped();
 
 	UFUNCTION(BlueprintImplementableEvent)
-	void ShowGrenade();
+	void ShowGrenade(class UTexture2D* uiTexture);
 
 	UFUNCTION(BlueprintImplementableEvent)
 	void ShowStunBattonEquiped();

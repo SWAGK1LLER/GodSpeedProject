@@ -28,6 +28,8 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	float StunDuration = 5;
 
+	bool isActive = false;
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Setup")
 	TArray<TSubclassOf<AActor>> EnemyHittable;
 
@@ -52,7 +54,7 @@ public:
 
 	bool isFull() { return ammo == maxAmmo; };
 
-	void MUlToggleVisibility_Implementation(bool visible) override {};
+	void MUlToggleVisibility_Implementation(bool visible) override;
 
 	void UpdateUI_Implementation() override;
 };

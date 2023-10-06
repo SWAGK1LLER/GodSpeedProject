@@ -58,6 +58,15 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
 	class UInputAction* PauseAction = nullptr;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
+	class UInputAction* Belt1Action = nullptr;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
+	class UInputAction* Belt2Action = nullptr;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
+	class UInputAction* Belt3Action = nullptr;
 };
 
 UCLASS()
@@ -111,6 +120,9 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	bool bIsRunning = false;
+
+	UPROPERTY(Category = "Animation", EditDefaultsOnly)
+	class UAnimMontage* GrenadeThrowMontage;
 
 	ABase3C(const FObjectInitializer& ObjectInitializer);
 
@@ -208,4 +220,14 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 	void PlayFootstep();
+
+	UFUNCTION(NetMulticast, Reliable, BlueprintCallable)
+	void MUlThrowGrenade();
+	void MUlThrowGrenade_Implementation();
+
+	UFUNCTION(BlueprintCallable)
+	void ThrowGrenade();
+
+	UFUNCTION(BlueprintCallable)
+	void ThrowFinish();
 };

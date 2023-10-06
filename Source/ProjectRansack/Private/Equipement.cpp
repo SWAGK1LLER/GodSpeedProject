@@ -7,7 +7,9 @@
 #include "CameraComp.h"
 #include "Camera/CameraComponent.h"
 #include "Decoy.h"
-#include <Thief.h>
+#include "GamePlayerController.h"
+#include "EnhancedInputComponent.h"
+#include "Engine/Texture2D.h"
 
 UEquipement::UEquipement()
 {
@@ -24,14 +26,21 @@ UEquipement::UEquipement()
 	decoyGadget = CreateDefaultSubobject<UDecoy>(TEXT("Decoy Gadget"));
 
 	equippedWeapon = StunWeapon;
+
+	playerCache = Cast<ABase3C>(GetOwner());
 }
 
 void UEquipement::FinishAttachement(class USceneComponent* root)
 {
 	StunWeapon->SetupAttachment(root);
 	StunStick->SetupAttachment(root, FName("RightHandSocket"));
-	GrenateTrajectory->FinishAttachment(root, Cast<ABase3C>(GetOwner())->cameraComponent->camera);
-	decoyGadget->SetupComp(Cast<AThief>(GetOwner()));
+	GrenateTrajectory->FinishAttachment(root, playerCache->cameraComponent->camera);
+
+	AController* controller = playerCache->GetController();
+	if (controller == nullptr || !controller->IsLocalPlayerController())
+		return;
+
+	pcCache = Cast<AGamePlayerController>(controller);
 }
 
 void UEquipement::BeginPlay()
@@ -62,9 +71,12 @@ void UEquipement::EquipWeapon(const TScriptInterface<IWeapon>& nextWeapon)
 
 		equippedWeapon = nextWeapon.GetInterface();
 	}
-
-	IWeapon::Execute_UpdateUI(equippedWeapon->_getUObject());
 };
+
+void UEquipement::UpdateUI()
+{
+	IWeapon::Execute_UpdateUI(equippedWeapon->_getUObject());
+}
 
 void UEquipement::Fire()
 {
@@ -72,3 +84,113 @@ void UEquipement::Fire()
 
 	Cast<ABase3C>(GetOwner())->TryGeneratingOverlapEvent();
 };
+
+void UEquipement::BindBeltKey(UEnhancedInputComponent* input, FBase3CTable* table)
+{
+	input->BindAction(table->Belt1Action, ETriggerEvent::Started, this, &UEquipement::EquipeBelt1);
+	input->BindAction(table->Belt2Action, ETriggerEvent::Started, this, &UEquipement::EquipeBelt2);
+	input->BindAction(table->Belt3Action, ETriggerEvent::Started, this, &UEquipement::EquipeBelt3);
+}
+
+void UEquipement::EquipeBelt1()
+{
+	const TScriptInterface<IWeapon>& weapon = GetWeaponFromEnum(utilityBelt[0]);
+	if (weapon == equippedWeapon)
+	{
+		if ((weapon == GrenateTrajectory && !GrenateTrajectory->IsSameGrenadeClass()))
+		{
+			IWeapon::Execute_UpdateUI(weapon.GetObject());
+		}
+		else
+		{
+			IWeapon::Execute_UpdateUI(StunWeapon->_getUObject());
+			GrenateTrajectory->CurrentGrenadeClass = GrenadeType::None;
+			pcCache->SREquipWeapon(this, StunWeapon);
+			EquipWeapon(StunWeapon);
+		}
+	}
+	else
+	{
+		IWeapon::Execute_UpdateUI(weapon.GetObject());
+		pcCache->SREquipWeapon(this, weapon);
+		EquipWeapon(weapon);
+	}
+}
+
+void UEquipement::EquipeBelt2()
+{
+	const TScriptInterface<IWeapon>& weapon = GetWeaponFromEnum(utilityBelt[1]);
+	if (weapon == equippedWeapon)
+	{
+		if ((weapon == GrenateTrajectory && !GrenateTrajectory->IsSameGrenadeClass()))
+		{
+			IWeapon::Execute_UpdateUI(weapon.GetObject());
+		}
+		else
+		{
+			IWeapon::Execute_UpdateUI(StunWeapon->_getUObject());
+			GrenateTrajectory->CurrentGrenadeClass = GrenadeType::None;
+			pcCache->SREquipWeapon(this, StunWeapon);
+			EquipWeapon(StunWeapon);
+		}
+	}
+	else
+	{
+		IWeapon::Execute_UpdateUI(weapon.GetObject());
+		pcCache->SREquipWeapon(this, weapon);
+		EquipWeapon(weapon);
+	}
+}
+
+void UEquipement::EquipeBelt3()
+{
+	const TScriptInterface<IWeapon>& weapon = GetWeaponFromEnum(utilityBelt[2]);
+	if (weapon == equippedWeapon)
+	{
+		if ((weapon == GrenateTrajectory && !GrenateTrajectory->IsSameGrenadeClass()))
+		{
+			IWeapon::Execute_UpdateUI(weapon.GetObject());
+		}
+		else
+		{
+			IWeapon::Execute_UpdateUI(StunWeapon->_getUObject());
+			GrenateTrajectory->CurrentGrenadeClass = GrenadeType::None;
+			pcCache->SREquipWeapon(this, StunWeapon);
+			EquipWeapon(StunWeapon);
+		}
+	}
+	else
+	{
+		IWeapon::Execute_UpdateUI(weapon.GetObject());
+		pcCache->SREquipWeapon(this, weapon);
+		EquipWeapon(weapon);
+	}
+}
+
+const TScriptInterface<IWeapon> UEquipement::GetWeaponFromEnum(EquipementPossibility weapon)
+{
+	switch (weapon)
+	{
+		case SmokeGrenade:	
+							GrenateTrajectory->previousGrenadeClass = GrenateTrajectory->CurrentGrenadeClass;
+							GrenateTrajectory->CurrentGrenadeClass = GrenadeType::Smoke;
+							GrenateTrajectory->uiTexture = AllGrenade[GrenadeType::Smoke].uiImage;
+							pcCache->SetGrenade(this, GrenadeType::Smoke);
+							return GrenateTrajectory;
+
+		case StunGrenade:	
+							GrenateTrajectory->previousGrenadeClass = GrenateTrajectory->CurrentGrenadeClass;
+							GrenateTrajectory->CurrentGrenadeClass = GrenadeType::Stun;
+							GrenateTrajectory->uiTexture = AllGrenade[GrenadeType::Stun].uiImage;
+							pcCache->SetGrenade(this, GrenadeType::Stun);
+							return GrenateTrajectory;
+
+		case HoloDecoy: return decoyGadget;
+		default: return StunWeapon;
+	}
+}
+
+void UEquipement::SetGrenadeType_Implementation(GrenadeType grenadeType)
+{
+	GrenateTrajectory->GrenadeClass = &AllGrenade[grenadeType].type;
+}

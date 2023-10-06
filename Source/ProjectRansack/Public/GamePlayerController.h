@@ -215,8 +215,6 @@ public:
 	void SpawnDecoy(TSubclassOf<class ADecoyActor> DecoyActorClass, FVector location, FRotator rotation);
 	void SpawnDecoy_Implementation(TSubclassOf<class ADecoyActor> DecoyActorClass, FVector location, FRotator rotation);
 
-
-
 	UFUNCTION(Server, Reliable, BlueprintCallable)
 	void SRDisableSystem(class AProtectionLoot* actor);
 	void SRDisableSystem_Implementation(class AProtectionLoot* actor);
@@ -228,4 +226,8 @@ public:
 	UFUNCTION(Server, Reliable, BlueprintCallable)
 	void TryToggleCover(class AThief* thief);
 	void TryToggleCover_Implementation(class AThief* thief);
+
+	UFUNCTION(Server, Reliable, BlueprintCallable)
+	void SetGrenade(class UEquipement* equip, enum GrenadeType grenade);
+	void SetGrenade_Implementation(class UEquipement* equip, enum GrenadeType grenade);
 };

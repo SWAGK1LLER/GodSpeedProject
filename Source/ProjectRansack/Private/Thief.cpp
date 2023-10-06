@@ -111,7 +111,6 @@ void AThief::Tick(float DeltaTime)
 void AThief::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
-	Super::SetupPlayerInputComponent(PlayerInputComponent);
 
 	CreateTableInstance();
 
@@ -124,9 +123,6 @@ void AThief::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 		
 		EnhancedInputComponent->BindAction(thiefTableInstance->climbAction, ETriggerEvent::Started, this, &AThief::Climb);
 		EnhancedInputComponent->BindAction(thiefTableInstance->coverAction, ETriggerEvent::Started, this, &AThief::Cover);
-
-		EnhancedInputComponent->BindAction(thiefTableInstance->GrenadeAction, ETriggerEvent::Started, this, &AThief::ToggleEquipGrenade);
-		EnhancedInputComponent->BindAction(thiefTableInstance->DecoyAction, ETriggerEvent::Started, this, &AThief::ToggleDecoyGadget);
 	}
 }
 
@@ -662,18 +658,6 @@ void AThief::SetClientUI_Implementation()
 	ArrestUISelf->AddToViewport();
 }
 
-void AThief::ToggleEquipGrenade()
-{
-	if (isPaused)
-		return;
-
-	AGamePlayerController* playerController = Cast<AGamePlayerController>(GetController());
-	if (playerController == nullptr)
-		return;
-
-	playerController->SREquipWeapon(equipement, equipement->GrenateTrajectory);
-}
-
 void AThief::Fire()
 {
 	if (isPaused)
@@ -693,35 +677,4 @@ void AThief::Fire()
 		return;
 
 	playerController->SRFire(equipement);
-}
-
-void AThief::MUlThrowGrenade_Implementation()
-{
-	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
-	if (AnimInstance->Montage_IsPlaying(GrenadeThrowMontage))
-		return;
-
-	AnimInstance->Montage_Play(GrenadeThrowMontage);
-}
-
-void AThief::ThrowGrenade()
-{
-	equipement->GrenateTrajectory->ThrowGrenade();
-}
-
-void AThief::ThrowFinish()
-{
-	equipement->GrenateTrajectory->EndThrow();
-}
-
-void AThief::ToggleDecoyGadget()
-{
-	if (isPaused)
-		return;
-
-	AGamePlayerController* playerController = Cast<AGamePlayerController>(GetController());
-	if (playerController == nullptr)
-		return;
-
-	playerController->SREquipWeapon(equipement, equipement->decoyGadget);
 }

@@ -14,6 +14,7 @@
 #include "GamePlayerController.h"
 #include "Components/AudioComponent.h"
 #include "Equipement.h"
+#include "GrenadeTrajectory.h"
 
 ABase3C::ABase3C(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
 {
@@ -193,7 +194,10 @@ void ABase3C::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 		EnhancedInputComponent->BindAction(tableInstance->TabAction, ETriggerEvent::Completed, this, &ABase3C::StopTab);
 		
 		EnhancedInputComponent->BindAction(tableInstance->PauseAction, ETriggerEvent::Started, this, &ABase3C::TogglePauseMenu);
+
+		equipement->BindBeltKey(EnhancedInputComponent, tableInstance);
 	}
+	
 	cameraComponent->SetupInputComponent(PlayerInputComponent, tableInstance->lookAction);
 }
 
@@ -388,4 +392,23 @@ void ABase3C::PlayFootstep()
 		return;
 
 	audioComp->Play();
+}
+
+void ABase3C::MUlThrowGrenade_Implementation()
+{
+	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
+	if (AnimInstance->Montage_IsPlaying(GrenadeThrowMontage))
+		return;
+
+	AnimInstance->Montage_Play(GrenadeThrowMontage);
+}
+
+void ABase3C::ThrowGrenade()
+{
+	equipement->GrenateTrajectory->ThrowGrenade();
+}
+
+void ABase3C::ThrowFinish()
+{
+	equipement->GrenateTrajectory->EndThrow();
 }

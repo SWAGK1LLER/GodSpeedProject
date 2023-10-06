@@ -15,11 +15,10 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	TSubclassOf<class ADecoyActor> DecoyActorClass;
 
-	class AThief* owner = nullptr;
-	float timer = 0;
+	class ABase3C* owner = nullptr;
+	class AGamePlayerController* pcCache = nullptr;
 
 	UDecoy();
-	void SetupComp(class AThief* pThief);
 	virtual void BeginPlay() override;
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 

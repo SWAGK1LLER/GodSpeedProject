@@ -6,6 +6,8 @@
 #include "Components/StaticMeshComponent.h"
 #include <Thief.h>
 #include <GamePlayerController.h>
+#include "Engine/Texture2D.h"
+#include "Equipement.h"
 
 UGrenadeTrajectory::UGrenadeTrajectory()
 {
@@ -14,6 +16,7 @@ UGrenadeTrajectory::UGrenadeTrajectory()
 	niagara = CreateDefaultSubobject<UNiagaraComponent>(TEXT("Trajectory"));
 
 	mesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("MeshExposed"));
+	owner = Cast<ABase3C>(GetOwner());
 }
 
 void UGrenadeTrajectory::FinishAttachment(USceneComponent* root, UCameraComponent* pCamera)
@@ -34,6 +37,12 @@ void UGrenadeTrajectory::BeginPlay()
 	Super::BeginPlay();
 
 	mesh->SetVisibility(false);
+
+	AController* controller = owner->GetController();
+	if (controller == nullptr || !controller->IsLocalPlayerController())
+		return;
+
+	pcCache = Cast<AGamePlayerController>(controller);
 }
 
 void UGrenadeTrajectory::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
@@ -88,7 +97,7 @@ void UGrenadeTrajectory::ThrowGrenade()
 	timer = 0.1;
 	ammo--;
 
-	AGrenade* newGrenade = GetWorld()->GetWorld()->SpawnActor<AGrenade>(GrenadeClass, mesh->GetComponentLocation(), FRotator(), FActorSpawnParameters());
+	AGrenade* newGrenade = GetWorld()->GetWorld()->SpawnActor<AGrenade>(*GrenadeClass, mesh->GetComponentLocation(), FRotator(), FActorSpawnParameters());
 	newGrenade->SetVelocity(throwingVelo);
 }
 
@@ -96,12 +105,7 @@ void UGrenadeTrajectory::MUlToggleVisibility_Implementation(bool visible)
 {
 	mesh->SetVisibility(visible);
 
-	APawn* owner = Cast<APawn>(GetOwner());
-	AGamePlayerController* playerController = Cast<AGamePlayerController>(owner->GetController());
-	if (playerController == nullptr)
-		return;
-
-	if (!playerController->IsLocalPlayerController())
+	if (pcCache == nullptr || !pcCache->IsLocalPlayerController())
 		return;
 
 	CLTogglePredictPath(visible);
@@ -122,7 +126,7 @@ void UGrenadeTrajectory::MUlFire_Implementation()
 	isThrowing = true;
 	throwPosition = mesh->GetComponentLocation();
 
-	Cast<AThief>(GetOwner())->MUlThrowGrenade();
+	owner->MUlThrowGrenade();
 }
 
 void UGrenadeTrajectory::EndThrow()
@@ -132,5 +136,10 @@ void UGrenadeTrajectory::EndThrow()
 
 void UGrenadeTrajectory::UpdateUI_Implementation()
 {
-	Cast<ABase3C>(GetOwner())->WidgetUI->ShowGrenade();
+	owner->WidgetUI->ShowGrenade(uiTexture);
+}
+
+bool UGrenadeTrajectory::IsSameGrenadeClass()
+{
+	return CurrentGrenadeClass == previousGrenadeClass;
 }

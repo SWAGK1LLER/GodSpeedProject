@@ -17,8 +17,11 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	class UStaticMeshComponent* mesh = nullptr;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	TSubclassOf<AGrenade> GrenadeClass;
+	TSubclassOf<AGrenade>* GrenadeClass;
+	enum GrenadeType previousGrenadeClass;
+	enum GrenadeType CurrentGrenadeClass;
+
+	class UTexture2D* uiTexture = nullptr;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	class UNiagaraComponent* niagara = nullptr;
@@ -56,6 +59,9 @@ public:
 
 	bool isLocalComp = false;
 
+	class ABase3C* owner = nullptr;
+	class AGamePlayerController* pcCache = nullptr;
+
 	UGrenadeTrajectory();
 
 	void SetIslocalController(bool local);
@@ -84,4 +90,6 @@ public:
 	virtual void MUlFire_Implementation();
 
 	void UpdateUI_Implementation() override;
+
+	bool IsSameGrenadeClass();
 };

@@ -220,6 +220,7 @@ void AOfficer::SensorGadgetAction() //Reacts to the input of SensorGadget
 		return;
 
 	playerController->SREquipWeapon(equipement, equipement->sensorGadgetOfficer);
+	equipement->UpdateUI();
 }
 
 void AOfficer::ToggleEquipStunBaton()
@@ -232,6 +233,7 @@ void AOfficer::ToggleEquipStunBaton()
 		return;
 
 	playerController->SREquipWeapon(equipement, equipement->StunStick);
+	equipement->UpdateUI();
 }
 
 void AOfficer::Fire()
