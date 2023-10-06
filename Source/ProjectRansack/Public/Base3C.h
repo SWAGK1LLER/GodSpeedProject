@@ -60,16 +60,6 @@ public:
 	class UInputAction* PauseAction = nullptr;
 };
 
-UENUM()
-enum CharacterState
-{
-	Gun		UMETA(DisplayName = "Gun"),
-	Grenade		UMETA(DisplayName = "Grenade"),
-	Baton	UMETA(DisplayName = "Baton"),
-	SensorGadget	UMETA(DisplayName = "SensorGadget"),
-	Decoy	UMETA(DisplayName = "DecoyGadget")
-};
-
 UCLASS()
 class PROJECTRANSACK_API ABase3C : public ACharacter
 {
@@ -88,11 +78,11 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = damage, meta = (AllowPrivateAccess = "true"))
 	class UDamageIndicatorComp* damageIndicator = nullptr;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = weapon, meta = (AllowPrivateAccess = "true"))
-	class UStunWeapon* StunWeapon = nullptr;
-
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = sound, meta = (AllowPrivateAccess = "true"))
 	class UAudioComponent* audioComp = nullptr;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	class UEquipement* equipement = nullptr;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	FString nickName = "";
@@ -106,8 +96,6 @@ public:
 	FBase3CTable* tableInstance = nullptr;
 
 	float normalWalkSpeed;
-
-	CharacterState currentState;
 
 	bool bFreezeInput = true;
 	float FreezeDuration = -1;

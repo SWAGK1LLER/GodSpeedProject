@@ -13,16 +13,14 @@
 #include "DamageIndicatorComp.h"
 #include "GamePlayerController.h"
 #include "Components/AudioComponent.h"
+#include "Equipement.h"
 
 ABase3C::ABase3C(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
 {
  	PrimaryActorTick.bCanEverTick = true;
 	bReplicates = true;
 
-	currentState = CharacterState::Gun;
-
-	StunWeapon = CreateDefaultSubobject<UStunWeapon>(TEXT("StunWeapon"));
-	StunWeapon->SetupAttachment(GetMesh());
+	equipement = CreateDefaultSubobject<UEquipement>(TEXT("equipement"));
 
 	audioComp = CreateDefaultSubobject<UAudioComponent>(TEXT("Audio"));
 
@@ -34,6 +32,7 @@ void ABase3C::BeginPlay()
 	Super::BeginPlay();
 
 	SpawnTransform = GetActorTransform();
+	equipement->FinishAttachement(GetMesh());
 
 	if(!CreateTableInstance())
 		return;
@@ -264,13 +263,11 @@ void ABase3C::Fire()
 	if (bFreezeInput)
 		return;
 
-	if (currentState == CharacterState::Gun)
-	{
-		StunWeapon->Fire();
+	AGamePlayerController* playerController = Cast<AGamePlayerController>(GetController());
+	if (playerController == nullptr)
+		return;
 
-		//Ugly hack to trigger overlap event if actor is already in trigger volume
-		TryGeneratingOverlapEvent();
-	}
+	playerController->SRFire(equipement);
 }
 
 void ABase3C::SRStartSprinting_Implementation()

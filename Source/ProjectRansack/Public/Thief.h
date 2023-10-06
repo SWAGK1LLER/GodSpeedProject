@@ -89,14 +89,8 @@ public:
 	UPROPERTY(BlueprintReadWrite, VisibleAnywhere)
 	class UMyCharacterMovementComponent* MovementComponent;
 
-	UPROPERTY(BlueprintReadWrite, VisibleAnywhere)
-	class UGrenadeTrajectory* GrenateTrajectory;
-
 	UPROPERTY(Category = "Animation", EditDefaultsOnly)
 	class UAnimMontage* GrenadeThrowMontage;
-
-	UPROPERTY(BlueprintReadWrite, VisibleAnywhere)
-	class UDecoy* decoyGadget;
 
 	bool forceCrouch = false;
 

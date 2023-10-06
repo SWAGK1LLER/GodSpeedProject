@@ -58,9 +58,6 @@ class PROJECTRANSACK_API AOfficer : public ABase3C
 	GENERATED_BODY()
 
 public:
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = weapon, meta = (AllowPrivateAccess = "true"))
-	class UStunStick* StunStick = nullptr;
-
 	TArray<IOfficerInteractibleActor*> closeItems;
 	IOfficerInteractibleActor* ItemUsing = nullptr;
 
@@ -92,17 +89,12 @@ public:
 	UPROPERTY(editAnywhere, BlueprintReadWrite, Category = Light, meta = (AllowPrivateAccess = "true"))
 	class USpotLightComponent* flashLight;
 
-	UPROPERTY(editAnywhere, BlueprintReadWrite, Category = SensorGadget, meta = (AllowPrivateAccess = "true"), replicated)
-	class USensorGadgetOfficerComponent* sensorGadgetOfficer;
-
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	TSubclassOf<UOfficerNotificationUI> notificationWidgetClass;
 
 	UOfficerNotificationUI* notificationUI = nullptr;
 
 	bool flashLightOn = false;
-
-	bool usingSensorGadget = false;
 
 	AOfficer(const FObjectInitializer& ObjectInitializer);
 	virtual void BeginPlay() override;

@@ -2,34 +2,24 @@
 
 #include "CoreMinimal.h"
 #include "Weapon.h"
-#include "Base3C.h"
-#include "Templates/SubclassOf.h"
-#include "Particles/ParticleSystem.h"
+#include "Components/StaticMeshComponent.h"
 #include "StunWeapon.generated.h"
 
 UCLASS()
-class PROJECTRANSACK_API UStunWeapon : public UWeapon
+class PROJECTRANSACK_API UStunWeapon : public UStaticMeshComponent, public IWeapon
 {
 	GENERATED_BODY()
-
 public:
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	float Reach = 10000;
+	UStunWeapon();
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	float StunDuration = 5;
+	UFUNCTION(NetMulticast, Reliable, NotBlueprintable)
+	virtual void MUlToggleVisibility(bool visible);
+	virtual void MUlToggleVisibility_Implementation(bool visible) {};
 
-	UStunWeapon(const FObjectInitializer& ObjectInitializer);
-	
-	virtual void BeginPlay() override;
+	UFUNCTION(NetMulticast, Reliable, NotBlueprintable)
+	virtual void MUlFire();
+	virtual void MUlFire_Implementation() {};
 
-	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
-
-	virtual void Fire() override;
-
-	AActor* HitScan(FVector& hitLocation);
-
-	bool CheckHittableActor(AActor* pActorToCheck);
-
-	void HitEntity(class AGamePlayerController* PlayerController, AActor* pActorToHit);
+	void Tick_Implementation(float delta) override {};
+	void UpdateUI_Implementation() override {};
 };

@@ -52,3 +52,13 @@ void UDecoy::SpawnDecoy()
 	/*ADecoyActor* actor = GetWorld()->GetWorld()->SpawnActor<ADecoyActor>(DecoyActorClass, owner->GetActorLocation() + velocityoffSet, cam, FActorSpawnParameters());
 	actor->GetMovementComponent()->Velocity = owner->GetMovementComponent()->Velocity;*/
 }
+
+void UDecoy::MUlFire_Implementation()
+{
+	SpawnDecoy();
+}
+
+void UDecoy::UpdateUI_Implementation()
+{
+	Cast<ABase3C>(GetOwner())->WidgetUI->ShowDecoy();
+}

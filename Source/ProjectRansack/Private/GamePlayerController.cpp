@@ -18,11 +18,12 @@
 #include "Terminal.h"
 #include "SensorGadget.h"
 #include "CameraCompThief.h"
-#include "StunStick.h"
+#include "Baton.h"
 #include "ProtectionLoot.h"
 #include "MyCharacterMovementComponent.h"
 #include "GrenadeTrajectory.h"
 #include "DecoyActor.h"
+#include "Equipement.h"
 
 void AGamePlayerController::BeginPlay()
 {
@@ -80,7 +81,7 @@ void AGamePlayerController::PawnIsPossess(APawn* InPawn)
 		return;
 	}
 
-	thief->GrenateTrajectory->SetIslocalController(true);
+	thief->equipement->GrenateTrajectory->SetIslocalController(true);
 
 	SetUpUI(thief);
 	SRGetTeamData();
@@ -548,21 +549,6 @@ void AGamePlayerController::MUlSetRot_Implementation(UCameraCompThief* comp, FRo
 	comp->MUlSetLerpRot(rot);
 }
 
-void AGamePlayerController::MUlPlayAttackAnim_Implementation(UStunStick* comp)
-{
-	comp->MUlPlayAttack();
-}
-
-void AGamePlayerController::MUlToggleEquipStunBaton_Implementation(UStunStick* comp, bool visibility)
-{
-	comp->MUlToggleVisibility(visibility);
-}
-
-void AGamePlayerController::MUlToggleEquipGrenade_Implementation(UGrenadeTrajectory* comp, bool visibility)
-{
-	comp->MUlToggleVisibility(visibility);
-}
-
 void AGamePlayerController::SRDisableSystem_Implementation(AProtectionLoot* actor)
 {
 	actor->DisableSystem();
@@ -578,9 +564,19 @@ void AGamePlayerController::TryToggleCover_Implementation(AThief* thief)
 	thief->MovementComponent->TryToggleCover();
 }
 
-void AGamePlayerController::SRThrowGrenade_Implementation(AThief* thief)
+void AGamePlayerController::MUlPlayAttackAnim_Implementation(UBaton* comp)
 {
-	thief->MUlThrowGrenade();
+	comp->MUlPlayAttack();
+}
+
+void AGamePlayerController::SREquipWeapon_Implementation(UEquipement* equip, const TScriptInterface<IWeapon>& comp)
+{ 
+	equip->EquipWeapon(comp);
+}
+
+void AGamePlayerController::SRFire_Implementation(UEquipement* equip)
+{
+	equip->Fire();
 }
 
 void AGamePlayerController::SpawnDecoy_Implementation(TSubclassOf<ADecoyActor> DecoyActorClass, FVector location, FRotator rotation)

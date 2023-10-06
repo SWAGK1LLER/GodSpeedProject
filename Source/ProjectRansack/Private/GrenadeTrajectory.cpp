@@ -5,6 +5,7 @@
 #include "Camera/CameraComponent.h"
 #include "Components/StaticMeshComponent.h"
 #include <Thief.h>
+#include <GamePlayerController.h>
 
 UGrenadeTrajectory::UGrenadeTrajectory()
 {
@@ -94,6 +95,16 @@ void UGrenadeTrajectory::ThrowGrenade()
 void UGrenadeTrajectory::MUlToggleVisibility_Implementation(bool visible)
 {
 	mesh->SetVisibility(visible);
+
+	APawn* owner = Cast<APawn>(GetOwner());
+	AGamePlayerController* playerController = Cast<AGamePlayerController>(owner->GetController());
+	if (playerController == nullptr)
+		return;
+
+	if (!playerController->IsLocalPlayerController())
+		return;
+
+	CLTogglePredictPath(visible);
 }
 
 void UGrenadeTrajectory::CLTogglePredictPath(bool visible)
@@ -106,15 +117,20 @@ void UGrenadeTrajectory::CLTogglePredictPath(bool visible)
 	}
 }
 
-void UGrenadeTrajectory::StarThrow()
+void UGrenadeTrajectory::MUlFire_Implementation()
 {
 	isThrowing = true;
 	throwPosition = mesh->GetComponentLocation();
-	PredictionPositions.Empty();
-	UNiagaraDataInterfaceArrayFunctionLibrary::SetNiagaraArrayVector(niagara, FName("Positions"), PredictionPositions);
+
+	Cast<AThief>(GetOwner())->MUlThrowGrenade();
 }
 
 void UGrenadeTrajectory::EndThrow()
 {
 	isThrowing = false;
+}
+
+void UGrenadeTrajectory::UpdateUI_Implementation()
+{
+	Cast<ABase3C>(GetOwner())->WidgetUI->ShowGrenade();
 }

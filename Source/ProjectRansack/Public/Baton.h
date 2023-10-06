@@ -2,14 +2,29 @@
 
 #include "CoreMinimal.h"
 #include "StunWeapon.h"
-#include "StunStick.generated.h"
+#include "Baton.generated.h"
 
-UCLASS()
-class PROJECTRANSACK_API UStunStick : public UStunWeapon
+UCLASS(ClassGroup = (Custom), meta = (BlueprintSpawnableComponent))
+class PROJECTRANSACK_API UBaton : public UStunWeapon
 {
 	GENERATED_BODY()
-	
+
 public:
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	float coolDown = 2;
+	float CoolDownCurrentTime = 0;
+
+	bool isReloading = false;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	int maxAmmo = 1;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	int ammo = maxAmmo;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	float StunDuration = 5;
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	class UShapeComponent* HitArea = nullptr;
 
@@ -18,13 +33,19 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	bool isAttacking = false;
 
-	UStunStick(const FObjectInitializer& ObjectInitializer);
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Setup")
+	TArray<TSubclassOf<AActor>> EnemyHittable;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Setup")
+	UParticleSystem* particleEffect = nullptr;
+
+	UBaton(const FObjectInitializer& ObjectInitializer);
 
 	virtual void BeginPlay() override;
 
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
-	virtual void Fire() override;
+	void MUlFire_Implementation() override;
 
 	UFUNCTION()
 	void OnHitTriggerOverlapBegin(class UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, class UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
@@ -42,7 +63,11 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void deactivateTrigger();
 
-	UFUNCTION(NetMulticast, Reliable, BlueprintCallable)
-	void MUlToggleVisibility(bool visible);
-	void MUlToggleVisibility_Implementation(bool visible);
+	void MUlToggleVisibility_Implementation(bool visible) override;
+
+	bool CheckHittableActor(AActor* pActorToCheck);
+
+	void HitEntity(class AGamePlayerController* PlayerController, AActor* pActorToHit);
+
+	void UpdateUI_Implementation() override;
 };
