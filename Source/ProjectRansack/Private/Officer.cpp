@@ -16,8 +16,10 @@
 #include <GamePlayerController.h>
 #include <HelperClass.h>
 #include "CameraCompOfficer.h"
-#include "StunStick.h"
 #include <Components/BoxComponent.h>
+#include "Equipement.h"
+#include "Baton.h"
+#include "Gun.h"
 
 AOfficer::AOfficer(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
 {
@@ -28,11 +30,6 @@ AOfficer::AOfficer(const FObjectInitializer& ObjectInitializer) : Super(ObjectIn
 
 	flashLight = CreateDefaultSubobject<USpotLightComponent>(TEXT("FlashLight"));
 	flashLight->SetupAttachment((USceneComponent*)cameraComponent->camera);
-
-	sensorGadgetOfficer = CreateDefaultSubobject<USensorGadgetOfficerComponent>(TEXT("Sensor Gadget Component"));
-
-	StunStick = CreateDefaultSubobject<UStunStick>(TEXT("StunBaton"));
-	StunStick->SetupAttachment(GetMesh(), FName("RightHandSocket"));
 
 	HasMagnetCard = true;
 
@@ -50,7 +47,6 @@ void AOfficer::BeginPlay()
 	CreateTimeline();
 	SendDataToComponents();
 	flashLight->SetIntensity(0.f);
-	sensorGadgetOfficer->ToggleEnable(false);
 	GetMesh()->SetOwnerNoSee(true); 
 	SetupNotificationUI();
 
@@ -59,7 +55,7 @@ void AOfficer::BeginPlay()
 	HelperClass::deactivateTrigger(StunArea);
 	StunAreaActivate = false;
 
-	StunWeapon->maxAmmo = StunWeapon->ammo = officerTableInstance->MaxGunAmmo;
+	equipement->StunWeapon->maxAmmo = equipement->StunWeapon->ammo = officerTableInstance->MaxGunAmmo;
 }
 
 void AOfficer::Tick(float DeltaTime)
@@ -96,9 +92,6 @@ void AOfficer::Tick(float DeltaTime)
 			ui->SetProgress(HelperClass::mapValue(arrestTime, 0, TimeToArrestThief, 0, 1));
 		}
 	}
-
-	if (usingSensorGadget)
-		sensorGadgetOfficer->updatePosing(cameraComponent->camera->GetComponentLocation(), cameraComponent->camera->GetForwardVector());
 }
 
 void AOfficer::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
@@ -121,7 +114,8 @@ void AOfficer::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 void AOfficer::SendDataToComponents()
 {
 	ABase3C::SendDataToComponents();
-	sensorGadgetOfficer->fetchData(officerTableInstance->Range, officerTableInstance->RevealTime, officerTableInstance->MaxAmountOfSensors);
+
+	equipement->sensorGadgetOfficer->fetchData(officerTableInstance->Range, officerTableInstance->RevealTime, officerTableInstance->MaxAmountOfSensors);
 }
 
 void AOfficer::CreateTimeline() //Timeline is used for the motion vision to change between states
@@ -168,24 +162,8 @@ void AOfficer::MulReset_Implementation(FTransform transform)
 	Super::MulReset_Implementation(transform);
 }
 
-void AOfficer::ChangeStencilOnMovement() //Reveals enemies when motion vision is active
+void AOfficer::ChangeStencilOnMovement()
 {
-	/*if (Revealed)
-	{
-		return;
-	}
-		
-
-	if (GetVelocity().Length() > 0)
-	{
-		if (GetMesh())
-			GetMesh()->SetCustomDepthStencilValue(officerTableInstance->MotionSensorStencilBufNumber);
-	}
-	else
-	{
-		if (GetMesh())
-			GetMesh()->SetCustomDepthStencilValue(0);
-	}*/
 }
 
 void AOfficer::SetOfficerSensorScalor_Implementation(int newValue) //TODO Destroy officerSensor variable
@@ -237,20 +215,23 @@ void AOfficer::SensorGadgetAction() //Reacts to the input of SensorGadget
 	if (isPaused)
 		return;
 
-	if (currentState == CharacterState::SensorGadget || !sensorGadgetOfficer->HasUnusedSensor())
+	AGamePlayerController* playerController = Cast<AGamePlayerController>(GetController());
+	if (playerController == nullptr)
+		return;
+
+	if (equipement->equippedWeapon == equipement->sensorGadgetOfficer)
 	{
-		currentState = CharacterState::Gun;
-		usingSensorGadget = false;
-		sensorGadgetOfficer->ToggleEnable(false);
-		WidgetUI->ShowGunEquipped();
+		IWeapon::Execute_UpdateUI(equipement->StunWeapon->_getUObject());
+		equipement->EquipWeapon(equipement->StunWeapon);
 	}
 	else
 	{
-		currentState = CharacterState::SensorGadget;
-		sensorGadgetOfficer->ToggleEnable(true);
-		usingSensorGadget = true;
-		WidgetUI->ShowSensorEquipped();
+		IWeapon::Execute_UpdateUI(equipement->sensorGadgetOfficer->_getUObject());
+		equipement->EquipWeapon(equipement->sensorGadgetOfficer);
 	}
+
+	playerController->SREquipWeapon(equipement, equipement->sensorGadgetOfficer);
+	
 }
 
 void AOfficer::ToggleEquipStunBaton()
@@ -258,22 +239,22 @@ void AOfficer::ToggleEquipStunBaton()
 	if (isPaused)
 		return;
 
-	if (currentState == CharacterState::Baton)
-	{
-		currentState = CharacterState::Gun;
-		WidgetUI->ShowGunEquipped();
-	}
-	else
-	{
-		currentState = CharacterState::Baton;
-		WidgetUI->ShowStunBattonEquiped();
-	}
-
 	AGamePlayerController* playerController = Cast<AGamePlayerController>(GetController());
 	if (playerController == nullptr)
 		return;
 
-	playerController->MUlToggleEquipStunBaton(StunStick, currentState == CharacterState::Baton);
+	if (equipement->equippedWeapon == equipement->StunStick)
+	{
+		IWeapon::Execute_UpdateUI(equipement->StunWeapon->_getUObject());
+		equipement->EquipWeapon(equipement->StunWeapon);
+	}
+	else
+	{
+		IWeapon::Execute_UpdateUI(equipement->StunStick->_getUObject());
+		equipement->EquipWeapon(equipement->StunStick);
+	}
+
+	playerController->SREquipWeapon(equipement, equipement->StunStick);
 }
 
 void AOfficer::Fire()
@@ -287,22 +268,11 @@ void AOfficer::Fire()
 	if (ItemUsing != nullptr)
 		return;
 
-	if (currentState == CharacterState::SensorGadget)
-	{
-		sensorGadgetOfficer->Place();
-	
-		if (!sensorGadgetOfficer->HasUnusedSensor())
-			SensorGadgetAction();
-	}
-	else if (currentState == CharacterState::Baton)
-		StunStick->Fire();
-	else if (currentState == CharacterState::Gun)
-	{
-		StunWeapon->Fire();
-		
-		//Ugly hack to trigger overlap event if actor is already in trigger volume
-		TryGeneratingOverlapEvent();
-	}
+	AGamePlayerController* playerController = Cast<AGamePlayerController>(GetController());
+	if (playerController == nullptr)
+		return;
+
+	playerController->SRFire(equipement);
 }
 
 void AOfficer::Interact()
@@ -431,9 +401,9 @@ void AOfficer::OnStunTriggerOverlapEnd(UPrimitiveComponent* OverlappedComp, AAct
 	}
 }
 
-void AOfficer::ClientFreezeInput_Implementation(float duration, AActor* pActor)
+void AOfficer::ClientFreezeInput_Implementation(float duration, FVector DamageActorLocation)
 {
-	Super::ClientFreezeInput_Implementation(duration, pActor);
+	Super::ClientFreezeInput_Implementation(duration, DamageActorLocation);
 	SRActivateStunTrigger();
 }
 
@@ -468,8 +438,6 @@ void AOfficer::ToggleMagnetCardIU_Implementation()
 
 void AOfficer::ReloadGun()
 {
-	if (currentState != CharacterState::Gun || StunWeapon->isReloading || StunWeapon->isFull())
-		return;
-	
-	StunWeapon->Reload();
+	if (equipement->equippedWeapon == equipement->StunWeapon && !equipement->StunWeapon->isFull())
+		equipement->StunWeapon->Reload();
 }

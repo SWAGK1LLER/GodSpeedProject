@@ -5,6 +5,9 @@
 #include "Camera/CameraComponent.h"
 #include "Components/StaticMeshComponent.h"
 #include <Thief.h>
+#include <GamePlayerController.h>
+#include "Engine/Texture2D.h"
+#include "Equipement.h"
 
 UGrenadeTrajectory::UGrenadeTrajectory()
 {
@@ -13,6 +16,7 @@ UGrenadeTrajectory::UGrenadeTrajectory()
 	niagara = CreateDefaultSubobject<UNiagaraComponent>(TEXT("Trajectory"));
 
 	mesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("MeshExposed"));
+	owner = Cast<ABase3C>(GetOwner());
 }
 
 void UGrenadeTrajectory::FinishAttachment(USceneComponent* root, UCameraComponent* pCamera)
@@ -33,6 +37,12 @@ void UGrenadeTrajectory::BeginPlay()
 	Super::BeginPlay();
 
 	mesh->SetVisibility(false);
+
+	AController* controller = owner->GetController();
+	if (controller == nullptr || !controller->IsLocalPlayerController())
+		return;
+
+	pcCache = Cast<AGamePlayerController>(controller);
 }
 
 void UGrenadeTrajectory::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
@@ -81,19 +91,24 @@ void UGrenadeTrajectory::PredictGrenade()
 
 void UGrenadeTrajectory::ThrowGrenade()
 {
-	if (timer > 0 || ammo == 0)
+	if (timer > 0 || *currentAmmo == 0)
 		return;
 
 	timer = 0.1;
-	ammo--;
+	(*currentAmmo)--;
 
-	AGrenade* newGrenade = GetWorld()->GetWorld()->SpawnActor<AGrenade>(GrenadeClass, mesh->GetComponentLocation(), FRotator(), FActorSpawnParameters());
+	AGrenade* newGrenade = GetWorld()->GetWorld()->SpawnActor<AGrenade>(*GrenadeClass, mesh->GetComponentLocation(), FRotator(), FActorSpawnParameters());
 	newGrenade->SetVelocity(throwingVelo);
 }
 
 void UGrenadeTrajectory::MUlToggleVisibility_Implementation(bool visible)
 {
 	mesh->SetVisibility(visible);
+
+	if (pcCache == nullptr || !pcCache->IsLocalPlayerController())
+		return;
+
+	CLTogglePredictPath(visible);
 }
 
 void UGrenadeTrajectory::CLTogglePredictPath(bool visible)
@@ -106,15 +121,25 @@ void UGrenadeTrajectory::CLTogglePredictPath(bool visible)
 	}
 }
 
-void UGrenadeTrajectory::StarThrow()
+void UGrenadeTrajectory::MUlFire_Implementation()
 {
 	isThrowing = true;
 	throwPosition = mesh->GetComponentLocation();
-	PredictionPositions.Empty();
-	UNiagaraDataInterfaceArrayFunctionLibrary::SetNiagaraArrayVector(niagara, FName("Positions"), PredictionPositions);
+
+	owner->MUlThrowGrenade();
 }
 
 void UGrenadeTrajectory::EndThrow()
 {
 	isThrowing = false;
+}
+
+void UGrenadeTrajectory::UpdateUI_Implementation()
+{
+	owner->WidgetUI->ShowGrenade(uiTexture);
+}
+
+bool UGrenadeTrajectory::IsSameGrenadeClass()
+{
+	return CurrentGrenadeClass == previousGrenadeClass;
 }

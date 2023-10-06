@@ -60,5 +60,5 @@ public:
 
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
-	void ShowDamage(class AActor* DamageActor);
+	void ShowDamage(FVector DamageActorLocation);
 };

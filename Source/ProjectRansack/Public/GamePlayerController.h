@@ -7,6 +7,7 @@
 #include "RespawnUI.h"
 #include "Blueprint/UserWidget.h"
 #include <GamePauseMenu.h>
+#include "Weapon.h"
 #include "GamePlayerController.generated.h"
 
 UCLASS()
@@ -106,8 +107,8 @@ public:
 
 
 	UFUNCTION(Server, Reliable, BlueprintCallable)
-	void SRFreezeInput(float duration, ABase3C* actor, AActor* pActor);
-	void SRFreezeInput_Implementation(float duration, ABase3C* actor, AActor* pActor);
+	void SRFreezeInput(float duration, ABase3C* actor, FVector DamageActorLocation);
+	void SRFreezeInput_Implementation(float duration, ABase3C* actor, FVector DamageActorLocation);
 
 	UFUNCTION(Server, Reliable, BlueprintCallable)
 	void CameraFreezeInput(AActor* actor);
@@ -199,16 +200,20 @@ public:
 	void MUlSetRot_Implementation(class UCameraCompThief* comp, FRotator rot);
 
 	UFUNCTION(Server, Reliable, BlueprintCallable)
-	void MUlPlayAttackAnim(class UStunStick* comp);
-	void MUlPlayAttackAnim_Implementation(class UStunStick* comp);
+	void MUlPlayAttackAnim(class UBaton* comp);
+	void MUlPlayAttackAnim_Implementation(class UBaton* comp);
 
 	UFUNCTION(Server, Reliable, BlueprintCallable)
-	void MUlToggleEquipStunBaton(class UStunStick* comp, bool visibility);
-	void MUlToggleEquipStunBaton_Implementation(class UStunStick* comp, bool visibility);
+	void SREquipWeapon(class UEquipement* equip, const TScriptInterface<IWeapon>& weapon);
+	void SREquipWeapon_Implementation(class UEquipement* equip, const TScriptInterface<IWeapon>& comp);
 
 	UFUNCTION(Server, Reliable, BlueprintCallable)
-	void MUlToggleEquipGrenade(class UGrenadeTrajectory* comp, bool visibility);
-	void MUlToggleEquipGrenade_Implementation(class UGrenadeTrajectory* comp, bool visibility);
+	void SRFire(class UEquipement* equip);
+	void SRFire_Implementation(class UEquipement* equip);
+
+	UFUNCTION(Server, Reliable, BlueprintCallable)
+	void SpawnDecoy(TSubclassOf<class ADecoyActor> DecoyActorClass, FVector location, FRotator rotation);
+	void SpawnDecoy_Implementation(TSubclassOf<class ADecoyActor> DecoyActorClass, FVector location, FRotator rotation);
 
 	UFUNCTION(Server, Reliable, BlueprintCallable)
 	void SRDisableSystem(class AProtectionLoot* actor);
@@ -223,10 +228,6 @@ public:
 	void TryToggleCover_Implementation(class AThief* thief);
 
 	UFUNCTION(Server, Reliable, BlueprintCallable)
-	void SRThrowGrenade(class AThief* thief);
-	void SRThrowGrenade_Implementation(class AThief* thief);
-
-	UFUNCTION(Server, Reliable, BlueprintCallable)
-	void SpawnDecoy(TSubclassOf<class ADecoyActor> DecoyActorClass, FVector location, FRotator rotation);
-	void SpawnDecoy_Implementation(TSubclassOf<class ADecoyActor> DecoyActorClass, FVector location, FRotator rotation);
+	void SetGrenade(class UEquipement* equip, enum GrenadeType grenade);
+	void SetGrenade_Implementation(class UEquipement* equip, enum GrenadeType grenade);
 };

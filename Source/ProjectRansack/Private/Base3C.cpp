@@ -13,16 +13,16 @@
 #include "DamageIndicatorComp.h"
 #include "GamePlayerController.h"
 #include "Components/AudioComponent.h"
+#include "Equipement.h"
+#include "GrenadeTrajectory.h"
 
 ABase3C::ABase3C(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
 {
  	PrimaryActorTick.bCanEverTick = true;
 	bReplicates = true;
 
-	currentState = CharacterState::Gun;
-
-	StunWeapon = CreateDefaultSubobject<UStunWeapon>(TEXT("StunWeapon"));
-	StunWeapon->SetupAttachment(GetMesh());
+	equipement = CreateDefaultSubobject<UEquipement>(TEXT("equipement"));
+	equipement->RegisterComponent();
 
 	audioComp = CreateDefaultSubobject<UAudioComponent>(TEXT("Audio"));
 
@@ -34,6 +34,7 @@ void ABase3C::BeginPlay()
 	Super::BeginPlay();
 
 	SpawnTransform = GetActorTransform();
+	equipement->FinishAttachement(GetMesh());
 
 	if(!CreateTableInstance())
 		return;
@@ -132,10 +133,10 @@ void ABase3C::MulticastSetClientNickname_Implementation(const FString& pNickName
 	nickName = pNickName;
 }
 
-void ABase3C::ClientFreezeInput_Implementation(float duration, AActor* pActor)
+void ABase3C::ClientFreezeInput_Implementation(float duration, FVector DamageActorLocation)
 {
 	if (GetController() != nullptr && GetController()->IsLocalPlayerController())
-		damageIndicator->ShowDamage(pActor);
+		damageIndicator->ShowDamage(DamageActorLocation);
 
 	// Can not freeze again someone already freeze to reset count down
 	if (bFreezeInput)
@@ -194,7 +195,10 @@ void ABase3C::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 		EnhancedInputComponent->BindAction(tableInstance->TabAction, ETriggerEvent::Completed, this, &ABase3C::StopTab);
 		
 		EnhancedInputComponent->BindAction(tableInstance->PauseAction, ETriggerEvent::Started, this, &ABase3C::TogglePauseMenu);
+
+		equipement->BindBeltKey(EnhancedInputComponent, tableInstance);
 	}
+	
 	cameraComponent->SetupInputComponent(PlayerInputComponent, tableInstance->lookAction);
 }
 
@@ -264,13 +268,11 @@ void ABase3C::Fire()
 	if (bFreezeInput)
 		return;
 
-	if (currentState == CharacterState::Gun)
-	{
-		StunWeapon->Fire();
+	AGamePlayerController* playerController = Cast<AGamePlayerController>(GetController());
+	if (playerController == nullptr)
+		return;
 
-		//Ugly hack to trigger overlap event if actor is already in trigger volume
-		TryGeneratingOverlapEvent();
-	}
+	playerController->SRFire(equipement);
 }
 
 void ABase3C::SRStartSprinting_Implementation()
@@ -391,4 +393,23 @@ void ABase3C::PlayFootstep()
 		return;
 
 	audioComp->Play();
+}
+
+void ABase3C::MUlThrowGrenade_Implementation()
+{
+	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
+	if (AnimInstance->Montage_IsPlaying(GrenadeThrowMontage))
+		return;
+
+	AnimInstance->Montage_Play(GrenadeThrowMontage);
+}
+
+void ABase3C::ThrowGrenade()
+{
+	equipement->GrenateTrajectory->ThrowGrenade();
+}
+
+void ABase3C::ThrowFinish()
+{
+	equipement->GrenateTrajectory->EndThrow();
 }

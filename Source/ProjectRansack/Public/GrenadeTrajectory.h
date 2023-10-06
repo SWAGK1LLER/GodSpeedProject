@@ -4,11 +4,12 @@
 #include "Components/ActorComponent.h"
 #include "Components/SceneComponent.h"
 #include "Grenade.h"
+#include "Weapon.h"
 #include "GrenadeTrajectory.generated.h"
 
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
-class PROJECTRANSACK_API UGrenadeTrajectory : public UActorComponent
+class PROJECTRANSACK_API UGrenadeTrajectory : public UActorComponent, public IWeapon
 {
 	GENERATED_BODY()
 
@@ -16,8 +17,13 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	class UStaticMeshComponent* mesh = nullptr;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	TSubclassOf<AGrenade> GrenadeClass;
+	TSubclassOf<AGrenade>* GrenadeClass;
+	enum GrenadeType previousGrenadeClass;
+	enum GrenadeType CurrentGrenadeClass;
+
+	class UTexture2D* uiTexture = nullptr;
+
+	int* currentAmmo = nullptr;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	class UNiagaraComponent* niagara = nullptr;
@@ -32,9 +38,6 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	float radius = 10;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	int ammo = 3;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
 	class UCameraComponent* camera;
@@ -55,6 +58,9 @@ public:
 
 	bool isLocalComp = false;
 
+	class ABase3C* owner = nullptr;
+	class AGamePlayerController* pcCache = nullptr;
+
 	UGrenadeTrajectory();
 
 	void SetIslocalController(bool local);
@@ -65,17 +71,24 @@ public:
 
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
-	void StarThrow();
 	void EndThrow();
 
 	void PredictGrenade();
 	void ThrowGrenade();
 
-	UFUNCTION(NetMulticast, Reliable, BlueprintCallable)
-	void MUlToggleVisibility(bool visible);
-	void MUlToggleVisibility_Implementation(bool visible);
-
 	//UFUNCTION(Client, Reliable, BlueprintCallable)
 	void CLTogglePredictPath(bool visible);
 	//void CLTogglePredictPath_Implementation(bool visible);
+
+	UFUNCTION(NetMulticast, Reliable, NotBlueprintable)
+	virtual void MUlToggleVisibility(bool visible);
+	virtual void MUlToggleVisibility_Implementation(bool visible);
+
+	UFUNCTION(NetMulticast, Reliable, NotBlueprintable)
+	virtual void MUlFire();
+	virtual void MUlFire_Implementation();
+
+	void UpdateUI_Implementation() override;
+
+	bool IsSameGrenadeClass();
 };

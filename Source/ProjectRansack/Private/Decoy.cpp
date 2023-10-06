@@ -1,5 +1,5 @@
 #include "Decoy.h"
-#include "Thief.h"
+#include "Base3C.h"
 #include "Camera/CameraComponent.h"
 #include "CameraComp.h"
 #include "DecoyActor.h"
@@ -8,47 +8,45 @@
 
 UDecoy::UDecoy()
 {
-	PrimaryComponentTick.bCanEverTick = true;
-}
-
-void UDecoy::SetupComp(AThief* pThief)
-{
-	owner = pThief;
+	PrimaryComponentTick.bCanEverTick = false;
+	owner = Cast<ABase3C>(GetOwner());
 }
 
 void UDecoy::BeginPlay()
 {
 	Super::BeginPlay();
+
+	AController* controller = owner->GetController();
+	if (controller == nullptr || !controller->IsLocalPlayerController())
+		return;
+
+	pcCache = Cast<AGamePlayerController>(controller);
 }
 
 void UDecoy::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
-	
-	timer -= DeltaTime;
 }
 
 void UDecoy::SpawnDecoy()
 {
-	/*if (timer > 0)
-		return;*/
-	
-	//timer = 0.2f;
-	
-	AController* controller = owner->GetController();
-	if (controller == nullptr || !controller->IsLocalPlayerController())
+	if (pcCache == nullptr || !pcCache->IsLocalPlayerController())
 		return;
-
-
 	FVector velocityoffSet = owner->GetActorForwardVector() * 50;
 
 	FRotator cam = owner->cameraComponent->camera->GetForwardVector().Rotation();
 	cam.Roll = 0;
 	cam.Pitch = 0;
 
-	AGamePlayerController* pc = Cast<AGamePlayerController>(controller);
-	pc->SpawnDecoy(DecoyActorClass, owner->GetActorLocation() + velocityoffSet, cam);
+	pcCache->SpawnDecoy(DecoyActorClass, owner->GetActorLocation() + velocityoffSet, cam);
+}
 
-	/*ADecoyActor* actor = GetWorld()->GetWorld()->SpawnActor<ADecoyActor>(DecoyActorClass, owner->GetActorLocation() + velocityoffSet, cam, FActorSpawnParameters());
-	actor->GetMovementComponent()->Velocity = owner->GetMovementComponent()->Velocity;*/
+void UDecoy::MUlFire_Implementation()
+{
+	SpawnDecoy();
+}
+
+void UDecoy::UpdateUI_Implementation()
+{
+	owner->WidgetUI->ShowDecoy();
 }

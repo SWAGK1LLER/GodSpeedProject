@@ -58,16 +58,15 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
 	class UInputAction* PauseAction = nullptr;
-};
 
-UENUM()
-enum CharacterState
-{
-	Gun		UMETA(DisplayName = "Gun"),
-	Grenade		UMETA(DisplayName = "Grenade"),
-	Baton	UMETA(DisplayName = "Baton"),
-	SensorGadget	UMETA(DisplayName = "SensorGadget"),
-	Decoy	UMETA(DisplayName = "DecoyGadget")
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
+	class UInputAction* Belt1Action = nullptr;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
+	class UInputAction* Belt2Action = nullptr;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
+	class UInputAction* Belt3Action = nullptr;
 };
 
 UCLASS()
@@ -88,11 +87,11 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = damage, meta = (AllowPrivateAccess = "true"))
 	class UDamageIndicatorComp* damageIndicator = nullptr;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = weapon, meta = (AllowPrivateAccess = "true"))
-	class UStunWeapon* StunWeapon = nullptr;
-
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = sound, meta = (AllowPrivateAccess = "true"))
 	class UAudioComponent* audioComp = nullptr;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	class UEquipement* equipement = nullptr;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	FString nickName = "";
@@ -106,8 +105,6 @@ public:
 	FBase3CTable* tableInstance = nullptr;
 
 	float normalWalkSpeed;
-
-	CharacterState currentState;
 
 	bool bFreezeInput = true;
 	float FreezeDuration = -1;
@@ -123,6 +120,9 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	bool bIsRunning = false;
+
+	UPROPERTY(Category = "Animation", EditDefaultsOnly)
+	class UAnimMontage* GrenadeThrowMontage;
 
 	ABase3C(const FObjectInitializer& ObjectInitializer);
 
@@ -149,8 +149,8 @@ public:
 	void MulticastSetClientNickname_Implementation(const FString& pNickName);
 
 	UFUNCTION(NetMulticast, Reliable, BlueprintCallable)
-	void ClientFreezeInput(float duration, AActor* pActor);
-	virtual void ClientFreezeInput_Implementation(float duration, AActor* pActor);
+	void ClientFreezeInput(float duration, FVector DamageActorLocation);
+	virtual void ClientFreezeInput_Implementation(float duration, FVector DamageActorLocation);
 
 	UFUNCTION(NetMulticast, Reliable, BlueprintCallable)
 	void UnFreezeInput();
@@ -220,4 +220,14 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 	void PlayFootstep();
+
+	UFUNCTION(NetMulticast, Reliable, BlueprintCallable)
+	void MUlThrowGrenade();
+	void MUlThrowGrenade_Implementation();
+
+	UFUNCTION(BlueprintCallable)
+	void ThrowGrenade();
+
+	UFUNCTION(BlueprintCallable)
+	void ThrowFinish();
 };

@@ -38,12 +38,6 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
 	class UInputAction* coverAction = nullptr;
-
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
-	class UInputAction* GrenadeAction = nullptr;
-
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
-	class UInputAction* DecoyAction = nullptr;
 };
 
 UCLASS()
@@ -88,15 +82,6 @@ public:
 
 	UPROPERTY(BlueprintReadWrite, VisibleAnywhere)
 	class UMyCharacterMovementComponent* MovementComponent;
-
-	UPROPERTY(BlueprintReadWrite, VisibleAnywhere)
-	class UGrenadeTrajectory* GrenateTrajectory;
-
-	UPROPERTY(Category = "Animation", EditDefaultsOnly)
-	class UAnimMontage* GrenadeThrowMontage;
-
-	UPROPERTY(BlueprintReadWrite, VisibleAnywhere)
-	class UDecoy* decoyGadget;
 
 	bool forceCrouch = false;
 
@@ -190,7 +175,7 @@ public:
 	virtual void Tab() override;
 	virtual void StopTab() override;
 
-	void ClientFreezeInput_Implementation(float duration, AActor* pActor) override;
+	void ClientFreezeInput_Implementation(float duration, FVector DamageActorLocation) override;
 
 	virtual void UnFreezeInput_Implementation() override;
 
@@ -206,19 +191,4 @@ public:
 
 	UFUNCTION()
 	void OnArrestTriggerOverlapEnd(class UPrimitiveComponent* OverlappedComp, AActor* OtherActor, class UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);
-
-	void ToggleEquipGrenade();
-
-	UFUNCTION(NetMulticast, Reliable, BlueprintCallable)
-	void MUlThrowGrenade();
-	void MUlThrowGrenade_Implementation();
-
-	UFUNCTION(BlueprintCallable)
-	void ThrowGrenade();
-
-	UFUNCTION(BlueprintCallable)
-	void ThrowFinish();
-
-	UFUNCTION(BlueprintCallable)
-	void ToggleDecoyGadget();
 };

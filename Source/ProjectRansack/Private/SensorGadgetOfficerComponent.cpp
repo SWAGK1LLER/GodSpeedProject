@@ -1,10 +1,13 @@
 #include "SensorGadgetOfficerComponent.h"
 #include "Materials/Material.h"
 #include "SensorGadget.h"
+#include "CameraComp.h"
+#include "Camera/CameraComponent.h"
+#include "PlayerUI.h"
 
 USensorGadgetOfficerComponent::USensorGadgetOfficerComponent()
 {
-	PrimaryComponentTick.bCanEverTick = true;
+	PrimaryComponentTick.bCanEverTick = false;
 	
 	sensorGadgetOfficerMesh1 = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("SensorGadgetMesh1"));
 
@@ -15,6 +18,15 @@ USensorGadgetOfficerComponent::USensorGadgetOfficerComponent()
 
 	sensorGadgetOfficerMesh2->SetCollisionResponseToChannel(ECollisionChannel::ECC_Pawn, ECollisionResponse::ECR_Overlap);
 	sensorGadgetOfficerMesh2->SetCollisionResponseToChannel(ECollisionChannel::ECC_WorldStatic, ECollisionResponse::ECR_Overlap);
+
+	sensorGadgetOfficerMesh1->SetVisibility(false);
+	sensorGadgetOfficerMesh2->SetVisibility(false);
+}
+
+void USensorGadgetOfficerComponent::Tick_Implementation(float delta)
+{
+	AOfficer* officer = Cast<AOfficer>(GetOwner());
+	updatePosing(officer->cameraComponent->camera->GetComponentLocation(), officer->cameraComponent->camera->GetForwardVector());
 }
 
 void USensorGadgetOfficerComponent::fetchData(float pRange, float pRevealTime, unsigned int pMaxSensors)
@@ -30,15 +42,6 @@ void USensorGadgetOfficerComponent::updatePosing(FVector CamLocation, FVector Ca
 	state = state && ValidSecondPosition(sensorGadgetOfficerMesh1->GetComponentLocation(), MeshNormal);
 
 	ChangeMaterial(state);
-}
-
-void USensorGadgetOfficerComponent::ToggleEnable(bool Enabled)
-{
-	if (!sensorGadgetOfficerMesh1 || !sensorGadgetOfficerMesh2)
-		return;
-
-	sensorGadgetOfficerMesh1->SetVisibility(Enabled);
-	sensorGadgetOfficerMesh2->SetVisibility(Enabled);
 }
 
 bool USensorGadgetOfficerComponent::ValidFirstPosition(FVector CamLocation, FVector CamForward)
@@ -60,7 +63,7 @@ bool USensorGadgetOfficerComponent::ValidFirstPosition(FVector CamLocation, FVec
 		if (Cast<ASensorGadget>(Hit.GetActor()) != nullptr)
 			return false;
 
-		ToggleEnable(true);
+		MUlToggleVisibility(true);
 
 		MeshNormal = Hit.ImpactNormal;
 		FRotator Rotation = FRotationMatrix::MakeFromX(MeshNormal).Rotator();
@@ -78,7 +81,7 @@ bool USensorGadgetOfficerComponent::ValidFirstPosition(FVector CamLocation, FVec
 		return true;
 	}
 
-	ToggleEnable(false);
+	MUlToggleVisibility(false);
 	CanPlace = false;
 
 	return false;
@@ -135,18 +138,6 @@ void USensorGadgetOfficerComponent::ChangeMaterial(bool approved)
 	}
 }
 
-void USensorGadgetOfficerComponent::Place()
-{
-	if (!CanPlace || sensorsUsed >= maxSensors)
-		return;
-
-	sensorsUsed++;
-
-	ServerSpawnSensor(firstLocation, firstRotation, secondLocation, secondRotation, Cast<AOfficer>(GetOwner()));
-
-	CanPlace = false;
-}
-
 void USensorGadgetOfficerComponent::ServerSpawnSensor_Implementation(FVector pfirstLocation, FRotator pfirstRotation, FVector psecondLocation, FRotator psecondRotation, AOfficer* pOwner)
 {
 	FActorSpawnParameters SpawnInfo;
@@ -165,4 +156,30 @@ void USensorGadgetOfficerComponent::ServerSpawnSensor_Implementation(FVector pfi
 bool USensorGadgetOfficerComponent::HasUnusedSensor() 
 { 
 	return sensorsUsed < maxSensors; 
+}
+
+void USensorGadgetOfficerComponent::MUlToggleVisibility_Implementation(bool visible)
+{
+	if (!sensorGadgetOfficerMesh1 || !sensorGadgetOfficerMesh2)
+		return;
+
+	sensorGadgetOfficerMesh1->SetVisibility(visible);
+	sensorGadgetOfficerMesh2->SetVisibility(visible);
+}
+
+void USensorGadgetOfficerComponent::MUlFire_Implementation()
+{
+	if (!CanPlace || sensorsUsed >= maxSensors)
+		return;
+
+	sensorsUsed++;
+
+	ServerSpawnSensor(firstLocation, firstRotation, secondLocation, secondRotation, Cast<AOfficer>(GetOwner()));
+
+	CanPlace = false;
+}
+
+void USensorGadgetOfficerComponent::UpdateUI_Implementation()
+{
+	Cast<ABase3C>(GetOwner())->WidgetUI->ShowSensorEquipped();
 }

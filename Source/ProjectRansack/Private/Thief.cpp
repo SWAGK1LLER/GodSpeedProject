@@ -19,6 +19,7 @@
 #include "Camera/CameraComponent.h"
 #include "Animation/AnimInstance.h"
 #include "Decoy.h"
+#include "Equipement.h"
 
 AThief::AThief(const FObjectInitializer& ObjectInitializer)
 	: Super(ObjectInitializer.SetDefaultSubobjectClass<UMyCharacterMovementComponent>(ACharacter::CharacterMovementComponentName))
@@ -33,12 +34,6 @@ AThief::AThief(const FObjectInitializer& ObjectInitializer)
 	ArrestArea = CreateDefaultSubobject<UBoxComponent>(FName("ArrestArea"));
 	ArrestArea->SetGenerateOverlapEvents(true);
 	ArrestArea->SetupAttachment(RootComponent);
-
-	GrenateTrajectory = CreateDefaultSubobject<UGrenadeTrajectory>(TEXT("Grenate Trajectory"));
-	GrenateTrajectory->FinishAttachment(GetMesh(), cameraComponent->camera);
-
-	decoyGadget = CreateDefaultSubobject<UDecoy>(TEXT("Decoy Gadget"));
-	decoyGadget->SetupComp(this);
 
 	MovementComponent = Cast<UMyCharacterMovementComponent>(GetCharacterMovement());
 }
@@ -116,7 +111,6 @@ void AThief::Tick(float DeltaTime)
 void AThief::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
-	Super::SetupPlayerInputComponent(PlayerInputComponent);
 
 	CreateTableInstance();
 
@@ -129,9 +123,6 @@ void AThief::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 		
 		EnhancedInputComponent->BindAction(thiefTableInstance->climbAction, ETriggerEvent::Started, this, &AThief::Climb);
 		EnhancedInputComponent->BindAction(thiefTableInstance->coverAction, ETriggerEvent::Started, this, &AThief::Cover);
-
-		EnhancedInputComponent->BindAction(thiefTableInstance->GrenadeAction, ETriggerEvent::Started, this, &AThief::ToggleEquipGrenade);
-		EnhancedInputComponent->BindAction(thiefTableInstance->DecoyAction, ETriggerEvent::Started, this, &AThief::ToggleDecoyGadget);
 	}
 }
 
@@ -520,9 +511,9 @@ void AThief::StopTab()
 		PC->ToogleTeamDuffleBagUI(false);
 }
 
-void AThief::ClientFreezeInput_Implementation(float duration, AActor* pActor)
+void AThief::ClientFreezeInput_Implementation(float duration, FVector DamageActorLocation)
 {
-	Super::ClientFreezeInput_Implementation(duration, pActor);
+	Super::ClientFreezeInput_Implementation(duration, DamageActorLocation);
 	SRActivateArrestTrigger();
 }
 
@@ -667,30 +658,6 @@ void AThief::SetClientUI_Implementation()
 	ArrestUISelf->AddToViewport();
 }
 
-void AThief::ToggleEquipGrenade()
-{
-	if (isPaused)
-		return;
-
-	if (currentState == CharacterState::Grenade || GrenateTrajectory->ammo == 0)
-	{
-		currentState = CharacterState::Gun;
-		WidgetUI->ShowGunEquipped();
-	}
-	else
-	{
-		currentState = CharacterState::Grenade;
-		WidgetUI->ShowGrenade();
-	}
-
-	AGamePlayerController* playerController = Cast<AGamePlayerController>(GetController());
-	if (playerController == nullptr)
-		return;
-
-	playerController->MUlToggleEquipGrenade(GrenateTrajectory, currentState == CharacterState::Grenade);
-	GrenateTrajectory->CLTogglePredictPath(currentState == CharacterState::Grenade);
-}
-
 void AThief::Fire()
 {
 	if (isPaused)
@@ -702,72 +669,12 @@ void AThief::Fire()
 	if (ItemUsing != nullptr)
 		return;
 
-	if (currentState == CharacterState::Gun)
-	{
-		Super::Fire();
-	}
-	else if (currentState == CharacterState::Grenade)
-	{
-		AGamePlayerController* playerController = Cast<AGamePlayerController>(GetController());
-		if (playerController == nullptr)
-			return;
-
-		if (GrenateTrajectory->ammo - 1 == 0)
-			ToggleEquipGrenade();
-
-		playerController->SRThrowGrenade(this);
-	}
-	else if (currentState == CharacterState::Decoy)
-	{
-		decoyGadget->SpawnDecoy();
-	}
-}
-
-void AThief::MUlThrowGrenade_Implementation()
-{
-	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
-	if (AnimInstance->Montage_IsPlaying(GrenadeThrowMontage))
+	if (ItemUsing != nullptr)
 		return;
 
-	AnimInstance->Montage_Play(GrenadeThrowMontage);
-	GrenateTrajectory->StarThrow();
-}
-
-void AThief::ThrowGrenade()
-{
-	GrenateTrajectory->ThrowGrenade();
-}
-
-void AThief::ThrowFinish()
-{
-	GrenateTrajectory->EndThrow();
-}
-
-void AThief::ToggleDecoyGadget()
-{
-	if (isPaused)
+	AGamePlayerController* playerController = Cast<AGamePlayerController>(GetController());
+	if (playerController == nullptr)
 		return;
 
-	if (currentState == CharacterState::Decoy/* || GrenateTrajectory->ammo == 0*/)
-	{
-		currentState = CharacterState::Gun;
-		WidgetUI->ShowGunEquipped();
-	}
-	else
-	{
-		CharacterState prev = currentState;
-
-		currentState = CharacterState::Decoy;
-		WidgetUI->ShowDecoy();
-
-		if (prev == CharacterState::Grenade)
-		{
-			AGamePlayerController* playerController = Cast<AGamePlayerController>(GetController());
-			if (playerController == nullptr)
-				return;
-
-			playerController->MUlToggleEquipGrenade(GrenateTrajectory, false);
-			GrenateTrajectory->CLTogglePredictPath(false);
-		}
-	}
+	playerController->SRFire(equipement);
 }
