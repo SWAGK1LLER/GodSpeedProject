@@ -134,7 +134,7 @@ public:
 	virtual void Interact() override;
 	virtual void StopInteract() override;
 
-	void ClientFreezeInput_Implementation(float duration, AActor* pActor) override;
+	void ClientFreezeInput_Implementation(float duration, FVector DamageActorLocation) override;
 	virtual void UnFreezeInput_Implementation() override;
 
 	UFUNCTION(Server, Reliable, BlueprintCallable)

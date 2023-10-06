@@ -13,18 +13,8 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	class UStaticMeshComponent* mesh = nullptr;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	float timeBeforeExploseOnContact = 2;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	float effectDuration = 5;
-
 	UPROPERTY(EditDefaultsOnly, Category = "Setup")
 	UParticleSystem* particleEffect = nullptr;
-
-	bool counterStarted = false;
-
-	FVector startingVelo;
 
 	AGrenade();
 
@@ -32,10 +22,10 @@ public:
 
 	virtual void Tick(float DeltaTime) override;
 
-	UFUNCTION()
-	void OnHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit);
-
-	void Explose();
-
 	void SetVelocity(FVector velocity);
+
+	UFUNCTION()
+	virtual void OnHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit) {};
+
+	virtual void Explose() {};
 };

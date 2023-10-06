@@ -149,8 +149,8 @@ public:
 	void MulticastSetClientNickname_Implementation(const FString& pNickName);
 
 	UFUNCTION(NetMulticast, Reliable, BlueprintCallable)
-	void ClientFreezeInput(float duration, AActor* pActor);
-	virtual void ClientFreezeInput_Implementation(float duration, AActor* pActor);
+	void ClientFreezeInput(float duration, FVector DamageActorLocation);
+	virtual void ClientFreezeInput_Implementation(float duration, FVector DamageActorLocation);
 
 	UFUNCTION(NetMulticast, Reliable, BlueprintCallable)
 	void UnFreezeInput();

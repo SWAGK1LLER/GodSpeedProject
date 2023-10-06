@@ -103,7 +103,7 @@ bool UBaton::CheckHittableActor(AActor* pActorToCheck)
 void UBaton::HitEntity(AGamePlayerController* PlayerController, AActor* pActorToHit)
 {
     if (Cast<ABase3C>(pActorToHit))
-        PlayerController->SRFreezeInput(StunDuration, Cast<ABase3C>(pActorToHit), GetOwner());
+        PlayerController->SRFreezeInput(StunDuration, Cast<ABase3C>(pActorToHit), GetOwner()->GetActorLocation());
 }
 
 void UBaton::UpdateUI_Implementation()

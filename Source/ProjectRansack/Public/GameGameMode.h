@@ -130,7 +130,7 @@ public:
 	void AddToScore(int pValue, int& pScore);
 	void RemoveToScore(int pValue, int& pScore);
 
-	void FreezeInput(float duration, ABase3C* actor, AActor* pActor);
+	void FreezeInput(float duration, ABase3C* actor, FVector DamageActorLocation);
 
 	void FreezeCamera(AActor* actor);
 

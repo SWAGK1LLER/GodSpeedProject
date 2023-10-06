@@ -219,8 +219,19 @@ void AOfficer::SensorGadgetAction() //Reacts to the input of SensorGadget
 	if (playerController == nullptr)
 		return;
 
+	if (equipement->equippedWeapon == equipement->sensorGadgetOfficer)
+	{
+		IWeapon::Execute_UpdateUI(equipement->StunWeapon->_getUObject());
+		equipement->EquipWeapon(equipement->StunWeapon);
+	}
+	else
+	{
+		IWeapon::Execute_UpdateUI(equipement->sensorGadgetOfficer->_getUObject());
+		equipement->EquipWeapon(equipement->sensorGadgetOfficer);
+	}
+
 	playerController->SREquipWeapon(equipement, equipement->sensorGadgetOfficer);
-	equipement->UpdateUI();
+	
 }
 
 void AOfficer::ToggleEquipStunBaton()
@@ -232,8 +243,18 @@ void AOfficer::ToggleEquipStunBaton()
 	if (playerController == nullptr)
 		return;
 
+	if (equipement->equippedWeapon == equipement->StunStick)
+	{
+		IWeapon::Execute_UpdateUI(equipement->StunWeapon->_getUObject());
+		equipement->EquipWeapon(equipement->StunWeapon);
+	}
+	else
+	{
+		IWeapon::Execute_UpdateUI(equipement->StunStick->_getUObject());
+		equipement->EquipWeapon(equipement->StunStick);
+	}
+
 	playerController->SREquipWeapon(equipement, equipement->StunStick);
-	equipement->UpdateUI();
 }
 
 void AOfficer::Fire()
@@ -380,9 +401,9 @@ void AOfficer::OnStunTriggerOverlapEnd(UPrimitiveComponent* OverlappedComp, AAct
 	}
 }
 
-void AOfficer::ClientFreezeInput_Implementation(float duration, AActor* pActor)
+void AOfficer::ClientFreezeInput_Implementation(float duration, FVector DamageActorLocation)
 {
-	Super::ClientFreezeInput_Implementation(duration, pActor);
+	Super::ClientFreezeInput_Implementation(duration, DamageActorLocation);
 	SRActivateStunTrigger();
 }
 

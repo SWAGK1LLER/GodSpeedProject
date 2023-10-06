@@ -511,9 +511,9 @@ void AThief::StopTab()
 		PC->ToogleTeamDuffleBagUI(false);
 }
 
-void AThief::ClientFreezeInput_Implementation(float duration, AActor* pActor)
+void AThief::ClientFreezeInput_Implementation(float duration, FVector DamageActorLocation)
 {
-	Super::ClientFreezeInput_Implementation(duration, pActor);
+	Super::ClientFreezeInput_Implementation(duration, DamageActorLocation);
 	SRActivateArrestTrigger();
 }
 

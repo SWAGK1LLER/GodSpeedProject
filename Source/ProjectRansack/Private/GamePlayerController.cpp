@@ -311,12 +311,12 @@ void AGamePlayerController::SRToogleHackTerminal_Implementation(ATerminal* actor
 	actor->HackTerminal(isHack);
 }
 
-void AGamePlayerController::SRFreezeInput_Implementation(float duration, ABase3C* actor, AActor* pActor)
+void AGamePlayerController::SRFreezeInput_Implementation(float duration, ABase3C* actor, FVector DamageActorLocation)
 {
 	AGameGameMode* gameMode = Cast<AGameGameMode>(UGameplayStatics::GetGameMode(GetWorld()));
 
 	if (gameMode != nullptr)
-		gameMode->FreezeInput(duration, actor, pActor);
+		gameMode->FreezeInput(duration, actor, DamageActorLocation);
 }
 
 void AGamePlayerController::CameraFreezeInput_Implementation(AActor* actor)

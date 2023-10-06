@@ -175,7 +175,7 @@ public:
 	virtual void Tab() override;
 	virtual void StopTab() override;
 
-	void ClientFreezeInput_Implementation(float duration, AActor* pActor) override;
+	void ClientFreezeInput_Implementation(float duration, FVector DamageActorLocation) override;
 
 	virtual void UnFreezeInput_Implementation() override;
 

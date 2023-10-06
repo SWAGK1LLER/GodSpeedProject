@@ -22,6 +22,7 @@ ABase3C::ABase3C(const FObjectInitializer& ObjectInitializer) : Super(ObjectInit
 	bReplicates = true;
 
 	equipement = CreateDefaultSubobject<UEquipement>(TEXT("equipement"));
+	equipement->RegisterComponent();
 
 	audioComp = CreateDefaultSubobject<UAudioComponent>(TEXT("Audio"));
 
@@ -132,10 +133,10 @@ void ABase3C::MulticastSetClientNickname_Implementation(const FString& pNickName
 	nickName = pNickName;
 }
 
-void ABase3C::ClientFreezeInput_Implementation(float duration, AActor* pActor)
+void ABase3C::ClientFreezeInput_Implementation(float duration, FVector DamageActorLocation)
 {
 	if (GetController() != nullptr && GetController()->IsLocalPlayerController())
-		damageIndicator->ShowDamage(pActor);
+		damageIndicator->ShowDamage(DamageActorLocation);
 
 	// Can not freeze again someone already freeze to reset count down
 	if (bFreezeInput)

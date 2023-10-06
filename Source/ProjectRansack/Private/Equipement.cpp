@@ -4,6 +4,7 @@
 #include "Base3C.h"
 #include "SensorGadgetOfficerComponent.h"
 #include "GrenadeTrajectory.h"
+#include "InvisibleCloak.h"
 #include "CameraComp.h"
 #include "Camera/CameraComponent.h"
 #include "Decoy.h"
@@ -25,15 +26,18 @@ UEquipement::UEquipement()
 	
 	decoyGadget = CreateDefaultSubobject<UDecoy>(TEXT("Decoy Gadget"));
 
-	equippedWeapon = StunWeapon;
+	invisibleCloak = CreateDefaultSubobject<UInvisibleCloak>(TEXT("Invisible Cloak"));
 
-	playerCache = Cast<ABase3C>(GetOwner());
+	equippedWeapon = StunWeapon;
 }
 
 void UEquipement::FinishAttachement(class USceneComponent* root)
 {
+	playerCache = Cast<ABase3C>(root->GetOwner());
+
 	StunWeapon->SetupAttachment(root);
 	StunStick->SetupAttachment(root, FName("RightHandSocket"));
+
 	GrenateTrajectory->FinishAttachment(root, playerCache->cameraComponent->camera);
 
 	AController* controller = playerCache->GetController();
@@ -97,7 +101,7 @@ void UEquipement::EquipeBelt1()
 	const TScriptInterface<IWeapon>& weapon = GetWeaponFromEnum(utilityBelt[0]);
 	if (weapon == equippedWeapon)
 	{
-		if ((weapon == GrenateTrajectory && !GrenateTrajectory->IsSameGrenadeClass()))
+		if ((weapon == GrenateTrajectory && !GrenateTrajectory->IsSameGrenadeClass()) || (weapon == GrenateTrajectory && *GrenateTrajectory->currentAmmo == 0))
 		{
 			IWeapon::Execute_UpdateUI(weapon.GetObject());
 		}
@@ -122,7 +126,7 @@ void UEquipement::EquipeBelt2()
 	const TScriptInterface<IWeapon>& weapon = GetWeaponFromEnum(utilityBelt[1]);
 	if (weapon == equippedWeapon)
 	{
-		if ((weapon == GrenateTrajectory && !GrenateTrajectory->IsSameGrenadeClass()))
+		if ((weapon == GrenateTrajectory && !GrenateTrajectory->IsSameGrenadeClass()) || (weapon == GrenateTrajectory && *GrenateTrajectory->currentAmmo == 0))
 		{
 			IWeapon::Execute_UpdateUI(weapon.GetObject());
 		}
@@ -147,7 +151,7 @@ void UEquipement::EquipeBelt3()
 	const TScriptInterface<IWeapon>& weapon = GetWeaponFromEnum(utilityBelt[2]);
 	if (weapon == equippedWeapon)
 	{
-		if ((weapon == GrenateTrajectory && !GrenateTrajectory->IsSameGrenadeClass()))
+		if ((weapon == GrenateTrajectory && !GrenateTrajectory->IsSameGrenadeClass()) || (weapon == GrenateTrajectory && *GrenateTrajectory->currentAmmo == 0))
 		{
 			IWeapon::Execute_UpdateUI(weapon.GetObject());
 		}
@@ -186,6 +190,7 @@ const TScriptInterface<IWeapon> UEquipement::GetWeaponFromEnum(EquipementPossibi
 							return GrenateTrajectory;
 
 		case HoloDecoy: return decoyGadget;
+		case InvisibleCloak: return invisibleCloak;
 		default: return StunWeapon;
 	}
 }
@@ -193,4 +198,5 @@ const TScriptInterface<IWeapon> UEquipement::GetWeaponFromEnum(EquipementPossibi
 void UEquipement::SetGrenadeType_Implementation(GrenadeType grenadeType)
 {
 	GrenateTrajectory->GrenadeClass = &AllGrenade[grenadeType].type;
+	GrenateTrajectory->currentAmmo = &AllGrenade[grenadeType].ammo;
 }

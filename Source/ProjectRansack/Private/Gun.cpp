@@ -130,7 +130,7 @@ bool UGun::CheckHittableActor(AActor* pActorToCheck)
 void UGun::HitEntity(AGamePlayerController* PlayerController, AActor* pActorToHit)
 {
 	if (Cast<ABase3C>(pActorToHit))
-		PlayerController->SRFreezeInput(StunDuration, Cast<ABase3C>(pActorToHit), GetOwner());
+		PlayerController->SRFreezeInput(StunDuration, Cast<ABase3C>(pActorToHit), GetOwner()->GetActorLocation());
 	else if (Cast<ASecurityCamera>(pActorToHit))
 		PlayerController->CameraFreezeInput(pActorToHit);
 }

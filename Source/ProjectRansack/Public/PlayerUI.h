@@ -33,4 +33,7 @@ public:
 
 	UFUNCTION(BlueprintImplementableEvent)
 	void ShowDecoy();
+	
+	UFUNCTION(BlueprintImplementableEvent)
+	void ShowCloakEquiped();
 };

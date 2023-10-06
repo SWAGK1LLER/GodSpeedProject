@@ -17,7 +17,7 @@ void UDamageIndicatorComp::TickComponent(float DeltaTime, ELevelTick TickType, F
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 }
 
-void UDamageIndicatorComp::ShowDamage(AActor* DamageActor)
+void UDamageIndicatorComp::ShowDamage(FVector DamageActorLocation)
 {
 	ui = CreateWidget<UDamageIndicatorUI>(GetWorld(), uiClass);
 
@@ -26,7 +26,7 @@ void UDamageIndicatorComp::ShowDamage(AActor* DamageActor)
 	FRotator myRotation = GetOwner()->GetActorRotation();
 
 	// other player
-	FVector DamageLocation = DamageActor->GetActorLocation();
+	FVector DamageLocation = DamageActorLocation;
 
 	//calculate rotation
 	FRotator PlayerRot = UKismetMathLibrary::FindLookAtRotation(myLocation, DamageLocation);

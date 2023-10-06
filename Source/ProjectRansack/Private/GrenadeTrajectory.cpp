@@ -91,11 +91,11 @@ void UGrenadeTrajectory::PredictGrenade()
 
 void UGrenadeTrajectory::ThrowGrenade()
 {
-	if (timer > 0 || ammo == 0)
+	if (timer > 0 || *currentAmmo == 0)
 		return;
 
 	timer = 0.1;
-	ammo--;
+	(*currentAmmo)--;
 
 	AGrenade* newGrenade = GetWorld()->GetWorld()->SpawnActor<AGrenade>(*GrenadeClass, mesh->GetComponentLocation(), FRotator(), FActorSpawnParameters());
 	newGrenade->SetVelocity(throwingVelo);
