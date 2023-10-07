@@ -39,4 +39,7 @@ public:
 
 	UFUNCTION(BlueprintImplementableEvent)
 	void SetBeltImage(int a, int b, int c);
+
+	UFUNCTION(BlueprintImplementableEvent)
+	void ShowDeguisementEquiped();
 };

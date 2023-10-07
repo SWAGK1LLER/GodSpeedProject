@@ -11,6 +11,7 @@
 #include "GamePlayerController.h"
 #include "EnhancedInputComponent.h"
 #include "Engine/Texture2D.h"
+#include "DeguiseComp.h"
 
 UEquipement::UEquipement()
 {
@@ -22,6 +23,7 @@ UEquipement::UEquipement()
 	GrenateTrajectory = CreateDefaultSubobject<UGrenadeTrajectory>(TEXT("Grenate Trajectory"));
 	decoyGadget = CreateDefaultSubobject<UDecoy>(TEXT("Decoy Gadget"));
 	invisibleCloak = CreateDefaultSubobject<UInvisibleCloak>(TEXT("Invisible Cloak"));
+	deguisement = CreateDefaultSubobject<UDeguiseComp>(TEXT("deguisement"));
 
 	equippedWeapon = StunWeapon;
 }
@@ -35,10 +37,12 @@ void UEquipement::FinishAttachement(class USceneComponent* root)
 	GrenateTrajectory->pawn = pawn;
 	decoyGadget->pawn = pawn;
 	invisibleCloak->pawn = pawn;
+	deguisement->pawn = pawn;
 
 	StunWeapon->AttachToComponent(root, FAttachmentTransformRules::KeepRelativeTransform);
 	StunStick->AttachToComponent(root, FAttachmentTransformRules::SnapToTargetNotIncludingScale, FName("RightHandSocket"));
 	GrenateTrajectory->FinishAttachment(root, pawn->cameraComponent->camera);
+	deguisement->finishAttachement();
 }
 
 void UEquipement::SetController(AGamePlayerController* pController)
@@ -50,6 +54,7 @@ void UEquipement::SetController(AGamePlayerController* pController)
 	GrenateTrajectory->controller = pController;
 	decoyGadget->controller = pController;
 	invisibleCloak->controller = pController;
+	deguisement->controller = pController;
 }
 
 void UEquipement::BeginPlay()
@@ -241,6 +246,7 @@ const TScriptInterface<IWeapon> UEquipement::GetWeaponFromEnum(EquipementPossibi
 
 		case HoloDecoy: return decoyGadget;
 		case InvisibleCloak: return invisibleCloak;
+		case Deguisement: return deguisement;
 		default: return StunWeapon;
 	}
 }
