@@ -17,6 +17,7 @@ enum GrenadeType
 UENUM()
 enum EquipementPossibility
 {
+	_None				UMETA(DisplayName = "None"),
 	SmokeGrenade		UMETA(DisplayName = "Smoke Grenade"),
 	StunGrenade		UMETA(DisplayName = "Stun Grenade"),
 	HoloDecoy	UMETA(DisplayName = "DecoyGadget"),

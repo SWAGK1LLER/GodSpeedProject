@@ -46,6 +46,20 @@ public:
 	UPROPERTY(BlueprintReadWrite, Category = "Player Info")
 	int totalHightLoot = 0;
 
+	UPROPERTY(BlueprintReadWrite, Category = "Player Info")
+	int utilityBelt1Thief = 0;
+	UPROPERTY(BlueprintReadWrite, Category = "Player Info")
+	int utilityBelt2Thief = 0;
+	UPROPERTY(BlueprintReadWrite, Category = "Player Info")
+	int utilityBelt3Thief = 0;
+
+	UPROPERTY(BlueprintReadWrite, Category = "Player Info")
+	int utilityBelt1Officer = 0;
+	UPROPERTY(BlueprintReadWrite, Category = "Player Info")
+	int utilityBelt2Officer = 0;
+	UPROPERTY(BlueprintReadWrite, Category = "Player Info")
+	int utilityBelt3Officer = 0;
+
 
 	UPROPERTY(BlueprintReadWrite, Category = "Player Info")
 	int defaultCharacter = EDefaultCharacter::Thief;
@@ -55,4 +69,7 @@ public:
 
 	void levelUp();
 	void addXp(int pXp);
+
+
+	~UPlayerSaveGame() override;
 };

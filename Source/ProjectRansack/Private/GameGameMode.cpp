@@ -446,3 +446,8 @@ void AGameGameMode::stealMagnetCard(class AThief* thief, class AOfficer* officer
 {
 	thief->MUlStealMagnetCard(officer);
 }
+
+UEOSGameInstance::~UEOSGameInstance()
+{
+	bool d = false;
+}

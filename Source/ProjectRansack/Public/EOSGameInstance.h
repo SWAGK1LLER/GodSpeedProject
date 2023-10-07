@@ -6,10 +6,12 @@
 #include "EnumTeam.h"
 #include "PlayerSetting.h"
 #include "PlayerSaveGame.h"
+#include "GameFramework/SaveGame.h"
 #include "EOSGameInstance.generated.h"
 
 namespace EOnJoinSessionCompleteResult { enum Type; }
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnSaveGameFinish);
 
 template <typename T> 
 struct FSaveGameSlot
@@ -28,7 +30,21 @@ enum EOutcomePins
 	Success
 };
 
-DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnSaveGameFinish);
+USTRUCT()
+struct FServerSaveGameSlot
+{
+	GENERATED_BODY()
+
+public:
+	FServerSaveGameSlot() {}
+	FServerSaveGameSlot(FString pfileName, int pslotIdx, class UPlayerSaveGame* saveGame);
+
+	FString fileName = "";
+	int slotIdx = 0;
+
+	//UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	class UPlayerSaveGame* saveGame = nullptr;
+};
 
 UCLASS()
 class PROJECTRANSACK_API UEOSGameInstance : public UGameInstance
@@ -155,6 +171,8 @@ public:
 	UFUNCTION(BlueprintCallable)
 	UPlayerSaveGame* GetPlayerSaveGame();
 
+	~UEOSGameInstance();
+
 public:
 	class IOnlineSubsystem* OnlineSubsystem;
 	bool bIsLogin = false;
@@ -177,8 +195,10 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	int TotalConnectedPlayer = 1;
 
-	FSaveGameSlot<class UPlayerSaveGame> ServerGameSlot = { "SaveGame.sav", 0, nullptr };
 	FOnSaveGameFinish SaveGameFinish;
 
+	FServerSaveGameSlot ServerGameSlot = FServerSaveGameSlot("SaveGame.sav", 0, nullptr);
+	class USaveGame* chache;
+	
 	FSaveGameSlot<class UPlayerSetting> SettingsGameSlot = { "Settings.sav", 1, nullptr };
 };

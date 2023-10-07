@@ -98,6 +98,16 @@ void UEquipement::BindBeltKey(UEnhancedInputComponent* input, FBase3CTable* tabl
 
 void UEquipement::EquipeBelt1()
 {
+	if (utilityBelt.Num() > 1)
+	{
+		if (pcCache != nullptr)
+		{
+			pcCache->SREquipWeapon(this, StunWeapon);
+			EquipWeapon(StunWeapon);
+		}
+		return;
+	}
+
 	const TScriptInterface<IWeapon>& weapon = GetWeaponFromEnum(utilityBelt[0]);
 	if (weapon == equippedWeapon)
 	{
@@ -115,8 +125,9 @@ void UEquipement::EquipeBelt1()
 				pcCache->SREquipWeapon(this, StunWeapon);
 				EquipWeapon(StunWeapon);
 			}
-			
 		}
+
+		return;
 	}
 	else
 	{
@@ -132,6 +143,16 @@ void UEquipement::EquipeBelt1()
 
 void UEquipement::EquipeBelt2()
 {
+	if (utilityBelt.Num() > 2)
+	{
+		if (pcCache != nullptr)
+		{
+			pcCache->SREquipWeapon(this, StunWeapon);
+			EquipWeapon(StunWeapon);
+		}
+		return;
+	}
+
 	const TScriptInterface<IWeapon>& weapon = GetWeaponFromEnum(utilityBelt[1]);
 	if (weapon == equippedWeapon)
 	{
@@ -163,6 +184,16 @@ void UEquipement::EquipeBelt2()
 
 void UEquipement::EquipeBelt3()
 {
+	if (utilityBelt.Num() > 3)
+	{
+		if (pcCache != nullptr)
+		{
+			pcCache->SREquipWeapon(this, StunWeapon);
+			EquipWeapon(StunWeapon);
+		}
+		return;
+	}
+
 	const TScriptInterface<IWeapon>& weapon = GetWeaponFromEnum(utilityBelt[2]);
 	if (weapon == equippedWeapon)
 	{
@@ -196,6 +227,8 @@ const TScriptInterface<IWeapon> UEquipement::GetWeaponFromEnum(EquipementPossibi
 {
 	switch (weapon)
 	{
+		case _None : return StunWeapon;
+
 		case SmokeGrenade:	
 							GrenateTrajectory->previousGrenadeClass = GrenateTrajectory->CurrentGrenadeClass;
 							GrenateTrajectory->CurrentGrenadeClass = GrenadeType::Smoke;

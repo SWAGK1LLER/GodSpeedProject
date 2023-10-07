@@ -3,6 +3,8 @@
 
 #include "PlayerSaveGame.h"
 #include "HelperClass.h"
+#include <EOSGameInstance.h>
+#include <Kismet/GameplayStatics.h>
 
 float UPlayerSaveGame::GetPercent()
 {
@@ -21,4 +23,10 @@ void UPlayerSaveGame::addXp(int pXp)
 	xp += pXp;
 	while (xp >= xpMax)
 		levelUp();
+}
+
+UPlayerSaveGame::~UPlayerSaveGame()
+{
+	bool destroy = true;
+	return;
 }
