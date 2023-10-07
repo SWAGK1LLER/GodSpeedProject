@@ -805,7 +805,9 @@ void UEOSGameInstance::SaveGame()
 		return;
 
 	UGameplayStatics::SaveGameToSlot(ServerGameSlot.saveGame, ServerGameSlot.fileName, ServerGameSlot.slotIdx);
-	UploadPlayerData(ConvertSaveGameToUint());
+
+	if (!bIsLogin)
+		UploadPlayerData(ConvertSaveGameToUint());
 }
 
 void UEOSGameInstance::LoadSaveGame()
