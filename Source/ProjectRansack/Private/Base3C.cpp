@@ -362,6 +362,8 @@ void ABase3C::SetClientUI_Implementation()
 
 	if (IsA(AThief::StaticClass()))
 		WidgetUI->ToggleMagnetCard(false);
+
+	WidgetUI->SetBeltImage(equipement->utilityBelt[0], equipement->utilityBelt[1], equipement->utilityBelt[2]);
 }
 
 void ABase3C::TryGeneratingOverlapEvent()

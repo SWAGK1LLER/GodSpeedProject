@@ -37,12 +37,6 @@ void UGrenadeTrajectory::BeginPlay()
 	Super::BeginPlay();
 
 	mesh->SetVisibility(false);
-
-	AController* controller = owner->GetController();
-	if (controller == nullptr || !controller->IsLocalPlayerController())
-		return;
-
-	pcCache = Cast<AGamePlayerController>(controller);
 }
 
 void UGrenadeTrajectory::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
@@ -105,7 +99,7 @@ void UGrenadeTrajectory::MUlToggleVisibility_Implementation(bool visible)
 {
 	mesh->SetVisibility(visible);
 
-	if (pcCache == nullptr || !pcCache->IsLocalPlayerController())
+	if (!isLocalComp)
 		return;
 
 	CLTogglePredictPath(visible);

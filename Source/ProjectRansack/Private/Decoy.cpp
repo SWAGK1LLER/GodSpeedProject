@@ -15,12 +15,6 @@ UDecoy::UDecoy()
 void UDecoy::BeginPlay()
 {
 	Super::BeginPlay();
-
-	AController* controller = owner->GetController();
-	if (controller == nullptr || !controller->IsLocalPlayerController())
-		return;
-
-	pcCache = Cast<AGamePlayerController>(controller);
 }
 
 void UDecoy::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
@@ -30,8 +24,18 @@ void UDecoy::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponent
 
 void UDecoy::SpawnDecoy()
 {
+	if (pcCache == nullptr)
+	{
+		AController* controller = owner->GetController();
+		if (controller == nullptr || !controller->IsLocalPlayerController())
+			return;
+
+		pcCache = Cast<AGamePlayerController>(controller);
+	}
+
 	if (pcCache == nullptr || !pcCache->IsLocalPlayerController())
 		return;
+
 	FVector velocityoffSet = owner->GetActorForwardVector() * 50;
 
 	FRotator cam = owner->cameraComponent->camera->GetForwardVector().Rotation();

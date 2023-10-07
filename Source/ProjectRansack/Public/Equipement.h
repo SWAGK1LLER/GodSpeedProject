@@ -83,7 +83,9 @@ public:
 
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
+	UFUNCTION(NetMulticast, Reliable, BlueprintCallable)
 	void EquipWeapon(const TScriptInterface<IWeapon>& nextWeapon);
+	void EquipWeapon_Implementation(const TScriptInterface<IWeapon>& nextWeapon);
 
 	void UpdateUI();
 

@@ -52,6 +52,19 @@ void AThief::BeginPlay()
 	HelperClass::deactivateTrigger(ArrestArea);
 	ArrestAreaActivate = false;
 	GetMovementComponent()->GetNavAgentPropertiesRef().bCanCrouch = true;
+
+	//LoadBelt
+	UEOSGameInstance* instance = Cast<UEOSGameInstance>(UGameplayStatics::GetGameInstance(GetWorld()));
+	if (instance != nullptr && instance->ServerGameSlot.saveGame != nullptr)
+	{
+		equipement->utilityBelt.Empty();
+		equipement->utilityBelt.Add((EquipementPossibility)instance->GetPlayerSaveGame()->utilityBelt1Thief);
+		equipement->utilityBelt.Add((EquipementPossibility)instance->GetPlayerSaveGame()->utilityBelt2Thief);
+		equipement->utilityBelt.Add((EquipementPossibility)instance->GetPlayerSaveGame()->utilityBelt3Thief);
+
+		if (WidgetUI != nullptr)
+			WidgetUI->SetBeltImage(equipement->utilityBelt[0], equipement->utilityBelt[1], equipement->utilityBelt[2]);
+	}
 }
 
 void AThief::Tick(float DeltaTime)

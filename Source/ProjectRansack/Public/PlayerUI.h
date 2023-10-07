@@ -36,4 +36,7 @@ public:
 	
 	UFUNCTION(BlueprintImplementableEvent)
 	void ShowCloakEquiped();
+
+	UFUNCTION(BlueprintImplementableEvent)
+	void SetBeltImage(int a, int b, int c);
 };

@@ -95,7 +95,11 @@ void AGameGameMode::SpawnPlayer(ETeam team, APlayerController* NewPlayer)
 
 	FindSpawn(NewPlayer, team, spawnTransform, classToSpawn);
 
-	ABase3C* actor = Cast<ABase3C>(GetWorld()->SpawnActor(classToSpawn, &spawnTransform));
+	AActor* newActor = (GetWorld()->SpawnActor(classToSpawn, &spawnTransform));
+	if (newActor == nullptr)
+		return;
+
+	ABase3C* actor = Cast<ABase3C>(newActor);
 
 	switch (team)
 	{

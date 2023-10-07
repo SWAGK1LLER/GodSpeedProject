@@ -59,7 +59,6 @@ public:
 	bool isLocalComp = false;
 
 	class ABase3C* owner = nullptr;
-	class AGamePlayerController* pcCache = nullptr;
 
 	UGrenadeTrajectory();
 

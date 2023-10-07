@@ -57,9 +57,18 @@ void UEquipement::TickComponent(float DeltaTime, ELevelTick TickType, FActorComp
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 
 	IWeapon::Execute_Tick(equippedWeapon->_getUObject(), DeltaTime);
+
+	if (pcCache == nullptr)
+	{
+		AController* controller = playerCache->GetController();
+		if (controller == nullptr || !controller->IsLocalPlayerController())
+			return;
+
+		pcCache = Cast<AGamePlayerController>(controller);
+	}
 }
 
-void UEquipement::EquipWeapon(const TScriptInterface<IWeapon>& nextWeapon)
+void UEquipement::EquipWeapon_Implementation(const TScriptInterface<IWeapon>& nextWeapon)
 {
 	if (nextWeapon.GetInterface() == equippedWeapon)
 	{
@@ -98,12 +107,12 @@ void UEquipement::BindBeltKey(UEnhancedInputComponent* input, FBase3CTable* tabl
 
 void UEquipement::EquipeBelt1()
 {
-	if (utilityBelt.Num() > 1)
+	if (!(utilityBelt.Num() >= 1))
 	{
 		if (pcCache != nullptr)
 		{
 			pcCache->SREquipWeapon(this, StunWeapon);
-			EquipWeapon(StunWeapon);
+			//EquipWeapon(StunWeapon);
 		}
 		return;
 	}
@@ -123,7 +132,7 @@ void UEquipement::EquipeBelt1()
 			if (pcCache != nullptr)
 			{
 				pcCache->SREquipWeapon(this, StunWeapon);
-				EquipWeapon(StunWeapon);
+				//EquipWeapon(StunWeapon);
 			}
 		}
 
@@ -136,19 +145,19 @@ void UEquipement::EquipeBelt1()
 		if (pcCache != nullptr)
 		{
 			pcCache->SREquipWeapon(this, weapon);
-			EquipWeapon(weapon);
+			//EquipWeapon(weapon);
 		}
 	}
 }
 
 void UEquipement::EquipeBelt2()
 {
-	if (utilityBelt.Num() > 2)
+	if (!(utilityBelt.Num() >= 2))
 	{
 		if (pcCache != nullptr)
 		{
 			pcCache->SREquipWeapon(this, StunWeapon);
-			EquipWeapon(StunWeapon);
+			//EquipWeapon(StunWeapon);
 		}
 		return;
 	}
@@ -167,7 +176,7 @@ void UEquipement::EquipeBelt2()
 			if (pcCache != nullptr)
 			{
 				pcCache->SREquipWeapon(this, StunWeapon);
-				EquipWeapon(StunWeapon);
+				//EquipWeapon(StunWeapon);
 			}
 		}
 	}
@@ -177,19 +186,19 @@ void UEquipement::EquipeBelt2()
 		if (pcCache != nullptr)
 		{
 			pcCache->SREquipWeapon(this, weapon);
-			EquipWeapon(weapon);
+			//EquipWeapon(weapon);
 		}
 	}
 }
 
 void UEquipement::EquipeBelt3()
 {
-	if (utilityBelt.Num() > 3)
+	if (!(utilityBelt.Num() >= 3))
 	{
 		if (pcCache != nullptr)
 		{
 			pcCache->SREquipWeapon(this, StunWeapon);
-			EquipWeapon(StunWeapon);
+			//EquipWeapon(StunWeapon);
 		}
 		return;
 	}
@@ -208,7 +217,7 @@ void UEquipement::EquipeBelt3()
 			if (pcCache != nullptr)
 			{
 				pcCache->SREquipWeapon(this, StunWeapon);
-				EquipWeapon(StunWeapon);
+				//EquipWeapon(StunWeapon);
 			}
 		}
 	}
@@ -218,7 +227,7 @@ void UEquipement::EquipeBelt3()
 		if (pcCache != nullptr)
 		{
 			pcCache->SREquipWeapon(this, weapon);
-			EquipWeapon(weapon);
+			//EquipWeapon(weapon);
 		}
 	}
 }

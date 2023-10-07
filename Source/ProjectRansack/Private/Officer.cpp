@@ -56,6 +56,19 @@ void AOfficer::BeginPlay()
 	StunAreaActivate = false;
 
 	equipement->StunWeapon->maxAmmo = equipement->StunWeapon->ammo = officerTableInstance->MaxGunAmmo;
+
+	//LoadBelt
+	UEOSGameInstance* instance = Cast<UEOSGameInstance>(UGameplayStatics::GetGameInstance(GetWorld()));
+	if (instance != nullptr && instance->ServerGameSlot.saveGame != nullptr)
+	{
+		equipement->utilityBelt.Empty();
+		equipement->utilityBelt.Add((EquipementPossibility)instance->GetPlayerSaveGame()->utilityBelt1Officer);
+		equipement->utilityBelt.Add((EquipementPossibility)instance->GetPlayerSaveGame()->utilityBelt2Officer);
+		equipement->utilityBelt.Add((EquipementPossibility)instance->GetPlayerSaveGame()->utilityBelt3Officer);
+
+		if (WidgetUI != nullptr)
+			WidgetUI->SetBeltImage(equipement->utilityBelt[0], equipement->utilityBelt[1], equipement->utilityBelt[2]);
+	}
 }
 
 void AOfficer::Tick(float DeltaTime)
@@ -222,12 +235,12 @@ void AOfficer::SensorGadgetAction() //Reacts to the input of SensorGadget
 	if (equipement->equippedWeapon == equipement->sensorGadgetOfficer)
 	{
 		IWeapon::Execute_UpdateUI(equipement->StunWeapon->_getUObject());
-		equipement->EquipWeapon(equipement->StunWeapon);
+		//equipement->EquipWeapon(equipement->StunWeapon);
 	}
 	else
 	{
 		IWeapon::Execute_UpdateUI(equipement->sensorGadgetOfficer->_getUObject());
-		equipement->EquipWeapon(equipement->sensorGadgetOfficer);
+		//equipement->EquipWeapon(equipement->sensorGadgetOfficer);
 	}
 
 	playerController->SREquipWeapon(equipement, equipement->sensorGadgetOfficer);
@@ -246,12 +259,12 @@ void AOfficer::ToggleEquipStunBaton()
 	if (equipement->equippedWeapon == equipement->StunStick)
 	{
 		IWeapon::Execute_UpdateUI(equipement->StunWeapon->_getUObject());
-		equipement->EquipWeapon(equipement->StunWeapon);
+		//equipement->EquipWeapon(equipement->StunWeapon);
 	}
 	else
 	{
 		IWeapon::Execute_UpdateUI(equipement->StunStick->_getUObject());
-		equipement->EquipWeapon(equipement->StunStick);
+		//equipement->EquipWeapon(equipement->StunStick);
 	}
 
 	playerController->SREquipWeapon(equipement, equipement->StunStick);
