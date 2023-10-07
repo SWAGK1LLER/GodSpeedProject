@@ -13,9 +13,6 @@ const FString FSearchName = FString("ProjectRansackLobby");
 const FName FGameSessionName = FName("Match");
 const FString FSearchGameSessionName = FString("ProjectRansackMatch");
 
-FServerSaveGameSlot::FServerSaveGameSlot(FString pfileName, int pslotIdx, UPlayerSaveGame* saveGame) 
-	: fileName(pfileName), slotIdx(pslotIdx), saveGame(saveGame) {}
-
 UEOSGameInstance::UEOSGameInstance()
 {
 
@@ -957,8 +954,8 @@ void UEOSGameInstance::ReadPlayerData(const FString& FileName)
 
 	isLoadingSaveGame = false;
 
-	chache = ConvertUintToSaveGame(data);
-	ServerGameSlot.saveGame = Cast<UPlayerSaveGame>(chache);
+	ServerGameSlot.saveGame = Cast<UPlayerSaveGame>(ConvertUintToSaveGame(data));
+	ServerGameSlot.saveGame->AddToRoot();
 
 	LoadSaveGameFinished();
 	LoadSaveGameSuccessful(ServerGameSlot.saveGame->GetPercent(), ServerGameSlot.saveGame->level);

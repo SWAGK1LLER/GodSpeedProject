@@ -28,5 +28,4 @@ void UPlayerSaveGame::addXp(int pXp)
 UPlayerSaveGame::~UPlayerSaveGame()
 {
 	bool destroy = true;
-	return;
 }
