@@ -72,8 +72,8 @@ public:
 
 	IWeapon* equippedWeapon = nullptr;
 	
-	class ABase3C* playerCache = nullptr;
-	class AGamePlayerController* pcCache = nullptr;
+	class ABase3C* pawn = nullptr;
+	class AGamePlayerController* controller = nullptr;
 
 	UEquipement();
 
@@ -86,6 +86,8 @@ public:
 	UFUNCTION(NetMulticast, Reliable, BlueprintCallable)
 	void EquipWeapon(const TScriptInterface<IWeapon>& nextWeapon);
 	void EquipWeapon_Implementation(const TScriptInterface<IWeapon>& nextWeapon);
+
+	void SetController(class AGamePlayerController* controller);
 
 	void UpdateUI();
 

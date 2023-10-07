@@ -14,13 +14,11 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	float duration = 3;
 
-	bool isActive = false;
-
-	class ABase3C* owner = nullptr;
+	bool abilityUsed = false;
 
 	UInvisibleCloak();
 
-	virtual void BeginPlay() override;
+	virtual void BeginPlay() override {};
 
 	void MUlFire_Implementation() override;
 

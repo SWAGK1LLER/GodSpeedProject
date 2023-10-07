@@ -24,8 +24,3 @@ void UPlayerSaveGame::addXp(int pXp)
 	while (xp >= xpMax)
 		levelUp();
 }
-
-UPlayerSaveGame::~UPlayerSaveGame()
-{
-	bool destroy = true;
-}

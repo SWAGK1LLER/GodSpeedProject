@@ -9,7 +9,6 @@
 UDecoy::UDecoy()
 {
 	PrimaryComponentTick.bCanEverTick = false;
-	owner = Cast<ABase3C>(GetOwner());
 }
 
 void UDecoy::BeginPlay()
@@ -24,25 +23,16 @@ void UDecoy::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponent
 
 void UDecoy::SpawnDecoy()
 {
-	if (pcCache == nullptr)
-	{
-		AController* controller = owner->GetController();
-		if (controller == nullptr || !controller->IsLocalPlayerController())
-			return;
-
-		pcCache = Cast<AGamePlayerController>(controller);
-	}
-
-	if (pcCache == nullptr || !pcCache->IsLocalPlayerController())
+	if (controller == nullptr || !controller->IsLocalPlayerController())
 		return;
 
-	FVector velocityoffSet = owner->GetActorForwardVector() * 50;
+	FVector velocityoffSet = pawn->GetActorForwardVector() * 50;
 
-	FRotator cam = owner->cameraComponent->camera->GetForwardVector().Rotation();
+	FRotator cam = pawn->cameraComponent->camera->GetForwardVector().Rotation();
 	cam.Roll = 0;
 	cam.Pitch = 0;
 
-	pcCache->SpawnDecoy(DecoyActorClass, owner->GetActorLocation() + velocityoffSet, cam);
+	controller->SpawnDecoy(DecoyActorClass, pawn->GetActorLocation() + velocityoffSet, cam);
 }
 
 void UDecoy::MUlFire_Implementation()
@@ -52,5 +42,5 @@ void UDecoy::MUlFire_Implementation()
 
 void UDecoy::UpdateUI_Implementation()
 {
-	owner->WidgetUI->ShowDecoy();
+	pawn->WidgetUI->ShowDecoy();
 }

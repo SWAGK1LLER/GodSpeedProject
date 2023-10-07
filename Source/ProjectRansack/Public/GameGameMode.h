@@ -61,10 +61,10 @@ public:
 	static int teamCount;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	TSubclassOf<AActor> ThiefClass;
+	TSubclassOf<ABase3C> ThiefClass;
 	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	TSubclassOf<AActor> OfficerClass;
+	TSubclassOf<ABase3C> OfficerClass;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	TArray<class APlayerController*> PC;
@@ -93,7 +93,7 @@ public:
 
 	void SpawnPlayer(ETeam team, class APlayerController* NewPlayer);
 
-	void FindSpawn(class APlayerController* NewPlayer, const ETeam& team, FTransform& Location, TSubclassOf<AActor>& ActorClass);
+	void FindSpawn(class APlayerController* NewPlayer, const ETeam& team, FTransform& Location, TSubclassOf<ABase3C>& ActorClass);
 
 	void SendPlayerName();
 

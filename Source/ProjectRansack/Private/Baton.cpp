@@ -18,7 +18,6 @@ void UBaton::BeginPlay()
 	Super::BeginPlay();
 
 	HitArea->OnComponentBeginOverlap.AddDynamic(this, &UBaton::OnHitTriggerOverlapBegin);
-	HitArea->OnComponentEndOverlap.AddDynamic(this, &UBaton::OnHitTriggerOverlapEnd);
 
 	HelperClass::deactivateTrigger(HitArea);
 	SetVisibility(false);
@@ -37,11 +36,10 @@ void UBaton::MUlFire_Implementation()
         return;
 
     //Play animation
-    AGamePlayerController* playerController = Cast<AGamePlayerController>(Cast<APawn>(GetOwner())->GetController());
-    if (playerController == nullptr)
+    if (controller == nullptr)
         return;
 
-    playerController->MUlPlayAttackAnim(this);
+    controller->MUlPlayAttackAnim(this);
     isAttacking = true;
 }
 
@@ -55,22 +53,13 @@ void UBaton::OnHitTriggerOverlapBegin(class UPrimitiveComponent* OverlappedCompo
     }
 }
 
-void UBaton::OnHitTriggerOverlapEnd(class UPrimitiveComponent* OverlappedComp, AActor* OtherActor, class UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
-{
-    /*ABase3C* player = Cast<ABase3C>(OtherActor);
-    if (player != nullptr)
-        possibleHittedActor.Remove(player);*/
-}
-
 void UBaton::CheckPossibleHit()
 {
-    APawn* owner = Cast<APawn>(GetOwner());
-    AGamePlayerController* playerController = Cast<AGamePlayerController>(owner->GetController());
-    if (playerController == nullptr)
+    if (controller == nullptr)
         return;
 
     for (ABase3C* player : possibleHittedActor)
-        HitEntity(playerController, player);
+        HitEntity(controller, player);
 }
 
 void UBaton::MUlPlayAttack_Implementation()
@@ -89,6 +78,7 @@ void UBaton::deactivateTrigger()
 
 void UBaton::MUlToggleVisibility_Implementation(bool visible)
 {
+    isActive = visible;
     SetVisibility(visible);
 }
 
@@ -108,5 +98,5 @@ void UBaton::HitEntity(AGamePlayerController* PlayerController, AActor* pActorTo
 
 void UBaton::UpdateUI_Implementation()
 {
-    Cast<ABase3C>(GetOwner())->WidgetUI->ShowStunBattonEquiped();
+    pawn->WidgetUI->ShowStunBattonEquiped();
 }

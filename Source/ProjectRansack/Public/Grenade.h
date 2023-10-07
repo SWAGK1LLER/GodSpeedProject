@@ -16,7 +16,11 @@ public:
 	UPROPERTY(EditDefaultsOnly, Category = "Setup")
 	UParticleSystem* particleEffect = nullptr;
 
+	class ABase3C* owner = nullptr;
+
 	AGrenade();
+
+	void SetThrower(class ABase3C* pOwner);
 
 	virtual void BeginPlay() override;
 

@@ -91,15 +91,13 @@ void AGameGameMode::SpawnPlayer(ETeam team, APlayerController* NewPlayer)
 	}
 
 	FTransform spawnTransform;
-	TSubclassOf<AActor> classToSpawn;
+	TSubclassOf<ABase3C> classToSpawn;
 
 	FindSpawn(NewPlayer, team, spawnTransform, classToSpawn);
 
-	AActor* newActor = (GetWorld()->SpawnActor(classToSpawn, &spawnTransform));
-	if (newActor == nullptr)
+	ABase3C* actor = GetWorld()->SpawnActor<ABase3C>(classToSpawn, spawnTransform, FActorSpawnParameters());
+	if (actor == nullptr)
 		return;
-
-	ABase3C* actor = Cast<ABase3C>(newActor);
 
 	switch (team)
 	{
@@ -122,11 +120,11 @@ void AGameGameMode::SpawnPlayer(ETeam team, APlayerController* NewPlayer)
 
 	if (roundStarted)
 	{
-		((ABase3C*)actor)->UnFreezeInput();
+		actor->UnFreezeInput();
 	}
 }
 
-void AGameGameMode::FindSpawn(APlayerController* NewPlayer, const ETeam& team, FTransform& Location, TSubclassOf<AActor>& ActorClass)
+void AGameGameMode::FindSpawn(APlayerController* NewPlayer, const ETeam& team, FTransform& Location, TSubclassOf<ABase3C>& ActorClass)
 {
 	TArray<AActor*> spawnPoint;
 	if (team == ETeam::A)

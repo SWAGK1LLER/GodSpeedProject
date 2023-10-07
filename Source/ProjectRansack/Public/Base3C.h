@@ -136,6 +136,8 @@ public:
 	virtual void SendDataToComponents();
 	virtual void CreateTimeline() {};
 
+	void DispatchController(class AGamePlayerController* controller);
+
 	UFUNCTION(Client, Reliable, BlueprintCallable)
 	void SetClientUI();
 	virtual void SetClientUI_Implementation();

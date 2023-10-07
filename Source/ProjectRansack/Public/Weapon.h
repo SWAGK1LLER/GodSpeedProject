@@ -15,13 +15,15 @@ class PROJECTRANSACK_API IWeapon
 	GENERATED_BODY()
 
 public:
+	class AGamePlayerController* controller = nullptr;
+	class ABase3C* pawn = nullptr;
+	bool isActive = false;
+
 	UFUNCTION(NetMulticast, Reliable, NotBlueprintable)
 	virtual void MUlToggleVisibility(bool visible);
-	//virtual void MUlToggleVisibility_Implementation(bool visible) {};
 
 	UFUNCTION(NetMulticast, Reliable, NotBlueprintable)
 	virtual void MUlFire();
-	//virtual void MUlFire_Implementation() {};
 
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
 	void Tick(float delta);

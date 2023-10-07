@@ -42,6 +42,8 @@ void AGamePlayerController::BeginPlay()
 		RoundUIWidget->AddToViewport();
 	}
 
+	//debug mimic load save game
+	instance->ServerGameSlot.debugSave = !instance->bIsLogin;
 	instance->LoadSaveGame();
 	//instance->LoadSaveSettings();
 
@@ -68,6 +70,12 @@ void AGamePlayerController::Tick(float DeltaTime)
 
 void AGamePlayerController::PawnIsPossess(APawn* InPawn)
 {
+	if (InPawn == nullptr)
+		return;
+
+	ABase3C* base = Cast<ABase3C>(InPawn);
+	base->DispatchController(this);
+
 	if (!IsLocalPlayerController())
 		return;
 

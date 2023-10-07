@@ -14,9 +14,7 @@ UGrenadeTrajectory::UGrenadeTrajectory()
 	PrimaryComponentTick.bCanEverTick = true;
 
 	niagara = CreateDefaultSubobject<UNiagaraComponent>(TEXT("Trajectory"));
-
 	mesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("MeshExposed"));
-	owner = Cast<ABase3C>(GetOwner());
 }
 
 void UGrenadeTrajectory::FinishAttachment(USceneComponent* root, UCameraComponent* pCamera)
@@ -41,6 +39,9 @@ void UGrenadeTrajectory::BeginPlay()
 
 void UGrenadeTrajectory::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
 {
+	if (!isActive)
+		return;
+
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 	refreshCounter -= DeltaTime;
 	timer -= DeltaTime;
@@ -91,12 +92,14 @@ void UGrenadeTrajectory::ThrowGrenade()
 	timer = 0.1;
 	(*currentAmmo)--;
 
-	AGrenade* newGrenade = GetWorld()->GetWorld()->SpawnActor<AGrenade>(*GrenadeClass, mesh->GetComponentLocation(), FRotator(), FActorSpawnParameters());
+	AGrenade* newGrenade = GetWorld()->SpawnActor<AGrenade>(*GrenadeClass, mesh->GetComponentLocation(), FRotator(), FActorSpawnParameters());
+	newGrenade->SetThrower(pawn);
 	newGrenade->SetVelocity(throwingVelo);
 }
 
 void UGrenadeTrajectory::MUlToggleVisibility_Implementation(bool visible)
 {
+	isActive = visible;
 	mesh->SetVisibility(visible);
 
 	if (!isLocalComp)
@@ -120,7 +123,7 @@ void UGrenadeTrajectory::MUlFire_Implementation()
 	isThrowing = true;
 	throwPosition = mesh->GetComponentLocation();
 
-	owner->MUlThrowGrenade();
+	pawn->MUlThrowGrenade();
 }
 
 void UGrenadeTrajectory::EndThrow()
@@ -130,7 +133,7 @@ void UGrenadeTrajectory::EndThrow()
 
 void UGrenadeTrajectory::UpdateUI_Implementation()
 {
-	owner->WidgetUI->ShowGrenade(uiTexture);
+	pawn->WidgetUI->ShowGrenade(uiTexture);
 }
 
 bool UGrenadeTrajectory::IsSameGrenadeClass()

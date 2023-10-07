@@ -58,8 +58,6 @@ public:
 
 	bool isLocalComp = false;
 
-	class ABase3C* owner = nullptr;
-
 	UGrenadeTrajectory();
 
 	void SetIslocalController(bool local);

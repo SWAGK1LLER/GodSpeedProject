@@ -69,7 +69,4 @@ public:
 
 	void levelUp();
 	void addXp(int pXp);
-
-
-	~UPlayerSaveGame() override;
 };

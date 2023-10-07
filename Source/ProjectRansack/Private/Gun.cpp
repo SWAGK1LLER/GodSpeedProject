@@ -10,7 +10,7 @@
 #include "Base3C.h"
 #include "PlayerUI.h"
 
-UGun::UGun(const FObjectInitializer& ObjectInitializer) //: UStaticMeshComponent(ObjectInitializer)
+UGun::UGun(const FObjectInitializer& ObjectInitializer)
 {
 	PrimaryComponentTick.bCanEverTick = true;
 }
@@ -19,7 +19,6 @@ void UGun::BeginPlay()
 {
 	Super::BeginPlay();
 	CoolDownCurrentTime = 0;
-
 	isActive = true;
 }
 
@@ -40,14 +39,13 @@ void UGun::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTi
 		}
 	}
 
-	ABase3C* player = Cast<ABase3C>(GetOwner());
-	if (player->WidgetUI == nullptr)
+	if (pawn->WidgetUI == nullptr)
 		return;
 
 	if (CoolDownCurrentTime > 0)
-		player->WidgetUI->UpdateCooldown(CoolDownCurrentTime);
+		pawn->WidgetUI->UpdateCooldown(CoolDownCurrentTime);
 	else
-		player->WidgetUI->ShowGunReady();
+		pawn->WidgetUI->ShowGunReady();
 }
 
 void UGun::Reload()
@@ -78,29 +76,22 @@ void UGun::MUlFire_Implementation()
 
 	FTransform position = FTransform(hitLocation);
 
-	APawn* owner = Cast<APawn>(GetOwner());
-	AGamePlayerController* playerController = Cast<AGamePlayerController>(owner->GetController());
-	if (playerController == nullptr)
+	if (controller == nullptr || !controller->IsLocalPlayerController())
 		return;
 
-	if (!playerController->IsLocalPlayerController())
-		return;
-
-	playerController->SRSpawnParticle(particleEffect, position, (hitableEnemy ? StunDuration : -1));
+	controller->SRSpawnParticle(particleEffect, position, (hitableEnemy ? StunDuration : -1));
 
 	if (!hitableEnemy)
 		return;
 
-	HitEntity(playerController, actor);
+	HitEntity(controller, actor);
 }
 
 AActor* UGun::HitScan(FVector& hitLocation)
 {
-	ABase3C* player = Cast<ABase3C>(GetOwner());
+	FVector begin = pawn->cameraComponent->camera->GetComponentLocation();
 
-	FVector begin = player->cameraComponent->camera->K2_GetComponentLocation();
-
-	FVector forward = UKismetMathLibrary::GetForwardVector(player->cameraComponent->camera->K2_GetComponentRotation());
+	FVector forward = UKismetMathLibrary::GetForwardVector(pawn->cameraComponent->camera->GetComponentRotation());
 
 	FVector LineTraceEnd = begin + (forward * Reach);
 
@@ -139,7 +130,7 @@ void UGun::HitEntity(AGamePlayerController* PlayerController, AActor* pActorToHi
 
 void UGun::UpdateUI_Implementation()
 {
-	Cast<ABase3C>(GetOwner())->WidgetUI->ShowGunEquipped();
+	pawn->WidgetUI->ShowGunEquipped();
 }
 
 void UGun::MUlToggleVisibility_Implementation(bool visible)

@@ -25,8 +25,7 @@ USensorGadgetOfficerComponent::USensorGadgetOfficerComponent()
 
 void USensorGadgetOfficerComponent::Tick_Implementation(float delta)
 {
-	AOfficer* officer = Cast<AOfficer>(GetOwner());
-	updatePosing(officer->cameraComponent->camera->GetComponentLocation(), officer->cameraComponent->camera->GetForwardVector());
+	updatePosing(pawn->cameraComponent->camera->GetComponentLocation(), pawn->cameraComponent->camera->GetForwardVector());
 }
 
 void USensorGadgetOfficerComponent::fetchData(float pRange, float pRevealTime, unsigned int pMaxSensors)
@@ -163,6 +162,8 @@ void USensorGadgetOfficerComponent::MUlToggleVisibility_Implementation(bool visi
 	if (!sensorGadgetOfficerMesh1 || !sensorGadgetOfficerMesh2)
 		return;
 
+	isActive = visible;
+
 	sensorGadgetOfficerMesh1->SetVisibility(visible);
 	sensorGadgetOfficerMesh2->SetVisibility(visible);
 }
@@ -181,5 +182,5 @@ void USensorGadgetOfficerComponent::MUlFire_Implementation()
 
 void USensorGadgetOfficerComponent::UpdateUI_Implementation()
 {
-	Cast<ABase3C>(GetOwner())->WidgetUI->ShowSensorEquipped();
+	pawn->WidgetUI->ShowSensorEquipped();
 }

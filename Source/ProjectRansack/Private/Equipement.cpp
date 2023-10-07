@@ -17,15 +17,10 @@ UEquipement::UEquipement()
 	PrimaryComponentTick.bCanEverTick = true;
 
 	StunWeapon = CreateDefaultSubobject<UGun>(TEXT("StunWeapon"));
-	
 	StunStick = CreateDefaultSubobject<UBaton>(TEXT("StunBaton"));
-	
 	sensorGadgetOfficer = CreateDefaultSubobject<USensorGadgetOfficerComponent>(TEXT("Sensor Gadget Component"));
-
 	GrenateTrajectory = CreateDefaultSubobject<UGrenadeTrajectory>(TEXT("Grenate Trajectory"));
-	
 	decoyGadget = CreateDefaultSubobject<UDecoy>(TEXT("Decoy Gadget"));
-
 	invisibleCloak = CreateDefaultSubobject<UInvisibleCloak>(TEXT("Invisible Cloak"));
 
 	equippedWeapon = StunWeapon;
@@ -33,18 +28,28 @@ UEquipement::UEquipement()
 
 void UEquipement::FinishAttachement(class USceneComponent* root)
 {
-	playerCache = Cast<ABase3C>(root->GetOwner());
+	pawn = Cast<ABase3C>(root->GetOwner());
+	StunWeapon->pawn = pawn;
+	StunStick->pawn = pawn;
+	sensorGadgetOfficer->pawn = pawn;
+	GrenateTrajectory->pawn = pawn;
+	decoyGadget->pawn = pawn;
+	invisibleCloak->pawn = pawn;
 
 	StunWeapon->SetupAttachment(root);
 	StunStick->SetupAttachment(root, FName("RightHandSocket"));
+	GrenateTrajectory->FinishAttachment(root, pawn->cameraComponent->camera);
+}
 
-	GrenateTrajectory->FinishAttachment(root, playerCache->cameraComponent->camera);
-
-	AController* controller = playerCache->GetController();
-	if (controller == nullptr || !controller->IsLocalPlayerController())
-		return;
-
-	pcCache = Cast<AGamePlayerController>(controller);
+void UEquipement::SetController(AGamePlayerController* pController)
+{
+	controller = pController;
+	StunWeapon->controller = pController;
+	StunStick->controller = pController;
+	sensorGadgetOfficer->controller = pController;
+	GrenateTrajectory->controller = pController;
+	decoyGadget->controller = pController;
+	invisibleCloak->controller = pController;
 }
 
 void UEquipement::BeginPlay()
@@ -57,15 +62,6 @@ void UEquipement::TickComponent(float DeltaTime, ELevelTick TickType, FActorComp
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 
 	IWeapon::Execute_Tick(equippedWeapon->_getUObject(), DeltaTime);
-
-	if (pcCache == nullptr)
-	{
-		AController* controller = playerCache->GetController();
-		if (controller == nullptr || !controller->IsLocalPlayerController())
-			return;
-
-		pcCache = Cast<AGamePlayerController>(controller);
-	}
 }
 
 void UEquipement::EquipWeapon_Implementation(const TScriptInterface<IWeapon>& nextWeapon)
@@ -109,10 +105,9 @@ void UEquipement::EquipeBelt1()
 {
 	if (!(utilityBelt.Num() >= 1))
 	{
-		if (pcCache != nullptr)
+		if (controller != nullptr)
 		{
-			pcCache->SREquipWeapon(this, StunWeapon);
-			//EquipWeapon(StunWeapon);
+			controller->SREquipWeapon(this, StunWeapon);
 		}
 		return;
 	}
@@ -129,10 +124,9 @@ void UEquipement::EquipeBelt1()
 			IWeapon::Execute_UpdateUI(StunWeapon->_getUObject());
 			GrenateTrajectory->CurrentGrenadeClass = GrenadeType::None;
 
-			if (pcCache != nullptr)
+			if (controller != nullptr)
 			{
-				pcCache->SREquipWeapon(this, StunWeapon);
-				//EquipWeapon(StunWeapon);
+				controller->SREquipWeapon(this, StunWeapon);
 			}
 		}
 
@@ -142,10 +136,9 @@ void UEquipement::EquipeBelt1()
 	{
 		IWeapon::Execute_UpdateUI(weapon.GetObject());
 
-		if (pcCache != nullptr)
+		if (controller != nullptr)
 		{
-			pcCache->SREquipWeapon(this, weapon);
-			//EquipWeapon(weapon);
+			controller->SREquipWeapon(this, weapon);
 		}
 	}
 }
@@ -154,10 +147,9 @@ void UEquipement::EquipeBelt2()
 {
 	if (!(utilityBelt.Num() >= 2))
 	{
-		if (pcCache != nullptr)
+		if (controller != nullptr)
 		{
-			pcCache->SREquipWeapon(this, StunWeapon);
-			//EquipWeapon(StunWeapon);
+			controller->SREquipWeapon(this, StunWeapon);
 		}
 		return;
 	}
@@ -173,20 +165,18 @@ void UEquipement::EquipeBelt2()
 		{
 			IWeapon::Execute_UpdateUI(StunWeapon->_getUObject());
 			GrenateTrajectory->CurrentGrenadeClass = GrenadeType::None;
-			if (pcCache != nullptr)
+			if (controller != nullptr)
 			{
-				pcCache->SREquipWeapon(this, StunWeapon);
-				//EquipWeapon(StunWeapon);
+				controller->SREquipWeapon(this, StunWeapon);
 			}
 		}
 	}
 	else
 	{
 		IWeapon::Execute_UpdateUI(weapon.GetObject());
-		if (pcCache != nullptr)
+		if (controller != nullptr)
 		{
-			pcCache->SREquipWeapon(this, weapon);
-			//EquipWeapon(weapon);
+			controller->SREquipWeapon(this, weapon);
 		}
 	}
 }
@@ -195,10 +185,9 @@ void UEquipement::EquipeBelt3()
 {
 	if (!(utilityBelt.Num() >= 3))
 	{
-		if (pcCache != nullptr)
+		if (controller != nullptr)
 		{
-			pcCache->SREquipWeapon(this, StunWeapon);
-			//EquipWeapon(StunWeapon);
+			controller->SREquipWeapon(this, StunWeapon);
 		}
 		return;
 	}
@@ -214,20 +203,18 @@ void UEquipement::EquipeBelt3()
 		{
 			IWeapon::Execute_UpdateUI(StunWeapon->_getUObject());
 			GrenateTrajectory->CurrentGrenadeClass = GrenadeType::None;
-			if (pcCache != nullptr)
+			if (controller != nullptr)
 			{
-				pcCache->SREquipWeapon(this, StunWeapon);
-				//EquipWeapon(StunWeapon);
+				controller->SREquipWeapon(this, StunWeapon);
 			}
 		}
 	}
 	else
 	{
 		IWeapon::Execute_UpdateUI(weapon.GetObject());
-		if (pcCache != nullptr)
+		if (controller != nullptr)
 		{
-			pcCache->SREquipWeapon(this, weapon);
-			//EquipWeapon(weapon);
+			controller->SREquipWeapon(this, weapon);
 		}
 	}
 }
@@ -242,14 +229,14 @@ const TScriptInterface<IWeapon> UEquipement::GetWeaponFromEnum(EquipementPossibi
 							GrenateTrajectory->previousGrenadeClass = GrenateTrajectory->CurrentGrenadeClass;
 							GrenateTrajectory->CurrentGrenadeClass = GrenadeType::Smoke;
 							GrenateTrajectory->uiTexture = AllGrenade[GrenadeType::Smoke].uiImage;
-							pcCache->SetGrenade(this, GrenadeType::Smoke);
+							controller->SetGrenade(this, GrenadeType::Smoke);
 							return GrenateTrajectory;
 
 		case StunGrenade:	
 							GrenateTrajectory->previousGrenadeClass = GrenateTrajectory->CurrentGrenadeClass;
 							GrenateTrajectory->CurrentGrenadeClass = GrenadeType::Stun;
 							GrenateTrajectory->uiTexture = AllGrenade[GrenadeType::Stun].uiImage;
-							pcCache->SetGrenade(this, GrenadeType::Stun);
+							controller->SetGrenade(this, GrenadeType::Stun);
 							return GrenateTrajectory;
 
 		case HoloDecoy: return decoyGadget;

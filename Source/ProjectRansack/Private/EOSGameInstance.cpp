@@ -46,6 +46,9 @@ void UEOSGameInstance::Logout()
 	if (!Identity)
 		return;
 
+	if (ServerGameSlot.saveGame != nullptr)
+		ServerGameSlot.saveGame->RemoveFromRoot();
+
 	Identity->OnLogoutCompleteDelegates->AddUObject(this, &UEOSGameInstance::logoutCompleted);
 	Identity->Logout(0);
 }
@@ -807,7 +810,14 @@ void UEOSGameInstance::SaveGame()
 
 void UEOSGameInstance::LoadSaveGame()
 {
-	if (isLoadingSaveGame)
+	if (ServerGameSlot.saveGame == nullptr && ServerGameSlot.debugSave)
+	{
+		//Editor save game
+		ServerGameSlot.saveGame = (UPlayerSaveGame*)(UGameplayStatics::CreateSaveGameObject(UPlayerSaveGame::StaticClass()));
+		return;
+	}
+
+	if (isLoadingSaveGame || ServerGameSlot.saveGame != nullptr)
 		return;
 
 	isLoadingSaveGame = true;

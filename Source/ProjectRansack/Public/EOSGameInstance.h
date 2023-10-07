@@ -19,6 +19,8 @@ struct FSaveGameSlot
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	T* saveGame = nullptr;
+
+	bool debugSave = false;
 };
 
 UENUM(BlueprintType)
@@ -177,8 +179,8 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	int TotalConnectedPlayer = 1;
 
-	FSaveGameSlot<class UPlayerSaveGame> ServerGameSlot = { "SaveGame.sav", 0, nullptr };
+	FSaveGameSlot<class UPlayerSaveGame> ServerGameSlot = { "SaveGame.sav", 0, nullptr, false };
 	FOnSaveGameFinish SaveGameFinish;
 
-	FSaveGameSlot<class UPlayerSetting> SettingsGameSlot = { "Settings.sav", 1, nullptr };
+	FSaveGameSlot<class UPlayerSetting> SettingsGameSlot = { "Settings.sav", 1, nullptr, false };
 };

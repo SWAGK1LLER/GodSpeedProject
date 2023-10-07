@@ -1,11 +1,12 @@
 #include "SmokeGrenade.h"
 #include "Particles/ParticleSystemComponent.h"
 #include "GenericParticleSystemComponent.h"
+#include "Base3C.h"
 #include <Kismet/GameplayStatics.h>
 
 void ASmokeGrenade::OnHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit)
 {
-	if (counterStarted)
+	if (counterStarted || owner == nullptr || OtherActor == owner)
 		return;
 
 	counterStarted = true;

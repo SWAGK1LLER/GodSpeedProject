@@ -18,7 +18,7 @@ void AStunGrenade::BeginPlay()
 
 void AStunGrenade::OnHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit)
 {
-	if (exploded)
+	if (exploded || owner == nullptr || OtherActor == owner)
 		return;
 
 	exploded = true;

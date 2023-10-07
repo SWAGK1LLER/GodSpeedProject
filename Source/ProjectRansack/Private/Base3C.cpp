@@ -22,10 +22,7 @@ ABase3C::ABase3C(const FObjectInitializer& ObjectInitializer) : Super(ObjectInit
 	bReplicates = true;
 
 	equipement = CreateDefaultSubobject<UEquipement>(TEXT("equipement"));
-	equipement->RegisterComponent();
-
 	audioComp = CreateDefaultSubobject<UAudioComponent>(TEXT("Audio"));
-
 	damageIndicator = CreateDefaultSubobject<UDamageIndicatorComp>(TEXT("DamageIndicator"));
 }
 
@@ -33,8 +30,8 @@ void ABase3C::BeginPlay()
 {
 	Super::BeginPlay();
 
-	SpawnTransform = GetActorTransform();
 	equipement->FinishAttachement(GetMesh());
+	SpawnTransform = GetActorTransform();
 
 	if(!CreateTableInstance())
 		return;
@@ -120,6 +117,11 @@ void ABase3C::SendDataToComponents()
 		return;
 
 	cameraComponent->fetchData(tableInstance->maxPitchBottom, tableInstance->maxPitchTop);
+}
+
+void ABase3C::DispatchController(AGamePlayerController* controller)
+{
+	equipement->SetController(controller);
 }
 
 void ABase3C::SetClientNickname_Implementation(const FString& pNickName)

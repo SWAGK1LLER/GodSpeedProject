@@ -4,34 +4,29 @@
 UInvisibleCloak::UInvisibleCloak()
 {
     PrimaryComponentTick.bCanEverTick = false;
-    owner = Cast<ABase3C>(GetOwner());
-}
-
-void UInvisibleCloak::BeginPlay()
-{
-
 }
 
 void UInvisibleCloak::MUlFire_Implementation()
 {
-    if (isActive)
+    if (abilityUsed)
         return;
 
-    isActive = true;
-    owner->GetMesh()->SetVisibility(false);
+    abilityUsed = true;
+    pawn->GetMesh()->SetVisibility(false);
 
     FTimerHandle Handle;
     GetWorld()->GetTimerManager().SetTimer(Handle, FTimerDelegate::CreateLambda([&] {
-        isActive = false;
-        owner->GetMesh()->SetVisibility(true);
+        abilityUsed = false;
+        pawn->GetMesh()->SetVisibility(true);
     }), duration, false);
 }
 
 void UInvisibleCloak::MUlToggleVisibility_Implementation(bool visible)
 {
+    isActive = visible;
 }
 
 void UInvisibleCloak::UpdateUI_Implementation()
 {
-    owner->WidgetUI->ShowCloakEquiped();
+    pawn->WidgetUI->ShowCloakEquiped();
 }
