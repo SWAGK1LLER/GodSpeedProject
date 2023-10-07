@@ -26,7 +26,7 @@ public:
 	float StunDuration = 5;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	class UShapeComponent* HitArea = nullptr;
+	class UBoxComponent* HitArea = nullptr;
 
 	TArray<class ABase3C*> possibleHittedActor;
 

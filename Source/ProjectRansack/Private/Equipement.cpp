@@ -36,8 +36,8 @@ void UEquipement::FinishAttachement(class USceneComponent* root)
 	decoyGadget->pawn = pawn;
 	invisibleCloak->pawn = pawn;
 
-	StunWeapon->SetupAttachment(root);
-	StunStick->SetupAttachment(root, FName("RightHandSocket"));
+	StunWeapon->AttachToComponent(root, FAttachmentTransformRules::KeepRelativeTransform);
+	StunStick->AttachToComponent(root, FAttachmentTransformRules::SnapToTargetNotIncludingScale, FName("RightHandSocket"));
 	GrenateTrajectory->FinishAttachment(root, pawn->cameraComponent->camera);
 }
 

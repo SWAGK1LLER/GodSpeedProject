@@ -10,7 +10,7 @@ UBaton::UBaton(const FObjectInitializer& ObjectInitializer) //: UStaticMeshCompo
 
 	HitArea = CreateDefaultSubobject<UBoxComponent>(FName("HitArea"));
 	HitArea->SetGenerateOverlapEvents(true);
-	HitArea->SetupAttachment(this);
+	//HitArea->SetupAttachment(GetMesh());
 }
 
 void UBaton::BeginPlay()

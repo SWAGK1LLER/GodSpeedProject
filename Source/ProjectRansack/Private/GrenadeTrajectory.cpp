@@ -19,10 +19,10 @@ UGrenadeTrajectory::UGrenadeTrajectory()
 
 void UGrenadeTrajectory::FinishAttachment(USceneComponent* root, UCameraComponent* pCamera)
 {
-	niagara->SetupAttachment(root);
+	niagara->AttachToComponent(root, FAttachmentTransformRules::KeepRelativeTransform);
 	camera = pCamera;
 
-	mesh->SetupAttachment(root, FName("RightHandSocket"));
+	mesh->AttachToComponent(root, FAttachmentTransformRules::SnapToTargetNotIncludingScale, (root, FName("RightHandSocket")));
 }
 
 void UGrenadeTrajectory::SetIslocalController(bool local)

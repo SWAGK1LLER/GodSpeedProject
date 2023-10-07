@@ -36,6 +36,8 @@ AOfficer::AOfficer(const FObjectInitializer& ObjectInitializer) : Super(ObjectIn
 	StunArea = CreateDefaultSubobject<UBoxComponent>(FName("StunArea"));
 	StunArea->SetGenerateOverlapEvents(true);
 	StunArea->SetupAttachment(RootComponent);
+
+	equipement->StunStick->HitArea->SetupAttachment(equipement->StunStick);
 }
 
 void AOfficer::BeginPlay()

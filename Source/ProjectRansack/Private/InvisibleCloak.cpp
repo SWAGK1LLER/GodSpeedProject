@@ -6,6 +6,11 @@ UInvisibleCloak::UInvisibleCloak()
     PrimaryComponentTick.bCanEverTick = false;
 }
 
+void UInvisibleCloak::BeginPlay()
+{
+    Super::BeginPlay();
+};
+
 void UInvisibleCloak::MUlFire_Implementation()
 {
     if (abilityUsed)

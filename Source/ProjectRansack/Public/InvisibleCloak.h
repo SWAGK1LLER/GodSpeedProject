@@ -18,7 +18,7 @@ public:
 
 	UInvisibleCloak();
 
-	virtual void BeginPlay() override {};
+	virtual void BeginPlay() override;
 
 	void MUlFire_Implementation() override;
 
