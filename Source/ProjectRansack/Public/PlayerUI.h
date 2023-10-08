@@ -42,4 +42,7 @@ public:
 
 	UFUNCTION(BlueprintImplementableEvent)
 	void ShowDeguisementEquiped();
+
+	UFUNCTION(BlueprintImplementableEvent)
+	void ShowEmpEquiped();
 };

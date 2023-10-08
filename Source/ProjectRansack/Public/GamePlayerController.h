@@ -212,8 +212,8 @@ public:
 	void SRFire_Implementation(class UEquipement* equip);
 
 	UFUNCTION(Server, Reliable, BlueprintCallable)
-	void SpawnDecoy(TSubclassOf<class ADecoyActor> DecoyActorClass, FVector location, FRotator rotation);
-	void SpawnDecoy_Implementation(TSubclassOf<class ADecoyActor> DecoyActorClass, FVector location, FRotator rotation);
+	void SpawnDecoy(TSubclassOf<class ADecoyActor> DecoyActorClass, class USkeletalMesh* mesh, class UClass* anim, FVector location, FRotator rotation);
+	void SpawnDecoy_Implementation(TSubclassOf<class ADecoyActor> DecoyActorClass, class USkeletalMesh* mesh, class UClass* anim, FVector location, FRotator rotation);
 
 	UFUNCTION(Server, Reliable, BlueprintCallable)
 	void SRDisableSystem(class AProtectionLoot* actor);

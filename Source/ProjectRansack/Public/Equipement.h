@@ -22,7 +22,8 @@ enum EquipementPossibility
 	StunGrenade		UMETA(DisplayName = "Stun Grenade"),
 	HoloDecoy	UMETA(DisplayName = "DecoyGadget"),
 	InvisibleCloak	UMETA(DisplayName = "Cloak"),
-	Deguisement UMETA(DisplayName = "Deguisement")
+	Deguisement UMETA(DisplayName = "Deguisement"),
+	EMP UMETA(DisplayName = "EMP")
 };
 
 USTRUCT(BlueprintType)
@@ -67,6 +68,9 @@ public:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
 	class UDeguiseComp* deguisement;
+	
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
+	class UEMP* emp;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	TArray<TEnumAsByte<EquipementPossibility>> utilityBelt;

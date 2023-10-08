@@ -15,9 +15,14 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	TSubclassOf<class ADecoyActor> DecoyActorClass;
 
+	class USkeletalMesh* originalMesh = nullptr;
+	class UAnimInstance* originalAnim = nullptr;
+
 	UDecoy();
 	virtual void BeginPlay() override;
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
+
+	void FinishSetup();
 
 	void SpawnDecoy();
 

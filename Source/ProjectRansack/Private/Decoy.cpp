@@ -4,6 +4,7 @@
 #include "CameraComp.h"
 #include "DecoyActor.h"
 #include "GameFramework/PawnMovementComponent.h"
+#include "Engine/SkeletalMesh.h"
 #include <GamePlayerController.h>
 
 UDecoy::UDecoy()
@@ -21,6 +22,12 @@ void UDecoy::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponent
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 }
 
+void UDecoy::FinishSetup()
+{
+	originalMesh = pawn->GetMesh()->GetSkeletalMeshAsset();
+	originalAnim = pawn->GetMesh()->GetAnimInstance();
+}
+
 void UDecoy::SpawnDecoy()
 {
 	if (controller == nullptr || !controller->IsLocalPlayerController())
@@ -32,7 +39,7 @@ void UDecoy::SpawnDecoy()
 	cam.Roll = 0;
 	cam.Pitch = 0;
 
-	controller->SpawnDecoy(DecoyActorClass, pawn->GetActorLocation() + velocityoffSet, cam);
+	controller->SpawnDecoy(DecoyActorClass, originalMesh, originalAnim->GetClass(), pawn->GetActorLocation() + velocityoffSet, cam);
 }
 
 void UDecoy::MUlFire_Implementation()

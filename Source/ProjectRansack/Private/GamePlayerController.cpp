@@ -590,9 +590,11 @@ void AGamePlayerController::SRFire_Implementation(UEquipement* equip)
 	equip->Fire();
 }
 
-void AGamePlayerController::SpawnDecoy_Implementation(TSubclassOf<ADecoyActor> DecoyActorClass, FVector location, FRotator rotation)
+void AGamePlayerController::SpawnDecoy_Implementation(TSubclassOf<ADecoyActor> DecoyActorClass, USkeletalMesh* mesh, UClass* anim, FVector location, FRotator rotation)
 {
-	GetWorld()->GetWorld()->SpawnActor<ADecoyActor>(DecoyActorClass, location, rotation, FActorSpawnParameters());
+	ADecoyActor* actor = GetWorld()->GetWorld()->SpawnActor<ADecoyActor>(DecoyActorClass, location, rotation, FActorSpawnParameters());
+	actor->GetMesh()->SetSkeletalMesh(mesh);
+	actor->GetMesh()->SetAnimInstanceClass(anim);
 }
 
 void AGamePlayerController::SetGrenade_Implementation(UEquipement* equip, GrenadeType grenade)
