@@ -26,6 +26,7 @@
 #include "Equipement.h"
 #include "DeguiseComp.h"
 #include "Engine/SkeletalMesh.h"
+#include "Animation/AnimInstance.h"
 
 void AGamePlayerController::BeginPlay()
 {
@@ -599,7 +600,7 @@ void AGamePlayerController::SetGrenade_Implementation(UEquipement* equip, Grenad
 	equip->SetGrenadeType(grenade);
 }
 
-void AGamePlayerController::SwithcSkeletalMesh_Implementation(UDeguiseComp* comp, USkeletalMesh* mesh)
+void AGamePlayerController::SwithcSkeletalMesh_Implementation(UDeguiseComp* comp, USkeletalMesh* mesh, UClass* anim)
 {
-	comp->SetMesh(mesh);
+	comp->SetMesh(mesh, anim);
 }

@@ -3,7 +3,6 @@
 #include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
 #include "Weapon.h"
-#include "Animation/AnimBlueprint.h"
 #include "DeguiseComp.generated.h"
 
 
@@ -22,16 +21,16 @@ public:
 	class USkeletalMesh* thiefMesh = nullptr;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = Animation)
-	UAnimBlueprint* thiefAnim = nullptr;
+	TSubclassOf<UAnimInstance> thiefAnim = nullptr;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	class USkeletalMesh* officerMesh = nullptr;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = Animation)
-	UAnimBlueprint* officerAnim = nullptr;
+	TSubclassOf<UAnimInstance> officerAnim = nullptr;
 
 	class USkeletalMesh* originalMesh = nullptr;
-	UAnimBlueprint* originalAnim = nullptr;
+	class UAnimInstance* originalAnim = nullptr;
 
 	UDeguiseComp();
 	virtual void BeginPlay() override;
@@ -45,5 +44,5 @@ public:
 
 	void UpdateUI_Implementation() override;
 
-	void SetMesh(class USkeletalMesh* mesh);
+	void SetMesh(class USkeletalMesh* mesh, class UClass* anim);
 };
