@@ -230,4 +230,8 @@ public:
 	UFUNCTION(Server, Reliable, BlueprintCallable)
 	void SetGrenade(class UEquipement* equip, enum GrenadeType grenade);
 	void SetGrenade_Implementation(class UEquipement* equip, enum GrenadeType grenade);
+	
+	UFUNCTION(Client, Reliable, BlueprintCallable)
+	void SwithcSkeletalMesh(class UDeguiseComp* comp, class USkeletalMesh* mesh);
+	void SwithcSkeletalMesh_Implementation(class UDeguiseComp* comp, class USkeletalMesh* mesh);
 };

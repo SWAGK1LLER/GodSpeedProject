@@ -3,6 +3,7 @@
 #include "Base3C.h"
 #include "Thief.h"
 #include "Officer.h"
+#include "GamePlayerController.h"
 
 UDeguiseComp::UDeguiseComp()
 {
@@ -21,8 +22,8 @@ void UDeguiseComp::TickComponent(float DeltaTime, ELevelTick TickType, FActorCom
 
 void UDeguiseComp::finishAttachement()
 {
-    if (originalMesh == nullptr)
-        originalMesh = pawn->GetMesh()->GetSkeletalMeshAsset();
+    originalMesh = pawn->GetMesh()->GetSkeletalMeshAsset();
+    //originalAnim = pawn->GetMesh()->GetAnimClass();
 }
 
 void UDeguiseComp::MUlFire_Implementation()
@@ -33,14 +34,27 @@ void UDeguiseComp::MUlFire_Implementation()
     abilityUsed = true;
 
     if (pawn->IsA(AThief::StaticClass()))
+    {
         pawn->GetMesh()->SetSkeletalMesh(officerMesh);
+        if (controller != nullptr)
+            controller->SwithcSkeletalMesh(this, officerMesh);
+    }
     else
+    {
         pawn->GetMesh()->SetSkeletalMesh(thiefMesh);
+        if (controller != nullptr)
+            controller->SwithcSkeletalMesh(this, thiefMesh);
+    }
+
+    
 
     FTimerHandle Handle;
     GetWorld()->GetTimerManager().SetTimer(Handle, FTimerDelegate::CreateLambda([&] {
         abilityUsed = false;
         pawn->GetMesh()->SetSkeletalMesh(originalMesh);
+        if (controller != nullptr)
+            controller->SwithcSkeletalMesh(this, originalMesh);
+
     }), duration, false);
 }
 
@@ -52,4 +66,9 @@ void UDeguiseComp::MUlToggleVisibility_Implementation(bool visible)
 void UDeguiseComp::UpdateUI_Implementation()
 {
     pawn->WidgetUI->ShowDeguisementEquiped();
+}
+
+void UDeguiseComp::SetMesh(USkeletalMesh* mesh)
+{
+    pawn->GetMesh()->SetSkeletalMesh(mesh);
 }

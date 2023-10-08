@@ -3,6 +3,7 @@
 #include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
 #include "Weapon.h"
+#include "Animation/AnimBlueprint.h"
 #include "DeguiseComp.generated.h"
 
 
@@ -20,10 +21,17 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	class USkeletalMesh* thiefMesh = nullptr;
 
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = Animation)
+	UAnimBlueprint* thiefAnim = nullptr;
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	class USkeletalMesh* officerMesh = nullptr;
 
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = Animation)
+	UAnimBlueprint* officerAnim = nullptr;
+
 	class USkeletalMesh* originalMesh = nullptr;
+	UAnimBlueprint* originalAnim = nullptr;
 
 	UDeguiseComp();
 	virtual void BeginPlay() override;
@@ -36,4 +44,6 @@ public:
 	void MUlToggleVisibility_Implementation(bool visible) override;
 
 	void UpdateUI_Implementation() override;
+
+	void SetMesh(class USkeletalMesh* mesh);
 };

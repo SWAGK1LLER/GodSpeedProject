@@ -24,6 +24,8 @@
 #include "GrenadeTrajectory.h"
 #include "DecoyActor.h"
 #include "Equipement.h"
+#include "DeguiseComp.h"
+#include "Engine/SkeletalMesh.h"
 
 void AGamePlayerController::BeginPlay()
 {
@@ -595,4 +597,9 @@ void AGamePlayerController::SpawnDecoy_Implementation(TSubclassOf<ADecoyActor> D
 void AGamePlayerController::SetGrenade_Implementation(UEquipement* equip, GrenadeType grenade)
 {
 	equip->SetGrenadeType(grenade);
+}
+
+void AGamePlayerController::SwithcSkeletalMesh_Implementation(UDeguiseComp* comp, USkeletalMesh* mesh)
+{
+	comp->SetMesh(mesh);
 }
