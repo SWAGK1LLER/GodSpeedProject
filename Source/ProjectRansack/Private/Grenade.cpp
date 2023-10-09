@@ -5,6 +5,7 @@
 AGrenade::AGrenade()
 {
 	PrimaryActorTick.bCanEverTick = true;
+	bReplicates = true;
 
 	RootComponent = mesh = CreateDefaultSubobject<UStaticMeshComponent>(FName("mesh"));
 }
@@ -27,7 +28,13 @@ void AGrenade::Tick(float DeltaTime)
 	Super::Tick(DeltaTime);
 }
 
-void AGrenade::SetVelocity(FVector velocity)
+void AGrenade::SetVelocityLocal(FVector velocity)
 {
 	mesh->SetPhysicsLinearVelocity(velocity);
+}
+
+void AGrenade::MUlSetVelocity_Implementation(ABase3C* pPawn, FVector velo)
+{
+	SetThrower(pPawn);
+	SetVelocityLocal(velo);
 }

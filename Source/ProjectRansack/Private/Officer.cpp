@@ -36,8 +36,6 @@ AOfficer::AOfficer(const FObjectInitializer& ObjectInitializer) : Super(ObjectIn
 	StunArea = CreateDefaultSubobject<UBoxComponent>(FName("StunArea"));
 	StunArea->SetGenerateOverlapEvents(true);
 	StunArea->SetupAttachment(RootComponent);
-
-	equipement->StunStick->HitArea->SetupAttachment(equipement->StunStick);
 }
 
 void AOfficer::BeginPlay()
@@ -49,7 +47,7 @@ void AOfficer::BeginPlay()
 	CreateTimeline();
 	SendDataToComponents();
 	flashLight->SetIntensity(0.f);
-	GetMesh()->SetOwnerNoSee(true); 
+	GetMesh()->SetOwnerNoSee(true);
 	SetupNotificationUI();
 
 	StunArea->OnComponentBeginOverlap.AddDynamic(this, &AOfficer::OnStunTriggerOverlapBegin);

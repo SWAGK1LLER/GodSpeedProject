@@ -26,10 +26,14 @@ public:
 
 	virtual void Tick(float DeltaTime) override;
 
-	void SetVelocity(FVector velocity);
+	void SetVelocityLocal(FVector velocity);
 
 	UFUNCTION()
 	virtual void OnHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit) {};
 
 	virtual void Explose() {};
+
+	UFUNCTION(NetMulticast, Reliable, NotBlueprintable)
+	virtual void MUlSetVelocity(class ABase3C* pPawn, FVector velo);
+	virtual void MUlSetVelocity_Implementation(class ABase3C* pPawn, FVector velo);
 };

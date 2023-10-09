@@ -1,9 +1,10 @@
 #include "InvisibleCloak.h"
 #include "Base3C.h"
+#include "GamePlayerController.h"
 
 UInvisibleCloak::UInvisibleCloak()
 {
-    PrimaryComponentTick.bCanEverTick = false;
+    PrimaryComponentTick.bCanEverTick = true;
 }
 
 void UInvisibleCloak::BeginPlay()
@@ -11,19 +12,36 @@ void UInvisibleCloak::BeginPlay()
     Super::BeginPlay();
 };
 
+void UInvisibleCloak::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
+{
+    Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
+
+    if (timer > 0)
+    {
+        timer -= DeltaTime;
+
+        if (timer < 0)
+        {
+            pawn->GetMesh()->SetVisibility(true);
+            abilityUsed = false;
+        }
+    }
+}
+
 void UInvisibleCloak::MUlFire_Implementation()
 {
     if (abilityUsed)
         return;
 
     abilityUsed = true;
-    pawn->GetMesh()->SetVisibility(false);
+    timer = duration;
 
-    FTimerHandle Handle;
-    GetWorld()->GetTimerManager().SetTimer(Handle, FTimerDelegate::CreateLambda([&] {
-        abilityUsed = false;
-        pawn->GetMesh()->SetVisibility(true);
-    }), duration, false);
+    if (controller != nullptr)
+    {
+        controller->SetPawnVisibility(pawn, false);
+    }
+
+    //pawn->GetMesh()->SetVisibility(false);
 }
 
 void UInvisibleCloak::MUlToggleVisibility_Implementation(bool visible)

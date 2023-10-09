@@ -25,7 +25,8 @@ USensorGadgetOfficerComponent::USensorGadgetOfficerComponent()
 
 void USensorGadgetOfficerComponent::Tick_Implementation(float delta)
 {
-	updatePosing(pawn->cameraComponent->camera->GetComponentLocation(), pawn->cameraComponent->camera->GetForwardVector());
+	if (isActive)
+		updatePosing(pawn->cameraComponent->camera->GetComponentLocation(), pawn->cameraComponent->camera->GetForwardVector());
 }
 
 void USensorGadgetOfficerComponent::fetchData(float pRange, float pRevealTime, unsigned int pMaxSensors)

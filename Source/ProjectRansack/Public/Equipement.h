@@ -23,7 +23,8 @@ enum EquipementPossibility
 	HoloDecoy	UMETA(DisplayName = "DecoyGadget"),
 	InvisibleCloak	UMETA(DisplayName = "Cloak"),
 	Deguisement UMETA(DisplayName = "Deguisement"),
-	EMP UMETA(DisplayName = "EMP")
+	EMP UMETA(DisplayName = "EMP"),
+	Claymore UMETA(DisplayName = "Claymore")
 };
 
 USTRUCT(BlueprintType)
@@ -71,6 +72,9 @@ public:
 	
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
 	class UEMP* emp;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
+	class UClaymoreComponent* claymoreComp;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	TArray<TEnumAsByte<EquipementPossibility>> utilityBelt;

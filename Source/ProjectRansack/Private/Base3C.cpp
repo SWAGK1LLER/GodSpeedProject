@@ -15,15 +15,19 @@
 #include "Components/AudioComponent.h"
 #include "Equipement.h"
 #include "GrenadeTrajectory.h"
+#include "Baton.h"
+#include "Components/BoxComponent.h"
 
 ABase3C::ABase3C(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
 {
  	PrimaryActorTick.bCanEverTick = true;
 	bReplicates = true;
 
-	equipement = CreateDefaultSubobject<UEquipement>(TEXT("equipement"));
+	equipement = CreateDefaultSubobject<UEquipement>(TEXT("Equipement"));
 	audioComp = CreateDefaultSubobject<UAudioComponent>(TEXT("Audio"));
 	damageIndicator = CreateDefaultSubobject<UDamageIndicatorComp>(TEXT("DamageIndicator"));
+
+	equipement->StunStick->HitArea->SetupAttachment(equipement->StunStick);
 }
 
 void ABase3C::BeginPlay()

@@ -13,6 +13,7 @@
 #include "Engine/Texture2D.h"
 #include "DeguiseComp.h"
 #include "EMP.h"
+#include "ClaymoreComponent.h"
 
 UEquipement::UEquipement()
 {
@@ -26,6 +27,7 @@ UEquipement::UEquipement()
 	invisibleCloak = CreateDefaultSubobject<UInvisibleCloak>(TEXT("Invisible Cloak"));
 	deguisement = CreateDefaultSubobject<UDeguiseComp>(TEXT("Deguisement"));
 	emp = CreateDefaultSubobject<UEMP>(TEXT("Emp"));
+	claymoreComp = CreateDefaultSubobject<UClaymoreComponent>(TEXT("ClaymoreComp"));
 
 	equippedWeapon = StunWeapon;
 }
@@ -41,6 +43,7 @@ void UEquipement::FinishAttachement(class USceneComponent* root)
 	invisibleCloak->pawn = pawn;
 	deguisement->pawn = pawn;
 	emp->pawn = pawn;
+	claymoreComp->pawn = pawn;
 
 	StunWeapon->AttachToComponent(root, FAttachmentTransformRules::KeepRelativeTransform);
 	StunStick->AttachToComponent(root, FAttachmentTransformRules::SnapToTargetNotIncludingScale, FName("RightHandSocket"));
@@ -60,6 +63,7 @@ void UEquipement::SetController(AGamePlayerController* pController)
 	invisibleCloak->controller = pController;
 	deguisement->controller = pController;
 	emp->controller = pController;
+	claymoreComp->controller = pController;
 }
 
 void UEquipement::BeginPlay()
@@ -253,6 +257,7 @@ const TScriptInterface<IWeapon> UEquipement::GetWeaponFromEnum(EquipementPossibi
 		case InvisibleCloak: return invisibleCloak;
 		case Deguisement: return deguisement;
 		case EMP: return emp;
+		case Claymore: return claymoreComp;
 		default: return StunWeapon;
 	}
 }

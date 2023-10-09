@@ -24,4 +24,8 @@ public:
 	virtual void Tick(float DeltaTime) override;
 
 	void Move();
+
+	UFUNCTION(NetMulticast, Reliable, NotBlueprintable)
+	void SetMesh(class USkeletalMesh* originalMesh, class UClass* originalAnim);
+	void SetMesh_Implementation(class USkeletalMesh* originalMesh, class UClass* originalAnim);
 };

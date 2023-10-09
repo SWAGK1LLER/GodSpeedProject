@@ -14,7 +14,8 @@ UGrenadeTrajectory::UGrenadeTrajectory()
 	PrimaryComponentTick.bCanEverTick = true;
 
 	niagara = CreateDefaultSubobject<UNiagaraComponent>(TEXT("Trajectory"));
-	mesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("MeshExposed"));
+
+	mesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("GrenadeMesh"));
 }
 
 void UGrenadeTrajectory::FinishAttachment(USceneComponent* root, UCameraComponent* pCamera)
@@ -35,14 +36,17 @@ void UGrenadeTrajectory::BeginPlay()
 	Super::BeginPlay();
 
 	mesh->SetVisibility(false);
+	PredictionPositions.Empty();
+	UNiagaraDataInterfaceArrayFunctionLibrary::SetNiagaraArrayVector(niagara, FName("Positions"), PredictionPositions);
 }
 
 void UGrenadeTrajectory::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
 {
+	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
+
 	if (!isActive)
 		return;
 
-	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 	refreshCounter -= DeltaTime;
 	timer -= DeltaTime;
 
@@ -50,13 +54,13 @@ void UGrenadeTrajectory::TickComponent(float DeltaTime, ELevelTick TickType, FAc
 	throwingVelo = throwVelocity * GetOwner()->GetActorForwardVector();
 	throwingVelo.Z = throwVelocity.Z * (camera->GetComponentRotation().Pitch / 8);
 
-	if (refresh && isLocalComp)
+	if (refresh)
 		PredictGrenade();
-	else if (isLocalComp)
+	/*else
 	{
 		PredictionPositions.Empty();
 		UNiagaraDataInterfaceArrayFunctionLibrary::SetNiagaraArrayVector(niagara, FName("Positions"), PredictionPositions);
-	}
+	}*/
 }
 
 void UGrenadeTrajectory::PredictGrenade()
@@ -86,15 +90,10 @@ void UGrenadeTrajectory::PredictGrenade()
 
 void UGrenadeTrajectory::ThrowGrenade()
 {
-	if (timer > 0 || *currentAmmo == 0)
-		return;
-
-	timer = 0.1;
-	(*currentAmmo)--;
-
-	AGrenade* newGrenade = GetWorld()->SpawnActor<AGrenade>(*GrenadeClass, mesh->GetComponentLocation(), FRotator(), FActorSpawnParameters());
-	newGrenade->SetThrower(pawn);
-	newGrenade->SetVelocity(throwingVelo);
+	if (controller != nullptr && controller->IsLocalPlayerController())
+	{
+		controller->SpawnGrenade(pawn, mesh->GetComponentLocation(), throwingVelo, *GrenadeClass);
+	}
 }
 
 void UGrenadeTrajectory::MUlToggleVisibility_Implementation(bool visible)
@@ -120,6 +119,12 @@ void UGrenadeTrajectory::CLTogglePredictPath(bool visible)
 
 void UGrenadeTrajectory::MUlFire_Implementation()
 {
+	if (timer > 0 || *currentAmmo == 0)
+		return;
+
+	timer = 0.1;
+	(*currentAmmo)--;
+
 	isThrowing = true;
 	throwPosition = mesh->GetComponentLocation();
 

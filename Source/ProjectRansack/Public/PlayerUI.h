@@ -45,4 +45,7 @@ public:
 
 	UFUNCTION(BlueprintImplementableEvent)
 	void ShowEmpEquiped();
+
+	UFUNCTION(BlueprintImplementableEvent)
+	void ShowClemore();
 };

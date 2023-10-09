@@ -234,4 +234,16 @@ public:
 	UFUNCTION(Client, Reliable, BlueprintCallable)
 	void SwithcSkeletalMesh(class UDeguiseComp* comp, class USkeletalMesh* mesh, class UClass* anim);
 	void SwithcSkeletalMesh_Implementation(class UDeguiseComp* comp, class USkeletalMesh* mesh, class UClass* anim);
+
+	UFUNCTION(Server, Reliable, BlueprintCallable)
+	void SpawnClaymore(TSubclassOf<class AClaymore> ClaymoreTospawn, FVector Location, FRotator rotation, class ABase3C* pOwner);
+	void SpawnClaymore_Implementation(TSubclassOf<class AClaymore> ClaymoreTospawn, FVector Location, FRotator rotation, class ABase3C* pOwner);
+
+	UFUNCTION(Server, Reliable, BlueprintCallable)
+	void SetPawnVisibility(class ABase3C* pOwner, bool visible);
+	void SetPawnVisibility_Implementation(class ABase3C* pOwner, bool visible);
+
+	UFUNCTION(Server, Reliable, BlueprintCallable)
+	void SpawnGrenade(class ABase3C* pPawn, FVector Location,  FVector throwingVelo, TSubclassOf<class AGrenade> GrenadeClass);
+	void SpawnGrenade_Implementation(class ABase3C* pPawn, FVector Location, FVector throwingVelo, TSubclassOf<class AGrenade> GrenadeClass);
 };

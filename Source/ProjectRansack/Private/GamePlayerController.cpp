@@ -27,6 +27,8 @@
 #include "DeguiseComp.h"
 #include "Engine/SkeletalMesh.h"
 #include "Animation/AnimInstance.h"
+#include "Claymore.h"
+#include "Grenade.h"
 
 void AGamePlayerController::BeginPlay()
 {
@@ -82,6 +84,8 @@ void AGamePlayerController::PawnIsPossess(APawn* InPawn)
 	if (!IsLocalPlayerController())
 		return;
 
+	base->equipement->GrenateTrajectory->SetIslocalController(true);
+
 	AThief* thief = Cast<AThief>(InPawn);
 	if (thief == nullptr)
 	{
@@ -91,8 +95,6 @@ void AGamePlayerController::PawnIsPossess(APawn* InPawn)
 		SetUpUI(officer);
 		return;
 	}
-
-	thief->equipement->GrenateTrajectory->SetIslocalController(true);
 
 	SetUpUI(thief);
 	SRGetTeamData();
@@ -593,8 +595,7 @@ void AGamePlayerController::SRFire_Implementation(UEquipement* equip)
 void AGamePlayerController::SpawnDecoy_Implementation(TSubclassOf<ADecoyActor> DecoyActorClass, USkeletalMesh* mesh, UClass* anim, FVector location, FRotator rotation)
 {
 	ADecoyActor* actor = GetWorld()->GetWorld()->SpawnActor<ADecoyActor>(DecoyActorClass, location, rotation, FActorSpawnParameters());
-	actor->GetMesh()->SetSkeletalMesh(mesh);
-	actor->GetMesh()->SetAnimInstanceClass(anim);
+	actor->SetMesh(mesh, anim);
 }
 
 void AGamePlayerController::SetGrenade_Implementation(UEquipement* equip, GrenadeType grenade)
@@ -605,4 +606,21 @@ void AGamePlayerController::SetGrenade_Implementation(UEquipement* equip, Grenad
 void AGamePlayerController::SwithcSkeletalMesh_Implementation(UDeguiseComp* comp, USkeletalMesh* mesh, UClass* anim)
 {
 	comp->SetMesh(mesh, anim);
+}
+
+void AGamePlayerController::SpawnClaymore_Implementation(TSubclassOf<AClaymore> ClaymoreTospawn, FVector Location, FRotator rotation, ABase3C* pOwner)
+{
+	AClaymore* actor = GetWorld()->SpawnActor<AClaymore>(ClaymoreTospawn, Location, rotation, FActorSpawnParameters());
+	actor->owner = pOwner;
+}
+
+void AGamePlayerController::SetPawnVisibility_Implementation(ABase3C* pOwner, bool visible)
+{
+	pOwner->GetMesh()->SetVisibility(visible);
+}
+
+void AGamePlayerController::SpawnGrenade_Implementation(ABase3C* pPawn, FVector Location, FVector throwingVelo, TSubclassOf<AGrenade> GrenadeClass)
+{
+	AGrenade* newGrenade = GetWorld()->SpawnActor<AGrenade>(GrenadeClass, Location, FRotator(), FActorSpawnParameters());
+	newGrenade->MUlSetVelocity(pPawn, throwingVelo);
 }

@@ -16,7 +16,7 @@ public:
 	class UStaticMeshComponent* sensorGadgetOfficerMesh1;
 
 	UPROPERTY(editAnywhere, BlueprintReadWrite, Category = SensorGadget, meta = (AllowPrivateAccess = "true"))
-	UStaticMeshComponent* sensorGadgetOfficerMesh2;
+	class UStaticMeshComponent* sensorGadgetOfficerMesh2;
 
 	UPROPERTY(editAnywhere, BlueprintReadWrite, Category = Color, meta = (AllowPrivateAccess = "true"))
 	class UMaterial* RejectMaterial;

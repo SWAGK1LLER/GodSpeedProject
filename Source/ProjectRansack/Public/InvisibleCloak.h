@@ -15,10 +15,13 @@ public:
 	float duration = 3;
 
 	bool abilityUsed = false;
+	float timer = 0;
 
 	UInvisibleCloak();
 
 	virtual void BeginPlay() override;
+
+	void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction);
 
 	void MUlFire_Implementation() override;
 

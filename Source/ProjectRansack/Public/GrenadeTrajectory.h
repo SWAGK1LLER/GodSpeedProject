@@ -5,6 +5,8 @@
 #include "Components/SceneComponent.h"
 #include "Grenade.h"
 #include "Weapon.h"
+#include "NiagaraSystemInstance.h"
+#include "NiagaraSystem.h"
 #include "GrenadeTrajectory.generated.h"
 
 
@@ -27,6 +29,9 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	class UNiagaraComponent* niagara = nullptr;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	UNiagaraSystem* system;
 
 	TArray<FVector> PredictionPositions;
 

@@ -18,7 +18,7 @@ void AStunGrenade::BeginPlay()
 
 void AStunGrenade::OnHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit)
 {
-	if (exploded || owner == nullptr || OtherActor == owner)
+	if (exploded || owner == nullptr || OtherActor == owner || !HitComponent->IsA(UStaticMeshComponent::StaticClass()))
 		return;
 
 	exploded = true;
@@ -63,7 +63,7 @@ void AStunGrenade::CheckHit()
 		for (FHitResult& Hit : OutHits)
 		{
 			ABase3C* player = Cast<ABase3C>(Hit.GetActor());
-			if (player == nullptr)
+			if (player == nullptr || !Hit.GetComponent()->IsA(USkeletalMeshComponent::StaticClass()) || owner == player)
 				continue;
 
 			//FreezePlayer
