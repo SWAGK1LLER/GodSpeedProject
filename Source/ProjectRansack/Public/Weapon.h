@@ -33,5 +33,4 @@ public:
 
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
 	void PlayerPossess();
-	void PlayerPossess_Implementation() {};
 };

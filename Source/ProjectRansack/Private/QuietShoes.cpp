@@ -1,4 +1,6 @@
 #include "QuietShoes.h"
+#include "Base3C.h"
+#include "Equipement.h"
 
 UQuietShoes::UQuietShoes()
 {
@@ -17,8 +19,15 @@ void UQuietShoes::TickComponent(float DeltaTime, ELevelTick TickType, FActorComp
 
 void UQuietShoes::UpdateUI_Implementation()
 {
-	//pawn->WidgetUI->ShowDecoy();
+
 }
+
+void UQuietShoes::MUlToggleVisibility_Implementation(bool visible)
+{
+	if (visible)
+		pawn->equipement->EquipDefault();
+};
+
 
 void UQuietShoes::PlayerPossess_Implementation()
 {

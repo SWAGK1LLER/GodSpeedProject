@@ -18,7 +18,7 @@ public:
 
 	UFUNCTION(NetMulticast, Reliable, NotBlueprintable)
 	virtual void MUlToggleVisibility(bool visible);
-	virtual void MUlToggleVisibility_Implementation(bool visible) {};
+	virtual void MUlToggleVisibility_Implementation(bool visible);
 
 	UFUNCTION(NetMulticast, Reliable, NotBlueprintable)
 	virtual void MUlFire();

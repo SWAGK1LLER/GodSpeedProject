@@ -18,9 +18,14 @@ void UExtendedMag::TickComponent(float DeltaTime, ELevelTick TickType, FActorCom
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 }
 
+void UExtendedMag::MUlToggleVisibility_Implementation(bool visible) 
+{
+	if (visible)
+		pawn->equipement->EquipDefault();
+};
+
 void UExtendedMag::UpdateUI_Implementation()
 {
-	//pawn->WidgetUI->ShowDecoy();
 }
 
 void UExtendedMag::PlayerPossess_Implementation()

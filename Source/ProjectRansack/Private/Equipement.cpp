@@ -291,3 +291,15 @@ void UEquipement::SetGrenadeType_Implementation(GrenadeType grenadeType)
 	GrenateTrajectory->GrenadeClass = &AllGrenade[grenadeType].type;
 	GrenateTrajectory->currentAmmo = &AllGrenade[grenadeType].ammo;
 }
+
+void UEquipement::EquipDefault()
+{
+	GrenateTrajectory->CurrentGrenadeClass = GrenadeType::None;
+	if (controller != nullptr)
+	{
+		controller->SREquipWeapon(this, StunWeapon);
+
+		if (pawn->WidgetUI != nullptr)
+			IWeapon::Execute_UpdateUI(StunWeapon->_getUObject());
+	}
+}

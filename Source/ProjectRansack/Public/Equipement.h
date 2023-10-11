@@ -132,4 +132,6 @@ public:
 	UFUNCTION(NetMulticast, Reliable, BlueprintCallable)
 	void SetGrenadeType(GrenadeType grenadeType);
 	void SetGrenadeType_Implementation(GrenadeType grenadeType);
+
+	void EquipDefault();
 };

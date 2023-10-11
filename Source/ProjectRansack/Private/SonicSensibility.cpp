@@ -1,4 +1,6 @@
 #include "SonicSensibility.h"
+#include "Base3C.h"
+#include "Equipement.h"
 
 USonicSensibility::USonicSensibility()
 {
@@ -17,8 +19,14 @@ void USonicSensibility::TickComponent(float DeltaTime, ELevelTick TickType, FAct
 
 void USonicSensibility::UpdateUI_Implementation()
 {
-	//pawn->WidgetUI->ShowDecoy();
+	
 }
+
+void USonicSensibility::MUlToggleVisibility_Implementation(bool visible)
+{
+	if (visible)
+		pawn->equipement->EquipDefault();
+};
 
 void USonicSensibility::PlayerPossess_Implementation()
 {
