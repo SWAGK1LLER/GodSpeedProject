@@ -14,6 +14,8 @@
 #include "DeguiseComp.h"
 #include "EMP.h"
 #include "ClaymoreComponent.h"
+#include "QuietShoes.h"
+#include "SonicSensibility.h"
 
 UEquipement::UEquipement()
 {
@@ -28,6 +30,8 @@ UEquipement::UEquipement()
 	deguisement = CreateDefaultSubobject<UDeguiseComp>(TEXT("Deguisement"));
 	emp = CreateDefaultSubobject<UEMP>(TEXT("Emp"));
 	claymoreComp = CreateDefaultSubobject<UClaymoreComponent>(TEXT("ClaymoreComp"));
+	quietShoes = CreateDefaultSubobject<UQuietShoes>(TEXT("QuietShoes"));
+	SonicAbility = CreateDefaultSubobject<USonicSensibility>(TEXT("SonicAbility"));
 
 	equippedWeapon = StunWeapon;
 }
@@ -44,6 +48,8 @@ void UEquipement::FinishAttachement(class USceneComponent* root)
 	deguisement->pawn = pawn;
 	emp->pawn = pawn;
 	claymoreComp->pawn = pawn;
+	quietShoes->pawn = pawn;
+	SonicAbility->pawn = pawn;
 
 	StunWeapon->AttachToComponent(root, FAttachmentTransformRules::KeepRelativeTransform);
 	StunStick->AttachToComponent(root, FAttachmentTransformRules::SnapToTargetNotIncludingScale, FName("RightHandSocket"));
@@ -64,11 +70,22 @@ void UEquipement::SetController(AGamePlayerController* pController)
 	deguisement->controller = pController;
 	emp->controller = pController;
 	claymoreComp->controller = pController;
+	quietShoes->controller = pController;
+	SonicAbility->controller = pController;
 }
 
 void UEquipement::BeginPlay()
 {
 	Super::BeginPlay();
+}
+
+void UEquipement::PossessItem_Implementation()
+{
+	for (EquipementPossibility weaponPossess : utilityBelt)
+	{
+		const TScriptInterface<IWeapon>& weapon = GetWeaponFromEnum(weaponPossess);
+		IWeapon::Execute_PlayerPossess(weapon.GetObject());
+	}
 }
 
 void UEquipement::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
@@ -258,6 +275,8 @@ const TScriptInterface<IWeapon> UEquipement::GetWeaponFromEnum(EquipementPossibi
 		case Deguisement: return deguisement;
 		case EMP: return emp;
 		case Claymore: return claymoreComp;
+		case QuietShoes: return quietShoes;
+		case Sonic: return SonicAbility;
 		default: return StunWeapon;
 	}
 }

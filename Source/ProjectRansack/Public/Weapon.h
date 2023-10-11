@@ -30,4 +30,8 @@ public:
 
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
 	void UpdateUI();
+
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
+	void PlayerPossess();
+	void PlayerPossess_Implementation() {};
 };

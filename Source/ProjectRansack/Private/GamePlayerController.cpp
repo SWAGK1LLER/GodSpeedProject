@@ -624,3 +624,8 @@ void AGamePlayerController::SpawnGrenade_Implementation(ABase3C* pPawn, FVector 
 	AGrenade* newGrenade = GetWorld()->SpawnActor<AGrenade>(GrenadeClass, Location, FRotator(), FActorSpawnParameters());
 	newGrenade->MUlSetVelocity(pPawn, throwingVelo);
 }
+
+void AGamePlayerController::SetPossessItem_Implementation(ABase3C* pPawn)
+{
+	pPawn->equipement->PossessItem();
+}

@@ -17,6 +17,8 @@
 #include "GrenadeTrajectory.h"
 #include "Baton.h"
 #include "Components/BoxComponent.h"
+#include "QuietShoes.h"
+#include "SonicSensibility.h"
 
 ABase3C::ABase3C(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
 {
@@ -370,6 +372,8 @@ void ABase3C::SetClientUI_Implementation()
 		WidgetUI->ToggleMagnetCard(false);
 
 	WidgetUI->SetBeltImage(equipement->utilityBelt[0], equipement->utilityBelt[1], equipement->utilityBelt[2]);
+
+	Cast<AGamePlayerController>(GetController())->SetPossessItem(this);
 }
 
 void ABase3C::TryGeneratingOverlapEvent()
@@ -397,10 +401,32 @@ void ABase3C::TogglePauseMenu()
 
 void ABase3C::PlayFootstep()
 {
-	if (!bIsRunning)
+	if (equipement->quietShoes->isActive)
 		return;
 
-	audioComp->Play();
+	APlayerController* controller = UGameplayStatics::GetPlayerController(GetWorld(), 0);
+	if (controller->IsLocalPlayerController())
+	{
+		ABase3C* pcOwner = Cast<ABase3C>(controller->GetPawn());
+		if (pcOwner->equipement->SonicAbility->isActive)
+		{
+			audioComp->Play();
+		}
+		else
+		{
+			if (!bIsRunning)
+				return;
+
+			audioComp->Play();
+		}
+	}
+	else
+	{
+		if (!bIsRunning)
+			return;
+
+		audioComp->Play();
+	}
 }
 
 void ABase3C::MUlThrowGrenade_Implementation()

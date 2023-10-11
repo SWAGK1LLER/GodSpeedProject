@@ -24,7 +24,9 @@ enum EquipementPossibility
 	InvisibleCloak	UMETA(DisplayName = "Cloak"),
 	Deguisement UMETA(DisplayName = "Deguisement"),
 	EMP UMETA(DisplayName = "EMP"),
-	Claymore UMETA(DisplayName = "Claymore")
+	Claymore UMETA(DisplayName = "Claymore"),
+	QuietShoes UMETA(DisplayName = "Quiet Shoes"),
+	Sonic UMETA(DisplayName = "Sonic Ability")
 };
 
 USTRUCT(BlueprintType)
@@ -75,6 +77,12 @@ public:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
 	class UClaymoreComponent* claymoreComp;
+	
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
+	class UQuietShoes* quietShoes;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
+	class USonicSensibility* SonicAbility;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	TArray<TEnumAsByte<EquipementPossibility>> utilityBelt;
@@ -92,6 +100,10 @@ public:
 	void FinishAttachement(class USceneComponent* root);
 
 	virtual void BeginPlay() override;
+
+	UFUNCTION(NetMulticast, Reliable, BlueprintCallable)
+	void PossessItem();
+	void PossessItem_Implementation();
 
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 

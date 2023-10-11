@@ -913,6 +913,8 @@ void UEOSGameInstance::GetPlayerData()
 		//In editor
 		ServerGameSlot.saveGame = (UPlayerSaveGame*)(UGameplayStatics::CreateSaveGameObject(UPlayerSaveGame::StaticClass()));
 		isLoadingSaveGame = false;
+		LoadSaveGameFinished();
+		LoadSaveGameSuccessful(ServerGameSlot.saveGame->GetPercent(), ServerGameSlot.saveGame->level);
 		return;
 	}
 

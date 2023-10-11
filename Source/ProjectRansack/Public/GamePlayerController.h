@@ -246,4 +246,8 @@ public:
 	UFUNCTION(Server, Reliable, BlueprintCallable)
 	void SpawnGrenade(class ABase3C* pPawn, FVector Location,  FVector throwingVelo, TSubclassOf<class AGrenade> GrenadeClass);
 	void SpawnGrenade_Implementation(class ABase3C* pPawn, FVector Location, FVector throwingVelo, TSubclassOf<class AGrenade> GrenadeClass);
+
+	UFUNCTION(Server, Reliable, BlueprintCallable)
+	void SetPossessItem(class ABase3C* pPawn);
+	void SetPossessItem_Implementation(class ABase3C* pPawn);
 };
