@@ -16,6 +16,7 @@
 #include "ClaymoreComponent.h"
 #include "QuietShoes.h"
 #include "SonicSensibility.h"
+#include "ExtendedMag.h"
 
 UEquipement::UEquipement()
 {
@@ -32,6 +33,7 @@ UEquipement::UEquipement()
 	claymoreComp = CreateDefaultSubobject<UClaymoreComponent>(TEXT("ClaymoreComp"));
 	quietShoes = CreateDefaultSubobject<UQuietShoes>(TEXT("QuietShoes"));
 	SonicAbility = CreateDefaultSubobject<USonicSensibility>(TEXT("SonicAbility"));
+	ExtendedMag = CreateDefaultSubobject<UExtendedMag>(TEXT("ExtendedMag"));
 
 	equippedWeapon = StunWeapon;
 }
@@ -50,6 +52,7 @@ void UEquipement::FinishAttachement(class USceneComponent* root)
 	claymoreComp->pawn = pawn;
 	quietShoes->pawn = pawn;
 	SonicAbility->pawn = pawn;
+	ExtendedMag->pawn = pawn;
 
 	StunWeapon->AttachToComponent(root, FAttachmentTransformRules::KeepRelativeTransform);
 	StunStick->AttachToComponent(root, FAttachmentTransformRules::SnapToTargetNotIncludingScale, FName("RightHandSocket"));
@@ -72,6 +75,7 @@ void UEquipement::SetController(AGamePlayerController* pController)
 	claymoreComp->controller = pController;
 	quietShoes->controller = pController;
 	SonicAbility->controller = pController;
+	ExtendedMag->controller = pController;
 }
 
 void UEquipement::BeginPlay()
@@ -277,6 +281,7 @@ const TScriptInterface<IWeapon> UEquipement::GetWeaponFromEnum(EquipementPossibi
 		case Claymore: return claymoreComp;
 		case QuietShoes: return quietShoes;
 		case Sonic: return SonicAbility;
+		case ExtMag: return ExtendedMag;
 		default: return StunWeapon;
 	}
 }

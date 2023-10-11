@@ -26,7 +26,8 @@ enum EquipementPossibility
 	EMP UMETA(DisplayName = "EMP"),
 	Claymore UMETA(DisplayName = "Claymore"),
 	QuietShoes UMETA(DisplayName = "Quiet Shoes"),
-	Sonic UMETA(DisplayName = "Sonic Ability")
+	Sonic UMETA(DisplayName = "Sonic Ability"),
+	ExtMag UMETA(DisplayName = "Extended Mag")
 };
 
 USTRUCT(BlueprintType)
@@ -83,6 +84,9 @@ public:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
 	class USonicSensibility* SonicAbility;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
+	class UExtendedMag* ExtendedMag;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	TArray<TEnumAsByte<EquipementPossibility>> utilityBelt;
