@@ -85,6 +85,9 @@ void UEquipement::BeginPlay()
 
 void UEquipement::PossessItem_Implementation()
 {
+	if (pawn == nullptr)
+		return;
+
 	for (EquipementPossibility weaponPossess : utilityBelt)
 	{
 		const TScriptInterface<IWeapon>& weapon = GetWeaponFromEnum(weaponPossess);
@@ -264,14 +267,17 @@ const TScriptInterface<IWeapon> UEquipement::GetWeaponFromEnum(EquipementPossibi
 							GrenateTrajectory->previousGrenadeClass = GrenateTrajectory->CurrentGrenadeClass;
 							GrenateTrajectory->CurrentGrenadeClass = GrenadeType::Smoke;
 							GrenateTrajectory->uiTexture = AllGrenade[GrenadeType::Smoke].uiImage;
-							controller->SetGrenade(this, GrenadeType::Smoke);
+
+							if (controller != nullptr)
+								controller->SetGrenade(this, GrenadeType::Smoke);
 							return GrenateTrajectory;
 
 		case StunGrenade:	
 							GrenateTrajectory->previousGrenadeClass = GrenateTrajectory->CurrentGrenadeClass;
 							GrenateTrajectory->CurrentGrenadeClass = GrenadeType::Stun;
 							GrenateTrajectory->uiTexture = AllGrenade[GrenadeType::Stun].uiImage;
-							controller->SetGrenade(this, GrenadeType::Stun);
+							if (controller != nullptr)
+								controller->SetGrenade(this, GrenadeType::Stun);
 							return GrenateTrajectory;
 
 		case HoloDecoy: return decoyGadget;

@@ -35,7 +35,6 @@ ABase3C::ABase3C(const FObjectInitializer& ObjectInitializer) : Super(ObjectInit
 void ABase3C::BeginPlay()
 {
 	Super::BeginPlay();
-
 	equipement->FinishAttachement(GetMesh());
 	SpawnTransform = GetActorTransform();
 
